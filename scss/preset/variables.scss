@@ -1,0 +1,35 @@
+// theme_customboost — Bootstrap variables.
+//
+// Prepended before Boost's default preset (whose variables are all !default), so these win. Colours are not set here:
+// $primary and the status colours come from the PHP token builder (classes/tokens.php), which guarantees AA contrast.
+
+$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+$headings-font-weight: 650;
+$headings-letter-spacing: -0.015em;
+$font-weight-bold: 650;
+$line-height-base: 1.55;
+
+// Shape.
+$border-radius: .625rem;
+$border-radius-sm: .5rem;
+$border-radius-lg: 1rem;
+$border-radius-xl: 1.5rem;
+$card-border-radius: 1rem;
+$btn-border-radius: .625rem;
+$btn-border-radius-sm: .5rem;
+$btn-border-radius-lg: .75rem;
+$input-border-radius: .625rem;
+$dropdown-border-radius: .75rem;
+$modal-content-border-radius: 1rem;
+
+// Compact header: 56px is the standard mobile app bar height and is kept on desktop for consistency.
+$navbar-height: 56px;
+
+// Comfortable controls: 44px high inputs and buttons (WCAG 2.5.5 target size).
+$input-btn-padding-y: .5625rem;
+$input-btn-padding-x: 1rem;
+$btn-font-weight: 600;
+
+$link-decoration: none;
+$link-hover-decoration: underline;
+$enable-shadows: false;

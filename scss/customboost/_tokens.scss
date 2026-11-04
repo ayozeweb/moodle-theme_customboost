@@ -1,0 +1,75 @@
+// Non colour design tokens, shared namespace "--ct-" (also read by format_customtiles).
+//
+// The contract is documented in docs/tokens.md. Plugins must read them with a fallback, e.g.
+// `border-radius: var(--ct-radius-lg, 1rem)`, so they keep working under other themes.
+
+:root {
+    // Typography.
+    --ct-font-family: #{$font-family-sans-serif};
+    --ct-font-family-heading: var(--ct-font-family);
+    --ct-font-size-xs: .75rem;
+    --ct-font-size-sm: .875rem;
+    --ct-font-size-md: 1rem;
+    --ct-font-size-lg: 1.125rem;
+    --ct-font-size-xl: 1.25rem;
+    --ct-font-size-2xl: #{unquote("clamp(1.375rem, 1.25rem + .6vw, 1.625rem)")};
+    --ct-font-size-3xl: #{unquote("clamp(1.625rem, 1.35rem + 1.2vw, 2.125rem)")};
+    --ct-font-size-4xl: #{unquote("clamp(2rem, 1.5rem + 2.2vw, 3rem)")};
+    --ct-line-height: 1.55;
+    --ct-line-height-tight: 1.2;
+    --ct-font-weight-regular: 400;
+    --ct-font-weight-medium: 500;
+    --ct-font-weight-semibold: 600;
+    --ct-font-weight-bold: 700;
+    --ct-letter-spacing-tight: -0.015em;
+
+    // Shape.
+    --ct-radius-sm: .5rem;
+    --ct-radius-md: .75rem;
+    --ct-radius-lg: 1rem;
+    --ct-radius-xl: 1.5rem;
+    --ct-radius-pill: 999px;
+
+    // Spacing (4px base) and density multiplier.
+    --ct-density: 1;
+    --ct-space-1: calc(.25rem * var(--ct-density));
+    --ct-space-2: calc(.5rem * var(--ct-density));
+    --ct-space-3: calc(.75rem * var(--ct-density));
+    --ct-space-4: calc(1rem * var(--ct-density));
+    --ct-space-5: calc(1.5rem * var(--ct-density));
+    --ct-space-6: calc(2rem * var(--ct-density));
+    --ct-space-7: calc(3rem * var(--ct-density));
+    --ct-space-8: calc(4rem * var(--ct-density));
+    --ct-gutter: 1rem;
+
+    // Elevation.
+    --ct-shadow-sm: 0 1px 2px rgba(17, 24, 39, .06), 0 1px 3px rgba(17, 24, 39, .08);
+    --ct-shadow-md: 0 6px 16px -4px rgba(17, 24, 39, .12), 0 2px 6px -2px rgba(17, 24, 39, .08);
+    --ct-shadow-lg: 0 20px 40px -12px rgba(17, 24, 39, .24);
+
+    // Motion.
+    --ct-duration-fast: 120ms;
+    --ct-duration: 200ms;
+    --ct-duration-slow: 320ms;
+    --ct-ease: cubic-bezier(.2, .7, .2, 1);
+
+    // Layout.
+    --ct-touch-target: 44px;
+    --ct-header-height: #{$navbar-height};
+    --ct-content-max: 1240px;
+    --ct-focus-width: 3px;
+    --ct-focus-offset: 2px;
+
+    @media (min-width: 768px) {
+        --ct-gutter: 1.5rem;
+    }
+    @media (min-width: 1280px) {
+        --ct-gutter: 2rem;
+    }
+}
+
+[data-bs-theme="dark"] {
+    --ct-shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+    --ct-shadow-md: 0 8px 20px -6px rgba(0, 0, 0, .55);
+    --ct-shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, .7);
+}

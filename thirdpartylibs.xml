@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<libraries>
+  <library>
+    <location>fonts/inter</location>
+    <name>Inter</name>
+    <description>Inter variable font (latin subset, normal and italic), self hosted. Packaged by Fontsource (@fontsource-variable/inter).</description>
+    <version>4.1 (Fontsource 5.3.0)</version>
+    <license>OFL</license>
+    <licenseversion>1.1</licenseversion>
+    <repository>https://github.com/rsms/inter</repository>
+    <copyrights>
+      <copyright>2016 The Inter Project Authors</copyright>
+    </copyrights>
+  </library>
+</libraries>

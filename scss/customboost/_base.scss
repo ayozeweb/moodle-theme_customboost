@@ -1,0 +1,135 @@
+// Base: typography, page canvas, focus and selection.
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--ct-font-family);
+    font-optical-sizing: auto;
+    // Inter: open digits and a disambiguated l/I make numbers and codes easier to read.
+    font-feature-settings: "cv05", "cv08", "ss03";
+    background-color: var(--ct-color-bg);
+    color: var(--ct-color-text);
+    line-height: var(--ct-line-height);
+}
+
+#page,
+#page.drawers,
+#page-wrapper,
+.pagelayout-standard #page.drawers .main-inner,
+#page.drawers .main-inner {
+    background-color: var(--ct-color-bg);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    color: var(--ct-color-text);
+    font-family: var(--ct-font-family-heading);
+    letter-spacing: var(--ct-letter-spacing-tight);
+    line-height: var(--ct-line-height-tight);
+}
+
+h1, .h1 {
+    font-size: var(--ct-font-size-3xl);
+}
+
+h2, .h2 {
+    font-size: var(--ct-font-size-2xl);
+}
+
+h3, .h3 {
+    font-size: var(--ct-font-size-xl);
+}
+
+h4, .h4 {
+    font-size: var(--ct-font-size-lg);
+}
+
+a {
+    text-underline-offset: .18em;
+    text-decoration-thickness: from-font;
+}
+
+.text-muted,
+.dimmed_text {
+    color: var(--ct-color-text-muted) !important; // Bootstrap utility uses !important; matched to keep AA.
+}
+
+::selection {
+    background-color: rgba(var(--ct-color-primary-rgb), .22);
+}
+
+// One consistent, visible focus indicator (WCAG 2.4.7) drawn with outline so it is never clipped by overflow.
+:focus-visible {
+    outline: var(--ct-focus-width) solid var(--ct-color-focus);
+    outline-offset: var(--ct-focus-offset);
+}
+
+.btn:focus-visible,
+.form-control:focus-visible,
+.form-select:focus-visible,
+.form-check-input:focus-visible,
+.nav-link:focus-visible,
+.dropdown-item:focus-visible,
+.aabtn:focus-visible {
+    outline: var(--ct-focus-width) solid var(--ct-color-focus);
+    outline-offset: var(--ct-focus-offset);
+    box-shadow: none;
+}
+
+// The main canvas: generous but not wasteful on small screens.
+#page.drawers .main-inner {
+    border-radius: 0;
+    padding-inline: var(--ct-gutter);
+    padding-top: var(--ct-space-4);
+    margin-top: 0;
+}
+
+@include media-breakpoint-up(md) {
+    #page.drawers .main-inner {
+        padding-top: var(--ct-space-5);
+    }
+}
+
+// Long words and URLs never cause horizontal scroll on 360px screens.
+#region-main {
+    overflow-wrap: anywhere;
+    min-width: 0;
+}
+
+#region-main,
+#region-main-box {
+    background-color: transparent;
+    border: 0;
+}
+
+// Page header: compact on mobile.
+#page-header {
+    padding-top: 0;
+    margin-bottom: var(--ct-space-3);
+
+    .page-header-headings h1,
+    h1.h2 {
+        font-size: var(--ct-font-size-2xl);
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+
+    .page-context-header {
+        padding: 0;
+    }
+}
+
+@include media-breakpoint-up(md) {
+    #page-header .page-header-headings h1,
+    #page-header h1.h2 {
+        font-size: var(--ct-font-size-3xl);
+    }
+}
+
+hr {
+    border-color: var(--ct-color-border);
+    opacity: 1;
+}

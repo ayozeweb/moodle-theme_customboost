@@ -1,0 +1,194 @@
+// Components re-pointed at the tokens. Bootstrap compiles literal colours into these, so they are reset through the
+// component's own custom properties, which keeps every state (hover, active, disabled) consistent in both modes.
+
+.btn {
+    --#{$prefix}btn-font-weight: 600;
+    min-height: var(--ct-touch-target);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ct-space-2);
+    transition: background-color var(--ct-duration-fast) var(--ct-ease), border-color var(--ct-duration-fast) var(--ct-ease),
+        color var(--ct-duration-fast) var(--ct-ease), box-shadow var(--ct-duration-fast) var(--ct-ease);
+
+    &.btn-sm {
+        min-height: 36px;
+    }
+
+    &.btn-icon,
+    &.btn-link {
+        min-height: 0;
+    }
+}
+
+.btn-primary {
+    --#{$prefix}btn-color: var(--ct-color-on-primary);
+    --#{$prefix}btn-bg: var(--ct-color-primary);
+    --#{$prefix}btn-border-color: var(--ct-color-primary);
+    --#{$prefix}btn-hover-color: var(--ct-color-on-primary);
+    --#{$prefix}btn-hover-bg: var(--ct-color-primary-hover);
+    --#{$prefix}btn-hover-border-color: var(--ct-color-primary-hover);
+    --#{$prefix}btn-active-color: var(--ct-color-on-primary);
+    --#{$prefix}btn-active-bg: var(--ct-color-primary-hover);
+    --#{$prefix}btn-active-border-color: var(--ct-color-primary-hover);
+    --#{$prefix}btn-disabled-color: var(--ct-color-on-primary);
+    --#{$prefix}btn-disabled-bg: var(--ct-color-primary);
+    --#{$prefix}btn-disabled-border-color: var(--ct-color-primary);
+    --#{$prefix}btn-focus-shadow-rgb: var(--ct-color-primary-rgb);
+    box-shadow: var(--ct-shadow-sm);
+}
+
+.btn-outline-primary {
+    --#{$prefix}btn-color: var(--ct-color-primary);
+    --#{$prefix}btn-border-color: var(--ct-color-primary);
+    --#{$prefix}btn-hover-color: var(--ct-color-on-primary);
+    --#{$prefix}btn-hover-bg: var(--ct-color-primary);
+    --#{$prefix}btn-hover-border-color: var(--ct-color-primary);
+    --#{$prefix}btn-active-color: var(--ct-color-on-primary);
+    --#{$prefix}btn-active-bg: var(--ct-color-primary-hover);
+    --#{$prefix}btn-active-border-color: var(--ct-color-primary-hover);
+}
+
+.btn-secondary {
+    --#{$prefix}btn-color: var(--ct-color-text);
+    --#{$prefix}btn-bg: var(--ct-color-surface-2);
+    --#{$prefix}btn-border-color: var(--ct-color-border);
+    --#{$prefix}btn-hover-color: var(--ct-color-text);
+    --#{$prefix}btn-hover-bg: var(--ct-color-surface-sunken);
+    --#{$prefix}btn-hover-border-color: var(--ct-color-border-strong);
+    --#{$prefix}btn-active-color: var(--ct-color-text);
+    --#{$prefix}btn-active-bg: var(--ct-color-surface-sunken);
+    --#{$prefix}btn-active-border-color: var(--ct-color-border-strong);
+}
+
+.btn-outline-secondary {
+    --#{$prefix}btn-color: var(--ct-color-text);
+    --#{$prefix}btn-border-color: var(--ct-color-border-strong);
+    --#{$prefix}btn-hover-color: var(--ct-color-text);
+    --#{$prefix}btn-hover-bg: var(--ct-color-surface-2);
+    --#{$prefix}btn-hover-border-color: var(--ct-color-border-strong);
+}
+
+.btn-link {
+    --#{$prefix}btn-color: var(--ct-color-link);
+    --#{$prefix}btn-hover-color: var(--ct-color-primary-hover);
+}
+
+// Cards and surfaces.
+.card {
+    --#{$prefix}card-bg: var(--ct-color-surface);
+    --#{$prefix}card-border-color: var(--ct-color-border);
+    --#{$prefix}card-border-radius: var(--ct-radius-lg);
+    --#{$prefix}card-inner-border-radius: calc(var(--ct-radius-lg) - 1px);
+    --#{$prefix}card-cap-bg: transparent;
+}
+
+.block.card {
+    box-shadow: var(--ct-shadow-sm);
+}
+
+.dropdown-menu {
+    --#{$prefix}dropdown-bg: var(--ct-color-surface);
+    --#{$prefix}dropdown-border-color: var(--ct-color-border);
+    --#{$prefix}dropdown-link-color: var(--ct-color-text);
+    --#{$prefix}dropdown-link-hover-bg: var(--ct-color-surface-2);
+    --#{$prefix}dropdown-link-hover-color: var(--ct-color-text);
+    --#{$prefix}dropdown-link-active-bg: var(--ct-color-primary);
+    --#{$prefix}dropdown-link-active-color: var(--ct-color-on-primary);
+    --#{$prefix}dropdown-border-radius: var(--ct-radius-md);
+    box-shadow: var(--ct-shadow-lg);
+    padding: var(--ct-space-1);
+
+    .dropdown-item {
+        border-radius: var(--ct-radius-sm);
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+    }
+}
+
+.modal-content {
+    --#{$prefix}modal-bg: var(--ct-color-surface);
+    --#{$prefix}modal-border-color: var(--ct-color-border);
+    box-shadow: var(--ct-shadow-lg);
+}
+
+// Forms: 44px controls, clear borders (3:1 against the surface) and a ring on focus.
+.form-control,
+.form-select,
+.custom-select {
+    min-height: var(--ct-touch-target);
+    background-color: var(--ct-color-surface);
+    border-color: var(--ct-color-border-strong);
+    color: var(--ct-color-text);
+    // 16px stops iOS zooming into the field on focus.
+    font-size: max(1rem, 16px);
+
+    &:focus {
+        border-color: var(--ct-color-primary);
+        box-shadow: 0 0 0 .25rem rgba(var(--ct-color-primary-rgb), .2);
+    }
+
+    &::placeholder {
+        color: var(--ct-color-text-muted);
+        opacity: 1;
+    }
+}
+
+.form-check-input {
+    border-color: var(--ct-color-border-strong);
+
+    &:checked {
+        background-color: var(--ct-color-primary);
+        border-color: var(--ct-color-primary);
+    }
+}
+
+// Progress bars.
+.progress {
+    --#{$prefix}progress-bg: var(--ct-color-surface-2);
+    --#{$prefix}progress-bar-bg: var(--ct-color-primary);
+    --#{$prefix}progress-border-radius: var(--ct-radius-pill);
+}
+
+// Badges: pill shaped, tinted.
+.badge {
+    border-radius: var(--ct-radius-pill);
+    font-weight: 600;
+    padding: .35em .7em;
+}
+
+// Alerts: tinted surface with a coloured edge, text in the body colour (AA on every tint).
+.alert {
+    border-radius: var(--ct-radius-md);
+    border-width: 0 0 0 4px;
+    color: var(--ct-color-text);
+
+    @each $name in (success, warning, danger, info) {
+        &.alert-#{$name} {
+            --#{$prefix}alert-bg: var(--ct-color-#{$name}-subtle);
+            --#{$prefix}alert-color: var(--ct-color-text);
+            --#{$prefix}alert-border-color: var(--ct-color-#{$name});
+            --#{$prefix}alert-link-color: var(--ct-color-text);
+        }
+    }
+}
+
+// Tables.
+.table {
+    --#{$prefix}table-bg: transparent;
+    --#{$prefix}table-color: var(--ct-color-text);
+    --#{$prefix}table-border-color: var(--ct-color-border);
+    --#{$prefix}table-striped-bg: var(--ct-color-surface-2);
+    --#{$prefix}table-hover-bg: var(--ct-color-surface-2);
+}
+
+// Wide content scrolls inside its own box instead of the page.
+#region-main .table-responsive,
+#region-main .generaltable {
+    max-width: 100%;
+}
+
+#region-main pre {
+    overflow-x: auto;
+}

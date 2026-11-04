@@ -1,0 +1,28 @@
+// Motion preferences and print.
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important; // Must override every component animation.
+        animation-iteration-count: 1 !important; // Same reason.
+        transition-duration: .01ms !important; // Same reason.
+        scroll-behavior: auto !important; // Same reason.
+    }
+}
+
+@media print {
+    .ct-navbar,
+    .ct-login-media,
+    .ct-dashboard-hero .btn {
+        display: none !important; // Chrome is never printed.
+    }
+
+    body,
+    #page,
+    .ct-course-card {
+        background: #fff !important; // Print on white whatever the colour mode.
+        color: #000 !important; // Same reason.
+        box-shadow: none !important; // Same reason.
+    }
+}

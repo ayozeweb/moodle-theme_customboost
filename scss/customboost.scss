@@ -1,0 +1,17 @@
+// theme_customboost — appended after Boost (variables, Bootstrap, Moodle, dark mode).
+//
+// Layers: tokens → bridge → base → components → pages. Colour tokens (--ct-color-*) are emitted from PHP at the end of
+// the stylesheet (see classes/tokens.php); everything here only reads them.
+
+@import "customboost/tokens";
+@import "customboost/fonts";
+@import "customboost/bridge";
+@import "customboost/base";
+@import "customboost/header";
+@import "customboost/navigation";
+@import "customboost/components";
+@import "customboost/login";
+@import "customboost/dashboard";
+@import "customboost/courses";
+@import "customboost/footer";
+@import "customboost/motion";

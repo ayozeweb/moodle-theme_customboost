@@ -1,0 +1,22 @@
+// Footer.
+#page-footer {
+    background-color: var(--ct-color-surface);
+    color: var(--ct-color-text);
+    border-top: 1px solid var(--ct-color-border);
+}
+
+.btn-footer-popover {
+    background-color: var(--ct-color-surface);
+    color: var(--ct-color-text);
+    border: 1px solid var(--ct-color-border);
+    box-shadow: var(--ct-shadow-md);
+    bottom: calc(2rem + env(safe-area-inset-bottom));
+}
+
+// Sticky footer bar used by forms and activities on mobile.
+#sticky-footer,
+.stickyfooter {
+    background-color: var(--ct-color-surface);
+    border-top: 1px solid var(--ct-color-border);
+    padding-bottom: env(safe-area-inset-bottom);
+}

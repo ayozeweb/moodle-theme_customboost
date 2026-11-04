@@ -1,0 +1,94 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_customboost/dashboard
+
+    Greeting and "continue learning" course cards at the top of the personal area.
+    A swipeable row on phones, a grid from 768 px.
+
+    Example context (json):
+    {
+        "greeting": "Hello, Ana",
+        "mycoursesurl": "https://example.com/my/courses.php",
+        "hascourses": true,
+        "courses": [
+            {
+                "id": 2,
+                "fullname": "Digital marketing",
+                "continuelabel": "Continue Digital marketing",
+                "viewurl": "https://example.com/course/view.php?id=2",
+                "image": "https://example.com/image.jpg",
+                "category": "Marketing",
+                "hasprogress": true,
+                "progress": 40,
+                "progresstext": "40% complete",
+                "completed": false,
+                "notstarted": false,
+                "hidden": false
+            }
+        ]
+    }
+}}
+<section class="ct-dashboard-hero" aria-labelledby="ct-dashboard-greeting">
+    <div class="ct-dashboard-hero-head">
+        <div class="ct-dashboard-hero-text">
+            <h2 id="ct-dashboard-greeting" class="ct-dashboard-greeting">{{greeting}}</h2>
+            <p class="ct-dashboard-subtitle">{{#str}}greeting_subtitle, theme_customboost{{/str}}</p>
+        </div>
+        <a class="btn btn-outline-secondary ct-dashboard-all" href="{{mycoursesurl}}">
+            {{#str}}allmycourses, theme_customboost{{/str}}
+            {{#pix}}t/right, core{{/pix}}
+        </a>
+    </div>
+
+    {{#hascourses}}
+        <h3 class="ct-section-title" id="ct-dashboard-courses-title">{{#str}}coursesinprogress, theme_customboost{{/str}}</h3>
+        <div class="ct-course-scroller" tabindex="0" role="region" aria-labelledby="ct-dashboard-courses-title">
+            <ul class="ct-course-grid" role="list">
+                {{#courses}}
+                    <li class="ct-course-card{{#hidden}} ct-course-card-hidden{{/hidden}}">
+                        <div class="ct-course-card-media">
+                            <img src="{{image}}" alt="" loading="lazy" decoding="async" width="640" height="360">
+                            {{#completed}}
+                                <span class="ct-chip ct-chip-success">{{#pix}}i/checked, core{{/pix}}{{#str}}completed, theme_customboost{{/str}}</span>
+                            {{/completed}}
+                        </div>
+                        <div class="ct-course-card-body">
+                            {{#category}}
+                                <span class="ct-course-card-category"><span class="visually-hidden">{{#str}}coursecategory, theme_customboost{{/str}}: </span>{{category}}</span>
+                            {{/category}}
+                            <h4 class="ct-course-card-title">
+                                <a href="{{viewurl}}" class="ct-course-card-link">{{{fullname}}}</a>
+                            </h4>
+                            {{#hasprogress}}
+                                <div class="ct-course-card-progress">
+                                    <div class="progress" role="progressbar" aria-label="{{progresstext}}" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100">
+                                        <div class="progress-bar{{#completed}} ct-progress-complete{{/completed}}" style="width: {{progress}}%"></div>
+                                    </div>
+                                    <span class="ct-course-card-progress-text" aria-hidden="true">{{#notstarted}}{{#str}}notstarted, theme_customboost{{/str}}{{/notstarted}}{{^notstarted}}{{progresstext}}{{/notstarted}}</span>
+                                </div>
+                            {{/hasprogress}}
+                        </div>
+                    </li>
+                {{/courses}}
+            </ul>
+        </div>
+    {{/hascourses}}
+    {{^hascourses}}
+        <p class="ct-dashboard-empty">{{#str}}nocourses, theme_customboost{{/str}}</p>
+    {{/hascourses}}
+</section>

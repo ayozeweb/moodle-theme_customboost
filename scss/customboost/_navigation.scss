@@ -1,0 +1,114 @@
+// Navigation below the header: drawers, secondary (tabs) and tertiary navigation.
+
+// Mobile primary drawer: large, comfortable rows.
+#theme_boost-drawers-primary {
+    background-color: var(--ct-color-surface);
+
+    .drawerheader {
+        padding-inline: var(--ct-space-4) var(--ct-space-3);
+        font-weight: 700;
+        font-size: var(--ct-font-size-lg);
+    }
+
+    .list-group-item {
+        min-height: var(--ct-touch-target);
+        display: flex;
+        align-items: center;
+        border: 0;
+        border-radius: var(--ct-radius-md);
+        margin: 2px var(--ct-space-3);
+        width: auto;
+        background-color: transparent;
+        color: var(--ct-color-text);
+        font-weight: 500;
+
+        &.active {
+            background-color: var(--ct-color-primary-subtle);
+            color: var(--ct-color-on-primary-subtle);
+            font-weight: 650;
+        }
+
+        &:hover:not(.active) {
+            background-color: var(--ct-color-surface-2);
+        }
+    }
+}
+
+.drawer {
+    background-color: var(--ct-color-surface);
+    border-color: var(--ct-color-border);
+}
+
+// Secondary navigation: a single scrollable row of pills on phones, instead of wrapping onto several lines.
+.secondary-navigation {
+    margin-bottom: var(--ct-space-4);
+
+    .navigation {
+        border-bottom: 1px solid var(--ct-color-border);
+        padding: 0;
+        margin: 0;
+    }
+
+    .moremenu .nav-tabs,
+    .nav-tabs {
+        border: 0;
+        gap: var(--ct-space-1);
+    }
+
+    .moremenu .nav-link {
+        min-height: var(--ct-touch-target);
+        border: 0;
+        border-bottom: 3px solid transparent;
+        border-radius: 0;
+        color: var(--ct-color-text-muted);
+        font-weight: 500;
+        padding-inline: var(--ct-space-3);
+        background: transparent;
+
+        &:hover {
+            color: var(--ct-color-text);
+            border-bottom-color: var(--ct-color-border);
+            background: transparent;
+        }
+
+        &.active,
+        &.active:hover {
+            color: var(--ct-color-text);
+            font-weight: 650;
+            border-bottom-color: var(--ct-color-primary);
+            background: transparent;
+        }
+    }
+}
+
+.tertiary-navigation {
+    padding-inline: 0;
+
+    .navitem {
+        margin-bottom: var(--ct-space-3);
+    }
+}
+
+// Breadcrumb: smaller and quieter.
+.breadcrumb {
+    font-size: var(--ct-font-size-sm);
+    padding: 0;
+    margin-bottom: var(--ct-space-2);
+    background: transparent;
+}
+
+// Course index (left drawer).
+.courseindex {
+    .courseindex-item {
+        border-radius: var(--ct-radius-sm);
+    }
+
+    .courseindex-item.pageitem {
+        background-color: var(--ct-color-primary-subtle);
+        color: var(--ct-color-on-primary-subtle);
+
+        a {
+            color: var(--ct-color-on-primary-subtle);
+        }
+    }
+}

@@ -1,0 +1,89 @@
+// Core course cards (My courses, block_myoverview, recently accessed): same look as the personal area cards.
+
+.card-grid[data-region="card-deck"] {
+    --#{$prefix}gutter-x: var(--ct-space-4);
+    row-gap: var(--ct-space-2);
+
+    @include media-breakpoint-up(md) {
+        --#{$prefix}gutter-x: var(--ct-space-5);
+    }
+}
+
+.course-card.card {
+    border: 1px solid var(--ct-color-border);
+    border-radius: var(--ct-radius-lg);
+    background-color: var(--ct-color-surface);
+    box-shadow: var(--ct-shadow-sm);
+    overflow: hidden;
+    transition: transform var(--ct-duration) var(--ct-ease), box-shadow var(--ct-duration) var(--ct-ease),
+        border-color var(--ct-duration) var(--ct-ease);
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--ct-shadow-md);
+        border-color: var(--ct-color-border-strong);
+    }
+
+    .card-img-top {
+        height: auto;
+        aspect-ratio: 16 / 9;
+        border-radius: 0;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .card-body {
+        padding: var(--ct-space-4) var(--ct-space-4) var(--ct-space-2);
+    }
+
+    .coursename {
+        display: block;
+        color: var(--ct-color-text);
+        font-weight: 650;
+        font-size: var(--ct-font-size-md);
+        line-height: 1.35;
+        white-space: normal;
+    }
+
+    .categoryname,
+    .text-muted {
+        font-size: var(--ct-font-size-xs);
+        font-weight: 600;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+    }
+
+    .card-footer {
+        background-color: transparent !important; // Core uses the bg-white utility class.
+        padding-inline: var(--ct-space-4);
+    }
+
+    .progress {
+        height: 8px;
+    }
+}
+
+// List and summary views of block_myoverview.
+.block_myoverview .list-group-item.course-listitem {
+    border-color: var(--ct-color-border);
+    background-color: var(--ct-color-surface);
+
+    &:first-child {
+        border-top-left-radius: var(--ct-radius-lg);
+        border-top-right-radius: var(--ct-radius-lg);
+    }
+
+    &:last-child {
+        border-bottom-left-radius: var(--ct-radius-lg);
+        border-bottom-right-radius: var(--ct-radius-lg);
+    }
+}
+
+// Filter bar of My courses: wraps neatly on phones.
+.block_myoverview [data-region="filter"] {
+    gap: var(--ct-space-2);
+
+    .btn {
+        min-height: var(--ct-touch-target);
+    }
+}

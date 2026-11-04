@@ -1,0 +1,153 @@
+// Header: compact 56px app bar, brand visible on every width, 44px touch targets.
+
+.navbar.fixed-top.ct-navbar {
+    background-color: var(--ct-color-header-bg);
+    border-bottom: 1px solid var(--ct-color-border);
+    padding-top: env(safe-area-inset-top);
+    padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+    height: calc(#{$navbar-height} + 1px + env(safe-area-inset-top));
+
+    > .container-fluid {
+        gap: var(--ct-space-1);
+        padding-inline: var(--ct-space-2);
+
+        @include media-breakpoint-up(md) {
+            padding-inline: var(--ct-space-4);
+        }
+    }
+
+    .divider {
+        background-color: var(--ct-color-border);
+    }
+
+    .nav-link,
+    .usermenu .dropdown-toggle,
+    .popover-region-toggle,
+    .btn {
+        min-height: var(--ct-touch-target);
+        min-width: var(--ct-touch-target);
+    }
+
+    .usermenu .avatars .avatar img,
+    .usermenu .userinitials {
+        width: 34px;
+        height: 34px;
+    }
+
+    .usermenu .userinitials {
+        background-color: var(--ct-color-primary-subtle);
+        color: var(--ct-color-on-primary-subtle);
+        font-weight: 600;
+        font-size: var(--ct-font-size-sm);
+    }
+
+    // The edit mode switch keeps its label for screen readers but drops it visually on phones.
+    .editmode-switch-form label {
+        @include media-breakpoint-down(md) {
+            @include visually-hidden;
+        }
+    }
+}
+
+.ct-navbar-toggler {
+    width: var(--ct-touch-target);
+    height: var(--ct-touch-target);
+    margin-inline-end: var(--ct-space-1);
+    border-radius: var(--ct-radius-md);
+    color: var(--ct-color-text);
+
+    &:hover {
+        background-color: var(--ct-color-surface-2);
+    }
+}
+
+.ct-brand {
+    gap: var(--ct-space-2);
+    min-height: var(--ct-touch-target);
+    min-width: 0;
+    color: var(--ct-color-text);
+    font-weight: 700;
+    font-size: var(--ct-font-size-lg);
+    letter-spacing: var(--ct-letter-spacing-tight);
+    text-decoration: none;
+
+    &:hover {
+        color: var(--ct-color-text);
+        text-decoration: none;
+    }
+
+    .logo {
+        max-height: 36px;
+        width: auto;
+    }
+}
+
+.ct-brand-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 52vw;
+
+    @include media-breakpoint-up(md) {
+        max-width: 24ch;
+    }
+}
+
+// Monogram used when no compact logo is uploaded.
+.ct-brand-mark {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background:
+        radial-gradient(circle at 30% 25%, rgba(255, 255, 255, .45), transparent 55%),
+        linear-gradient(135deg, var(--ct-color-primary), var(--ct-color-accent));
+    box-shadow: var(--ct-shadow-sm);
+    position: relative;
+
+    // A four point spark: "learning" without relying on any third party logo.
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 22%;
+        background-color: #fff;
+        clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    }
+}
+
+// Primary navigation (desktop). Moodle 5.3 renders it with the design system's nav pills; they are tuned through
+// their tokens. The selected pill keeps the indicator dot, so the current page is not marked by colour alone.
+.ct-navbar .primary-navigation,
+.secondary-navigation {
+    .mds-nav-pill {
+        min-height: 40px;
+        padding-inline: var(--ct-space-3);
+        border-radius: var(--ct-radius-pill);
+    }
+
+    .mds-nav-pill__label {
+        font-family: var(--ct-font-family);
+        font-size: var(--ct-font-size-sm);
+        font-weight: 550;
+    }
+
+    .mds-nav-pill--selected,
+    .mds-nav-pill--selected:visited {
+        color: var(--ct-color-on-primary-subtle);
+
+        .mds-nav-pill__label {
+            font-weight: 650;
+        }
+    }
+}
+
+// Phones: every pixel of the 56px bar counts; the avatar alone opens the user menu.
+@include media-breakpoint-down(md) {
+    .ct-navbar .usermenu .dropdown-toggle::after {
+        display: none;
+    }
+
+    .ct-navbar #usernavigation {
+        flex-shrink: 0;
+    }
+}

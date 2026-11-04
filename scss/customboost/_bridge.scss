@@ -1,0 +1,62 @@
+// Bridge: point Bootstrap's and Moodle's custom properties at the --ct- colour tokens.
+//
+// Emitted after Boost's dark.scss, with the same specificity, so these win in both colour modes. Components compiled
+// with literal colours (buttons, form controls) are re-pointed in _components.scss.
+
+:root,
+[data-bs-theme] {
+    --#{$prefix}body-bg: var(--ct-color-bg);
+    --#{$prefix}body-color: var(--ct-color-text);
+    --#{$prefix}body-color-rgb: var(--ct-color-text-rgb);
+    --#{$prefix}body-font-family: var(--ct-font-family);
+    --#{$prefix}emphasis-color: var(--ct-color-text);
+    --#{$prefix}secondary-color: var(--ct-color-text-muted);
+    --#{$prefix}secondary-bg: var(--ct-color-surface-2);
+    --#{$prefix}tertiary-bg: var(--ct-color-surface-2);
+    --#{$prefix}border-color: var(--ct-color-border);
+    --#{$prefix}border-radius: var(--ct-radius-md);
+    --#{$prefix}heading-color: var(--ct-color-text);
+
+    --#{$prefix}primary: var(--ct-color-primary);
+    --#{$prefix}primary-rgb: var(--ct-color-primary-rgb);
+    --#{$prefix}primary-text-emphasis: var(--ct-color-on-primary-subtle);
+    --#{$prefix}primary-bg-subtle: var(--ct-color-primary-subtle);
+    --#{$prefix}success-rgb: var(--ct-color-success-rgb);
+    --#{$prefix}warning-rgb: var(--ct-color-warning-rgb);
+    --#{$prefix}danger-rgb: var(--ct-color-danger-rgb);
+    --#{$prefix}info-rgb: var(--ct-color-info-rgb);
+
+    --#{$prefix}link-color: var(--ct-color-link);
+    --#{$prefix}link-color-rgb: var(--ct-color-primary-rgb);
+    --#{$prefix}link-hover-color: var(--ct-color-primary-hover);
+    --#{$prefix}link-hover-color-rgb: var(--ct-color-primary-rgb);
+    --#{$prefix}focus-ring-color: rgba(var(--ct-color-primary-rgb), .35);
+
+    // Moodle design system tokens used across core components.
+    --mds-text-default: var(--ct-color-text);
+    --mds-text-emphasis: var(--ct-color-text);
+    --mds-text-subtle: var(--ct-color-text-muted);
+    --mds-text-muted: var(--ct-color-text-muted);
+    --mds-text-link-primary-default: var(--ct-color-link);
+    --mds-text-link-primary-hover: var(--ct-color-primary-hover);
+    --mds-bg-surface-default: var(--ct-color-surface);
+    --mds-bg-surface-subtle: var(--ct-color-surface-2);
+    --mds-bg-surface-strong: var(--ct-color-surface-sunken);
+    --mds-border-default: var(--ct-color-border);
+    --mds-border-interactive-primary-default: var(--ct-color-focus);
+    --mds-bg-interactive-primary-default: var(--ct-color-primary);
+    --mds-bg-interactive-primary-hover: var(--ct-color-primary-hover);
+    --mds-text-inverse: var(--ct-color-on-primary);
+    --mds-bg-nav-pill-hover: var(--ct-color-surface-2);
+    --mds-bg-nav-pill-pressed: var(--ct-color-surface-sunken);
+    --mds-bg-nav-pill-selected: var(--ct-color-primary-subtle);
+}
+
+// Light mode: Boost uses --bs-white as the raised surface and the greys as page backgrounds.
+:root,
+[data-bs-theme="light"] {
+    --#{$prefix}white: var(--ct-color-surface);
+    --#{$prefix}gray-100: var(--ct-color-bg);
+    --#{$prefix}gray-200: var(--ct-color-surface-2);
+    --#{$prefix}gray-300: var(--ct-color-border);
+}
