@@ -1,7 +1,8 @@
 # STATUS · theme_customboost
 
 ## Current milestone
-**M1 · Base, tokens, login and personal area**: done.
+**M2 · Dark preset review, quality and captures**: done. Version 0.1.0 (ALPHA) is installable and complete for the
+requested scope.
 
 ## Done
 - Child theme of Boost for Moodle 5.3 (`requires` 2026100500, ALPHA, 0.1.0) with en/es strings and a null Privacy provider.
@@ -33,8 +34,30 @@
   `environment.xml` check was relaxed **in the local checkout only**. This does not affect the plugin.
 - core_scss rejects imports through symlinks, so the theme is copied into the checkout (`sync.sh`) instead.
 
+## M2 · Done
+- Dark preset reviewed on every page; `.btn-subtle-*` (activity completion) and standalone links (card titles,
+  section and activity names) aligned with the tokens. Prose links keep Boost's dark-mode underline (WCAG 1.4.1).
+- "All my courses" is only shown when *My courses* is enabled (`enablemycourses`, off by default in 5.3; without it
+  the course list is the overview block on the same page).
+- 27 real captures in `docs/screenshots/` (login, personal area, My courses, course, mobile navigation; light and
+  dark; 360/768/1280 px) taken with Playwright against the local Moodle 5.3. No page scrolls horizontally at 360 px
+  (checked by the capture script).
+- PHPUnit: 19 tests, 51 assertions, green, no deprecations (PHPUnit 11 attributes).
+- phpcs (moodle-cs v3.7.0, `moodle` standard): 0 errors, 0 warnings.
+- `cli/contrast.php`: all 98 pairs pass AA for the default colours (and for `#ffcc00`/`#39ff14`).
+- Full README in Spanish and English with gallery.
+
+## Not verified in the sandbox
+- `moodle-plugin-ci mustache` and `grunt` (need Java/Node toolchains from blocked hosts); the workflow in
+  `.github/workflows/ci.yml` runs them on GitHub. Templates were rendered on every captured page without errors.
+- Spanish captures: the Spanish core language pack could not be downloaded (download.moodle.org blocked), so the
+  captures are in English. The theme's own strings are complete in `lang/es`.
+- PostgreSQL 17 (see environment notes); tests ran on PostgreSQL 16.
+
 ## Blockers
 - None.
 
-## Next steps
-- M2: dark preset review, captures at 360/768/1280 in `docs/screenshots/`, full README (en/es).
+## Next steps (ideas)
+- Hero image per course category on the personal area cards.
+- Course page header with cover image when format_customtiles is not in use.
+- Behat scenarios for the login layout and the dashboard cards.

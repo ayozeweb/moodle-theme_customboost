@@ -23,8 +23,8 @@ namespace theme_customboost;
  * @category   test
  * @copyright  2026 Ayoze de Paz
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \theme_customboost\tokens
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_customboost\tokens::class)]
 final class tokens_test extends \basic_testcase {
     /**
      * Brand/accent pairs, including hostile ones (white, black, pure yellow, neon green).
@@ -49,10 +49,10 @@ final class tokens_test extends \basic_testcase {
     /**
      * Both presets pass every contrast pair for any brand colour.
      *
-     * @dataProvider brand_provider
      * @param string|null $brand
      * @param string|null $accent
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('brand_provider')]
     public function test_presets_reach_aa(?string $brand, ?string $accent): void {
         $palettes = tokens::build($brand, $accent);
         $this->assertSame([], tokens::audit($palettes['light']), 'Light preset');

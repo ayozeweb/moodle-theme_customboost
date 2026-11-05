@@ -51,8 +51,16 @@ foreach (['light', 'dark'] as $mode) {
         $ratio = tokens::contrast($palettes[$mode][$fg], $palettes[$mode][$bg]);
         $ok = $ratio >= $min;
         $failures += $ok ? 0 : 1;
-        cli_writeln(sprintf('| %s `%s` | %s `%s` | %.2f | %.1f | %s |', $fg, $palettes[$mode][$fg], $bg,
-            $palettes[$mode][$bg], $ratio, $min, $ok ? 'AA' : 'FAIL'));
+        cli_writeln(sprintf(
+            '| %s (%s) | %s (%s) | %.2f | %.1f | %s |',
+            $fg,
+            $palettes[$mode][$fg],
+            $bg,
+            $palettes[$mode][$bg],
+            $ratio,
+            $min,
+            $ok ? 'AA' : 'FAIL'
+        ));
     }
 }
 exit($failures ? 1 : 0);

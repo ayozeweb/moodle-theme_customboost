@@ -23,8 +23,8 @@ namespace theme_customboost;
  * @category   test
  * @copyright  2026 Ayoze de Paz
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \theme_customboost\hook_listener
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_customboost\hook_listener::class)]
 final class hook_listener_test extends \advanced_testcase {
     /**
      * The preset falls back to light when unset or invalid.

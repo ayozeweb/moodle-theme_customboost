@@ -192,3 +192,42 @@
 #region-main pre {
     overflow-x: auto;
 }
+
+// Moodle's subtle buttons (activity completion "Done", status toggles): tinted surface + body text, both modes AA
+// (the "text on *-subtle" pairs are part of the token contrast test). The edge carries the status colour.
+@each $name in (success, warning, danger, info) {
+    .btn-subtle-#{$name} {
+        --#{$prefix}btn-bg: var(--ct-color-#{$name}-subtle);
+        --#{$prefix}btn-color: var(--ct-color-text);
+        --#{$prefix}btn-border-color: rgba(var(--ct-color-#{$name}-rgb), .45);
+        --#{$prefix}btn-hover-bg: var(--ct-color-#{$name}-subtle);
+        --#{$prefix}btn-hover-color: var(--ct-color-text);
+        --#{$prefix}btn-hover-border-color: var(--ct-color-#{$name});
+        --#{$prefix}btn-active-bg: var(--ct-color-#{$name}-subtle);
+        --#{$prefix}btn-active-color: var(--ct-color-text);
+        --#{$prefix}btn-active-border-color: var(--ct-color-#{$name});
+        border-radius: var(--ct-radius-pill);
+
+        .icon {
+            color: var(--ct-color-#{$name});
+        }
+    }
+}
+
+// Boost's dark mode underlines every link in #region-main because prose links cannot be told apart from text by
+// colour alone on a dark page (WCAG 1.4.1). That reasoning applies to links inside text, not to standalone links
+// that are identified by their position (card titles, section and activity names), so these keep the light mode
+// look and are underlined on hover/focus instead.
+[data-bs-theme="dark"] #region-main {
+    .course-card a.coursename,
+    .ct-course-card a.ct-course-card-link,
+    .course-section .sectionname a,
+    .activity-item .activityname a {
+        text-decoration: none;
+
+        &:hover,
+        &:focus-visible {
+            text-decoration: underline;
+        }
+    }
+}

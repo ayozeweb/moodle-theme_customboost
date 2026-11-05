@@ -97,8 +97,12 @@ class tokens {
 
         // Light mode: the brand colour must be readable as text/link on every light surface where it may appear
         // (the darkest being surface-2), and a fill which carries white text.
-        $lightprimary = self::ensure_contrast($brand, [$light['surface-2'], $light['bg'], $light['surface']], self::MIN_TEXT,
-            '#000000');
+        $lightprimary = self::ensure_contrast(
+            $brand,
+            [$light['surface-2'], $light['bg'], $light['surface']],
+            self::MIN_TEXT,
+            '#000000'
+        );
         if ($lightprimary !== $brand) {
             $adjusted[] = 'primary-light';
         }
@@ -106,11 +110,19 @@ class tokens {
         $light['primary-hover'] = self::mix('#000000', $lightprimary, 0.15);
         $light['on-primary'] = self::best_on($lightprimary);
         $light['primary-subtle'] = self::mix($lightprimary, $light['surface'], 0.10);
-        $light['on-primary-subtle'] = self::ensure_contrast($lightprimary, [$light['primary-subtle']], self::MIN_TEXT,
-            '#000000');
+        $light['on-primary-subtle'] = self::ensure_contrast(
+            $lightprimary,
+            [$light['primary-subtle']],
+            self::MIN_TEXT,
+            '#000000'
+        );
 
-        $lightaccent = self::ensure_contrast($accent, [$light['surface-2'], $light['bg'], $light['surface']], self::MIN_TEXT,
-            '#000000');
+        $lightaccent = self::ensure_contrast(
+            $accent,
+            [$light['surface-2'], $light['bg'], $light['surface']],
+            self::MIN_TEXT,
+            '#000000'
+        );
         if ($lightaccent !== $accent) {
             $adjusted[] = 'accent-light';
         }
@@ -120,17 +132,29 @@ class tokens {
         $light['focus'] = self::ensure_contrast($lightprimary, [$light['bg'], $light['surface']], self::MIN_UI, '#000000');
 
         // Dark mode: lighten the brand until it reads on the lightest dark surface; fills then carry dark text.
-        $darkprimary = self::ensure_contrast($brand, [$dark['surface-2'], $dark['surface'], $dark['bg']], self::MIN_TEXT,
-            '#ffffff');
+        $darkprimary = self::ensure_contrast(
+            $brand,
+            [$dark['surface-2'], $dark['surface'], $dark['bg']],
+            self::MIN_TEXT,
+            '#ffffff'
+        );
         $adjusted[] = 'primary-dark';
         $dark['primary'] = $darkprimary;
         $dark['primary-hover'] = self::mix('#ffffff', $darkprimary, 0.18);
         $dark['on-primary'] = self::best_on($darkprimary, $dark['bg']);
         $dark['primary-subtle'] = self::mix($darkprimary, $dark['surface'], 0.16);
-        $dark['on-primary-subtle'] = self::ensure_contrast($darkprimary, [$dark['primary-subtle']], self::MIN_TEXT,
-            '#ffffff');
-        $darkaccent = self::ensure_contrast($accent, [$dark['surface-2'], $dark['surface'], $dark['bg']], self::MIN_TEXT,
-            '#ffffff');
+        $dark['on-primary-subtle'] = self::ensure_contrast(
+            $darkprimary,
+            [$dark['primary-subtle']],
+            self::MIN_TEXT,
+            '#ffffff'
+        );
+        $darkaccent = self::ensure_contrast(
+            $accent,
+            [$dark['surface-2'], $dark['surface'], $dark['bg']],
+            self::MIN_TEXT,
+            '#ffffff'
+        );
         $dark['accent'] = $darkaccent;
         $dark['on-accent'] = self::best_on($darkaccent, $dark['bg']);
         $dark['link'] = $darkprimary;
@@ -394,7 +418,8 @@ class tokens {
         [$h, $s, $l] = self::rgb_to_hsl(self::hex_to_rgb($colour));
         $direction = self::luminance($towards) > 0.5 ? 1 : -1;
         for ($step = 0; $step <= 100; $step++) {
-            $candidate = $step === 0 ? $colour : self::rgb_to_hex(self::hsl_to_rgb($h, $s, max(0, min(1, $l + $direction * $step * 0.01))));
+            $lightness = max(0, min(1, $l + $direction * $step * 0.01));
+            $candidate = $step === 0 ? $colour : self::rgb_to_hex(self::hsl_to_rgb($h, $s, $lightness));
             $ok = true;
             foreach ($backgrounds as $bg) {
                 if (self::contrast($candidate, $bg) < $min) {

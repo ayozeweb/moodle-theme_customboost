@@ -25,8 +25,8 @@ use theme_customboost\output\dashboard;
  * @category   test
  * @copyright  2026 Ayoze de Paz
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \theme_customboost\output\dashboard
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_customboost\output\dashboard::class)]
 final class dashboard_test extends \advanced_testcase {
     /**
      * Cards list enrolled courses with progress, most recently accessed first, up to the limit.

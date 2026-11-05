@@ -97,8 +97,10 @@ class hook_listener {
         if (!self::is_active()) {
             return;
         }
-        $palettes = tokens::build(get_config('theme_customboost', 'brandcolour') ?: null,
-            get_config('theme_customboost', 'accentcolour') ?: null);
+        $palettes = tokens::build(
+            get_config('theme_customboost', 'brandcolour') ?: null,
+            get_config('theme_customboost', 'accentcolour') ?: null
+        );
         // Mobile browsers tint their toolbar with this, so it matches the compact header in each mode.
         $hook->add_html(html_writer::empty_tag('meta', ['name' => 'theme-color',
             'content' => $palettes['light']['header-bg'], 'media' => '(prefers-color-scheme: light)']));

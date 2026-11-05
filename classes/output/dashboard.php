@@ -59,8 +59,11 @@ class dashboard implements renderable, templatable {
             $courses[$course->id] = $course;
         }
         if (count($courses) < $this->limit) {
-            $enrolled = enrol_get_my_courses(['summary', 'summaryformat', 'startdate', 'enddate'], 'fullname ASC',
-                $this->limit * 2);
+            $enrolled = enrol_get_my_courses(
+                ['summary', 'summaryformat', 'startdate', 'enddate'],
+                'fullname ASC',
+                $this->limit * 2
+            );
             foreach ($enrolled as $course) {
                 if (count($courses) >= $this->limit) {
                     break;
@@ -81,6 +84,7 @@ class dashboard implements renderable, templatable {
      * @return array
      */
     public function export_for_template(renderer_base $output): array {
+        global $CFG;
         $cards = [];
         foreach ($this->get_courses() as $course) {
             $context = \context_course::instance($course->id);
@@ -113,7 +117,8 @@ class dashboard implements renderable, templatable {
             'greeting' => get_string('greeting', 'theme_customboost', format_string($this->user->firstname)),
             'courses' => $cards,
             'hascourses' => !empty($cards),
-            'mycoursesurl' => (new \core\url('/my/courses.php'))->out(false),
+            // My courses is optional in 5.3 (off by default); without it the list is the overview block on this page.
+            'mycoursesurl' => empty($CFG->enablemycourses) ? null : (new \core\url('/my/courses.php'))->out(false),
         ];
     }
 }

@@ -49,10 +49,12 @@
             <h2 id="ct-dashboard-greeting" class="ct-dashboard-greeting">{{greeting}}</h2>
             <p class="ct-dashboard-subtitle">{{#str}}greeting_subtitle, theme_customboost{{/str}}</p>
         </div>
-        <a class="btn btn-outline-secondary ct-dashboard-all" href="{{mycoursesurl}}">
-            {{#str}}allmycourses, theme_customboost{{/str}}
-            {{#pix}}t/right, core{{/pix}}
-        </a>
+        {{#mycoursesurl}}
+            <a class="btn btn-outline-secondary ct-dashboard-all" href="{{mycoursesurl}}">
+                {{#str}}allmycourses, theme_customboost{{/str}}
+                {{#pix}}t/right, core{{/pix}}
+            </a>
+        {{/mycoursesurl}}
     </div>
 
     {{#hascourses}}

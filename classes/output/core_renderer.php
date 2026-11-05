@@ -31,14 +31,18 @@ class core_renderer extends \theme_boost\output\core_renderer {
      */
     public function full_header() {
         $header = parent::full_header();
-        if ($this->page->pagelayout !== 'mydashboard' || !isloggedin() || isguestuser()
-                || !get_config('theme_customboost', 'dashboardcourses')) {
+        if (
+            $this->page->pagelayout !== 'mydashboard' || !isloggedin() || isguestuser()
+                || !get_config('theme_customboost', 'dashboardcourses')
+        ) {
             return $header;
         }
         global $USER;
         $limit = (int) (get_config('theme_customboost', 'dashboardcoursecount') ?: 6);
         $dashboard = new dashboard($USER, $limit);
-        return $header . $this->render_from_template('theme_customboost/dashboard',
-            $dashboard->export_for_template($this));
+        return $header . $this->render_from_template(
+            'theme_customboost/dashboard',
+            $dashboard->export_for_template($this)
+        );
     }
 }
