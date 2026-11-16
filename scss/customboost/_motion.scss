@@ -4,9 +4,13 @@
     *,
     *::before,
     *::after {
+        // stylelint-disable-next-line declaration-no-important, time-min-milliseconds
         animation-duration: .01ms !important; // Must override every component animation.
+        // stylelint-disable-next-line declaration-no-important
         animation-iteration-count: 1 !important; // Same reason.
+        // stylelint-disable-next-line declaration-no-important, time-min-milliseconds
         transition-duration: .01ms !important; // Same reason.
+        // stylelint-disable-next-line declaration-no-important
         scroll-behavior: auto !important; // Same reason.
     }
 }
@@ -15,14 +19,18 @@
     .ct-navbar,
     .ct-login-media,
     .ct-dashboard-hero .btn {
+        // stylelint-disable-next-line declaration-no-important
         display: none !important; // Chrome is never printed.
     }
 
     body,
     #page,
     .ct-course-card {
+        // stylelint-disable-next-line declaration-no-important
         background: #fff !important; // Print on white whatever the colour mode.
+        // stylelint-disable-next-line declaration-no-important
         color: #000 !important; // Same reason.
+        // stylelint-disable-next-line declaration-no-important
         box-shadow: none !important; // Same reason.
     }
 }

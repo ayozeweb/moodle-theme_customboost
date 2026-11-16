@@ -3,8 +3,8 @@
 Plan para llevar `theme_customboost` de la versión **0.1.0 (alfa)** a una **1.0.0 estable**: verificación funcional,
 compatibilidad móvil, administración muy personalizable, seguridad, accesibilidad y compatibilidad.
 
-- **Punto de partida:** rama `claude/theme-customboost`, Moodle 5.3. Ya hay 19 tests PHPUnit en verde, `phpcs` sin
-  avisos, 98 combinaciones de color en AA y capturas a 360/768/1280 px.
+- **Punto de partida:** rama `claude/theme-customboost`, Moodle 5.3. Tras la fase F0 hay 29 tests PHPUnit y 13
+  escenarios Behat, `phpcs` y `stylelint` sin avisos, 98 combinaciones de color en AA y capturas a 360/768/1280 px.
 - **Cómo leerlo:** cada apartado tiene comprobaciones con identificador (por ejemplo `SEG-04`), el método y el
   criterio de aceptación. La [hoja de ruta](#9-hoja-de-ruta-y-criterios-de-salida) las ordena en fases.
 - **Leyenda de estado:** ✅ hecho · 🟡 parcial · ⬜ pendiente.
@@ -37,23 +37,23 @@ compatibilidad móvil, administración muy personalizable, seguridad, accesibili
 | Contraste AA de los presets | `tests/tokens_test.php` (10 colores de marca) y `cli/contrast.php` (98 parejas) |
 | Sin scroll horizontal a 360 px | Script de capturas en acceso, área personal, Mis cursos y curso |
 | Estilo de código | `phpcs` con moodle-cs 3.7.0: 0 errores, 0 avisos |
-| Tests | 19 tests, 51 aserciones (tokens, tarjetas, preset) |
+| Tests | 29 tests PHPUnit (tokens, tarjetas, preset, escapado, archivos, compilación SCSS, privacidad, idiomas) y 13 escenarios Behat |
 
 ### Hallazgos de la revisión previa del código
 
-Detectados al preparar este plan. Ninguno es explotable por un usuario sin privilegios, pero deben cerrarse antes
-de la versión estable.
+Detectados al preparar este plan y **cerrados en la fase F0** (versión 0.1.1), salvo donde se indica.
 
-| Id | Hallazgo | Dónde | Gravedad | Acción |
-|---|---|---|---|---|
-| H-01 | El nombre del sitio y el título de acceso se imprimen sin escapar (`{{{ }}}` con `escape => false`). Solo los edita un administrador, pero es salida no escapada innecesaria. | `layout/login.php`, `templates/login.mustache` | Baja | Escapar en PHP y usar `{{ }}`; test con `<script>` en el nombre del sitio. |
-| H-02 | Doble escapado: el saludo y la categoría pasan por `format_string()` y luego por `{{ }}`. Un nombre como «O'Brien» o una categoría «I+D & Formación» se verían con entidades HTML. | `classes/output/dashboard.php`, `templates/dashboard.mustache` | Baja (defecto visual) | Unificar: formatear en PHP y usar `{{{ }}}` solo para valores ya saneados. Test con `&`, `'` y multilang. |
-| H-03 | El script en línea del preset automático no funcionaría con una política CSP estricta sin `unsafe-inline`. | `classes/hook_listener.php` | Baja | Documentarlo; valorar moverlo a un módulo AMD o resolverlo solo con CSS (`prefers-color-scheme`). |
-| H-04 | La imagen de acceso admite PNG/JPG de cualquier peso; una imagen de varios MB penaliza el LCP del acceso. | `settings.php` | Media (rendimiento) | Límite de tamaño, aviso en el ajuste y, si es posible, redimensionado en servidor. |
-| H-05 | `tokens::build()` se ejecuta en cada página para las etiquetas `theme-color`. | `classes/hook_listener.php` | Baja (rendimiento) | Cachear el resultado (MUC o caché estática por petición). |
-| H-06 | No hay CSS precompilado propio (`style/moodle.css`): durante la primera compilación se sirve el de Boost. | `lib.php` | Baja | Generarlo en la publicación de cada versión. |
-| H-07 | Plantillas y JS no pasan aún por `moodle-plugin-ci mustache` ni `grunt` (no disponibles en el entorno de desarrollo). | CI | Media | Verificar en GitHub Actions y corregir lo que salga. |
-| H-08 | No hay pruebas Behat. | `tests/behat/` | Media | Ver [apartado 2](#2-verificación-funcional). |
+| Id | Hallazgo | Estado | Cómo se cerró |
+|---|---|---|---|
+| H-01 | Nombre del sitio y título de acceso impresos sin escapar | ✅ | `layout/login.php` exporta texto plano y la plantilla escapa con `{{ }}`. Escenario Behat con marcado en el título. |
+| H-02 | Doble escapado del saludo, el curso y la categoría («O'Brien», «I+D & Formación») | ✅ | Misma convención en `classes/output/dashboard.php`. Test `test_strings_are_escaped_once`. |
+| H-03 | El script en línea del preset automático necesita `unsafe-inline` con una CSP estricta | 🟡 aceptado | Mismo mecanismo que usa Boost para su modo automático. Documentado en la guía; se elimina si Boost lo hace. |
+| H-04 | Imagen de acceso sin límite de peso | ✅ | Límite de 1 MB en el ajuste. El redimensionado en servidor sigue previsto (ADM-L6). |
+| H-05 | `tokens::build()` se ejecutaba completo en cada página | ✅ | Resultado en caché durante la petición. |
+| H-06 | Sin CSS precompilado propio | 🟡 herramienta lista | `cli/build_css.php` genera `style/moodle.css` con los marcadores de imagen y fuente intactos. Se ejecuta al preparar cada versión; el archivo no se guarda en Git. |
+| H-07 | `mustache` y `grunt` sin verificar | ✅ | El CI de GitHub ya ejecutaba ambos: `mustache` pasaba y `grunt` fallaba por 80 avisos de stylelint, ahora corregidos. También fallaba `phpcs` por el orden de una cadena de idioma. |
+| H-08 | Sin pruebas Behat | ✅ | 13 escenarios (acceso, área personal, presets, cabecera móvil) y paso Behat en el CI. |
+| H-09 | Nuevo: el tema declaraba `editor.scss` pero el archivo no existía (aviso PHP y editor sin estilos del tema) | ✅ | `scss/editor.scss`: hoja del editor de Boost con la tipografía y las formas del tema. Los colores de marca no llegan al editor (limitación anotada en COM-23). |
 
 ---
 
@@ -101,15 +101,15 @@ Layout *embedded* y *popup*.
 
 | Id | Prueba | Tipo |
 |---|---|---|
-| AUT-01 | Acceso: se muestran imagen, título y lema configurados; valores por defecto si están vacíos | Behat |
-| AUT-02 | Área personal: tarjetas, progreso, estado vacío, ajuste desactivado | Behat |
-| AUT-03 | Cabecera móvil: abrir y cerrar el panel, marca visible (viewport 360) | Behat `@javascript` |
-| AUT-04 | Preset oscuro y automático: atributo en `<html>` | Behat |
-| AUT-05 | Escapado: nombre de sitio, categoría y nombre de usuario con `<`, `&`, `'` (cierra H-01 y H-02) | PHPUnit |
-| AUT-06 | `theme_customboost_pluginfile`: solo sirve `loginimage` en contexto de sistema | PHPUnit |
-| AUT-07 | Compilación SCSS completa sin errores con valores por defecto y con colores hostiles | PHPUnit |
+| AUT-01 ✅ | Acceso: se muestran imagen, título y lema configurados; valores por defecto si están vacíos | Behat |
+| AUT-02 ✅ | Área personal: tarjetas, progreso, estado vacío, ajuste desactivado | Behat |
+| AUT-03 🟡 | Cabecera móvil: abrir y cerrar el panel, marca visible, sin scroll horizontal (viewport 360). Escrito; solo se ejecuta en el CI | Behat `@javascript` |
+| AUT-04 ✅ | Preset claro y oscuro, y cesión a los modos de Boost: atributo en `<html>` | Behat |
+| AUT-05 ✅ | Escapado: nombre de sitio, categoría y nombre de usuario con `<`, `&`, `'` (cierra H-01 y H-02) | PHPUnit |
+| AUT-06 ✅ | `theme_customboost_pluginfile`: solo sirve `loginimage` en contexto de sistema | PHPUnit |
+| AUT-07 ✅ | Compilación SCSS completa sin errores con valores por defecto y con colores hostiles | PHPUnit |
 | AUT-08 | Regresión visual: capturas de referencia a 360/768/1280 en claro y oscuro, umbral de diferencia del 0,1 % | Playwright |
-| AUT-09 | Proveedor de privacidad (`null_provider`) | PHPUnit |
+| AUT-09 ✅ | Proveedor de privacidad (`null_provider`) | PHPUnit |
 
 **Criterio de aceptación:** FUN-01 a FUN-17 en ✅; AUT-01 a AUT-09 en verde en CI con PHP 8.3 y 8.4.
 
@@ -337,12 +337,12 @@ riesgo se concentra en la salida HTML, los archivos subidos, el SCSS del adminis
 
 | Id | Comprobación | Método | Criterio | Estado |
 |---|---|---|---|---|
-| SEG-01 | **XSS en plantillas**: revisar cada `{{{ }}}` | Auditoría de `templates/` + test con cargas (`<script>`, `"><img onerror>`, `javascript:`) en nombre de sitio, usuario, curso, categoría, título y lema | Solo se imprime sin escapar HTML generado por el core o saneado con `format_string`/`format_text` | 🟡 H-01, H-02 |
+| SEG-01 | **XSS en plantillas**: revisar cada `{{{ }}}` | Auditoría de `templates/` + test con cargas (`<script>`, `"><img onerror>`, `javascript:`) en nombre de sitio, usuario, curso, categoría, título y lema | Solo se imprime sin escapar HTML generado por el core o saneado con `format_string`/`format_text` | 🟡 H-01 y H-02 cerrados; falta la auditoría completa |
 | SEG-02 | **XSS por atributos**: URLs de imagen y enlaces | Revisión + test con comillas en nombres de archivo | Siempre `{{ }}` en atributos; URLs generadas con `moodle_url` | ⬜ |
-| SEG-03 | **Inyección de CSS**: colores | Test: valores como `red;}body{display:none` en `brandcolour` | `normalise_hex()` descarta todo lo que no sea hexadecimal (ya implementado; falta el test explícito) | 🟡 |
+| SEG-03 | **Inyección de CSS**: colores | Test: valores como `red;}body{display:none` en `brandcolour` | `normalise_hex()` descarta todo lo que no sea hexadecimal | ✅ `test_colour_settings_cannot_inject_css` |
 | SEG-04 | **SCSS del administrador** | Probar `@import` de rutas locales y remotas, `url()` externas, bucles costosos | Mismo comportamiento que Boost; sin lectura de archivos fuera de los directorios de temas; documentar que es un campo de confianza | ⬜ |
-| SEG-05 | **Servicio de archivos** | Peticiones a `pluginfile.php` con otras áreas, contextos, `../`, y sin sesión | Solo `loginimage` en contexto de sistema; 404 en el resto | 🟡 (falta test AUT-06) |
-| SEG-06 | **Subida de archivos** | SVG con script, archivo renombrado, archivo de 50 MB | Tipos limitados a JPG/PNG/WebP/AVIF (SVG no admitido); límite de tamaño (ADM-L6) | 🟡 |
+| SEG-05 | **Servicio de archivos** | Peticiones a `pluginfile.php` con otras áreas, contextos, `../`, y sin sesión | Solo `loginimage` en contexto de sistema; 404 en el resto | ✅ |
+| SEG-06 | **Subida de archivos** | SVG con script, archivo renombrado, archivo de 50 MB | Tipos limitados a JPG/PNG/WebP/AVIF (SVG no admitido); límite de 1 MB | 🟡 falta probar archivos renombrados |
 | SEG-07 | **Fuga de información en tarjetas** | Usuario con cursos ocultos, suspendido, matrícula caducada | Solo cursos visibles para ese usuario; nunca datos de otros | 🟡 |
 | SEG-08 | **Página de acceso** | Enumeración de usuarios, mensajes de error, autocompletado, token de acceso | Idéntico al core (se reutiliza `core/loginform`); el layout no añade campos ni scripts | ✅ por diseño; verificar |
 | SEG-09 | **Sin recursos externos** | Registrar todas las peticiones de red en el recorrido 2.2 | 0 peticiones a dominios ajenos (fuentes, imágenes, scripts, analítica) | 🟡 |
@@ -442,8 +442,8 @@ un lector de escritorio y uno móvil); declaración publicada.
 |---|---|---|---|---|
 | COM-01 | Moodle | 5.3.0 y la última 5.3.x | CI con `MOODLE_503_STABLE` | 🟡 local |
 | COM-02 | Moodle siguiente | Rama `main` (aviso temprano, no bloqueante) | Job de CI permitido a fallar | ⬜ |
-| COM-03 | PHP | 8.3 y 8.4 | Matriz de CI | 🟡 solo 8.3 local |
-| COM-04 | Base de datos | PostgreSQL 17, MariaDB 11.4, MySQL 8.4 | Matriz de CI (el tema no hace SQL propio; riesgo bajo) | 🟡 PostgreSQL 16 local |
+| COM-03 | PHP | 8.3 y 8.4 | Matriz de CI | ✅ PHPUnit en ambas |
+| COM-04 | Base de datos | PostgreSQL 17, MariaDB 11.4, MySQL 8.4 | Matriz de CI (el tema no hace SQL propio; riesgo bajo) | 🟡 PostgreSQL 17 en CI; faltan MariaDB y MySQL |
 | COM-05 | Servidor web | Apache, nginx; con y sin *slash arguments* | Manual: fuentes, imagen de acceso y CSS se sirven | ⬜ |
 | COM-06 | Caché | Con y sin modo diseñador de temas; con CDN/proxy inverso delante | Manual | ⬜ |
 | COM-07 | Instalación en subdirectorio | `https://sitio/moodle/` | Manual: rutas de fuentes e imágenes | ⬜ |
@@ -469,7 +469,7 @@ sin romper la página; comprobarlo desactivándolas.
 | COM-20 | Modos de color de Boost 5.3 | FUN-13 y FUN-14 | 🟡 |
 | COM-21 | Formatos de curso: temas, semanas, actividad única, social | Lectura y edición, índice del curso, arrastrar y soltar | 🟡 temas |
 | COM-22 | Navegación lineal y pie fijo de actividad de 5.3 | No se duplican ni se solapan con la cabecera | ⬜ |
-| COM-23 | Editor TinyMCE y hoja de estilos del editor | El contenido del editor usa la tipografía y colores del tema, en claro y oscuro | ⬜ |
+| COM-23 | Editor TinyMCE y hoja de estilos del editor | El contenido del editor usa la tipografía y colores del tema, en claro y oscuro | 🟡 tipografía y formas sí; colores de marca no (hoja estática) |
 | COM-24 | Componentes React del sistema de diseño (navegación principal) | Píldoras, menú «Más», foco | 🟡 |
 | COM-25 | Layouts especiales: `secure`, `embedded`, `popup`, `maintenance`, `print`, `redirect` | Se ven correctos; impresión en blanco | ⬜ |
 | COM-26 | Idiomas RTL (árabe, hebreo) | Hoja RTL: cabecera, acceso (imagen al lado contrario), tarjetas | ⬜ |

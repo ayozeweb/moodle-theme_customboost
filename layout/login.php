@@ -26,8 +26,10 @@ defined('MOODLE_INTERNAL') || die();
 
 $bodyattributes = $OUTPUT->body_attributes(['ct-pagelayout-login']);
 $systemcontext = context_system::instance();
-$sitename = format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), 'escape' => false]);
-$sitefullname = format_string($SITE->fullname, true, ['context' => context_course::instance(SITEID), 'escape' => false]);
+// Strings are passed as plain text (tags stripped, not entity-escaped); the template escapes them once with {{ }}.
+$sitecontext = context_course::instance(SITEID);
+$sitename = format_string($SITE->shortname, true, ['context' => $sitecontext, 'escape' => false]);
+$sitefullname = format_string($SITE->fullname, true, ['context' => $sitecontext, 'escape' => false]);
 
 $loginimage = $PAGE->theme->setting_file_url('loginimage', 'loginimage');
 $isdefaultimage = empty($loginimage);
@@ -48,8 +50,11 @@ $templatecontext = [
     'bodyattributes' => $bodyattributes,
     'loginimage' => $loginimage,
     'isdefaultimage' => $isdefaultimage,
-    'logintitle' => $title !== '' ? format_string($title, true, ['context' => $systemcontext]) : $sitefullname,
-    'logintagline' => $tagline !== '' ? format_string($tagline, true, ['context' => $systemcontext])
+    'logintitle' => $title !== ''
+        ? format_string($title, true, ['context' => $systemcontext, 'escape' => false])
+        : $sitefullname,
+    'logintagline' => $tagline !== ''
+        ? format_string($tagline, true, ['context' => $systemcontext, 'escape' => false])
         : get_string('logintagline_default', 'theme_customboost'),
     'leftinstructions' => $leftinstructions,
 ];

@@ -3,7 +3,7 @@
 Guía completa para instalar, configurar y mantener el tema **Custom Boost** (`theme_customboost`) en tu Moodle.
 No hace falta saber programar: cada apartado indica dónde hacer clic y qué resultado esperar.
 
-> Versión documentada: **0.1.0 (alfa)** para **Moodle 5.3**. Las opciones marcadas como *previstas* todavía no
+> Versión documentada: **0.1.1 (alfa)** para **Moodle 5.3**. Las opciones marcadas como *previstas* todavía no
 > existen; están descritas en el [plan de puesta a punto](PLAN-PUESTA-A-PUNTO.md).
 
 ## Índice
@@ -197,7 +197,7 @@ Pestaña *Página de acceso*.
 
 | Ajuste | Qué hace | Recomendación |
 |---|---|---|
-| Imagen de acceso | Imagen junto al formulario. Vacía: ilustración incluida en el tema. | Horizontal, mínimo 1600 px de ancho, JPG/WebP de menos de 300 KB. Formatos: JPG, PNG, WebP, AVIF. |
+| Imagen de acceso | Imagen junto al formulario. Vacía: ilustración incluida en el tema. | Horizontal, mínimo 1600 px de ancho. Formatos: JPG, PNG, WebP, AVIF. Tamaño máximo: 1 MB (recomendado: menos de 300 KB). |
 | Título de acceso | Encabezado sobre la imagen. Vacío: nombre completo del sitio. | Máximo 40 caracteres. |
 | Lema de acceso | Frase bajo el título. Vacío: «Aprende a tu ritmo, desde cualquier dispositivo». | Una sola frase. |
 
@@ -373,6 +373,7 @@ extensiones*, busca *Custom Boost* y pulsa *Desinstalar*. Se borran sus ajustes 
 | Las tarjetas no aparecen | Ajuste desactivado o el usuario no tiene cursos | Revisa *Área personal*; sin cursos se muestra un aviso. |
 | La imagen de acceso se ve recortada | Proporción distinta a la pantalla | Es normal (se ajusta para cubrir). Centra el motivo y evita texto dentro de la imagen. |
 | La imagen de acceso tarda en cargar | Archivo muy pesado | Redúcela a ~1600–2000 px y menos de 300 KB (WebP). |
+| No puedo subir la imagen de acceso | Supera 1 MB o el formato no está admitido | Expórtala como JPG o WebP a 1600–2000 px de ancho. |
 | El logotipo no se ve en oscuro | Logotipo oscuro sobre fondo oscuro | Usa una versión válida para ambos fondos. |
 | El nombre del sitio sale cortado en móvil | Nombre corto demasiado largo | Acórtalo o sube un logotipo compacto. |
 | Mensaje sobre `max_input_vars` | Requisito de Moodle 5.x, no del tema | Pon `max_input_vars = 5000` en `php.ini`. |
@@ -394,12 +395,19 @@ navegador (también desde el móvil).
 **¿Carga algo de servidores externos?** No. Fuente, iconos e imágenes se sirven desde tu Moodle. No hay CDN ni
 analítica.
 
+**¿Funciona con una política de seguridad de contenido (CSP) estricta?** Sí, con una excepción: el preset
+*Automático* usa un pequeño script en línea para leer la preferencia claro/oscuro del dispositivo (igual que Boost).
+Si tu CSP prohíbe scripts en línea, usa el preset *Claro* u *Oscuro*.
+
+**¿El editor de texto usa el aspecto del tema?** Sí en tipografía y formas. Los colores de marca no se aplican
+dentro del área de edición.
+
 **¿Guarda datos personales?** No. La preferencia claro/oscuro, si activas los modos de color, la guarda Boost.
 
 **¿Es compatible con otros formatos de curso y extensiones?** Sí, con cualquiera que funcione con Boost. Está
 preparado para compartir estilos con `format_customtiles` mediante los tokens `--ct-*`.
 
-**¿Puedo usarlo en producción?** La versión 0.1.0 es alfa. Pruébala antes en un entorno de pruebas; el
+**¿Puedo usarlo en producción?** La versión 0.1.1 es alfa. Pruébala antes en un entorno de pruebas; el
 [plan de puesta a punto](PLAN-PUESTA-A-PUNTO.md) detalla lo que falta para la versión estable.
 
 **¿Funciona con idiomas de derecha a izquierda?** Moodle genera la hoja de estilos RTL automáticamente; aún no
@@ -414,7 +422,7 @@ está verificado pantalla a pantalla (previsto en el plan).
 | Preset de color (`colourpreset`) | Apariencia | Lista | Claro | `light`, `dark`, `auto`. Se ignora con los modos de color de Boost activos. |
 | Color de marca (`brandcolour`) | Apariencia | Color | `#4338ca` | Ajustado a AA automáticamente. |
 | Color de acento (`accentcolour`) | Apariencia | Color | `#c2410c` | Ajustado a AA automáticamente. |
-| Imagen de acceso (`loginimage`) | Página de acceso | Archivo | Ilustración del tema | JPG, PNG, WebP, AVIF. Un archivo. |
+| Imagen de acceso (`loginimage`) | Página de acceso | Archivo | Ilustración del tema | JPG, PNG, WebP, AVIF. Un archivo de hasta 1 MB. |
 | Título de acceso (`logintitle`) | Página de acceso | Texto | Nombre del sitio | Texto plano. |
 | Lema de acceso (`logintagline`) | Página de acceso | Texto | Lema por defecto | Texto plano. |
 | Mostrar tarjetas de cursos (`dashboardcourses`) | Área personal | Casilla | Sí | |

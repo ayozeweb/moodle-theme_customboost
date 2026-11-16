@@ -4,6 +4,7 @@
     #page.ct-login {
         margin: 0;
         min-height: 100vh;
+        // stylelint-disable-next-line declaration-block-no-duplicate-properties
         min-height: 100svh;
         background-color: var(--ct-color-surface);
     }
@@ -17,6 +18,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     min-height: 100vh;
+    // stylelint-disable-next-line declaration-block-no-duplicate-properties
     min-height: 100svh;
 }
 
@@ -27,6 +29,7 @@
     display: flex;
     align-items: flex-end;
     min-height: 240px;
+    // stylelint-disable-next-line declaration-block-no-duplicate-properties
     min-height: #{unquote("clamp(240px, 36svh, 360px)")};
     background-color: #1e1b4b;
     color: #fff;
@@ -87,6 +90,7 @@
     font-weight: 750;
     line-height: 1.08;
     letter-spacing: -0.025em;
+    // stylelint-disable-next-line csstree/validator
     text-wrap: balance;
 }
 
@@ -94,6 +98,7 @@
     margin: 0;
     color: rgba(255, 255, 255, .92);
     font-size: var(--ct-font-size-lg);
+    // stylelint-disable-next-line csstree/validator
     text-wrap: pretty;
 }
 
@@ -132,6 +137,7 @@
     }
 
     #loginlogo {
+        // stylelint-disable-next-line declaration-no-important
         justify-content: flex-start !important; // Core sets justify-content-center as a utility class.
 
         img {
@@ -177,6 +183,7 @@
         position: sticky;
         top: 0;
         height: 100vh;
+        // stylelint-disable-next-line declaration-block-no-duplicate-properties
         height: 100svh;
         min-height: 0;
     }

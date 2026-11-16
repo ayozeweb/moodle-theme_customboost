@@ -15,7 +15,9 @@
     background-color: var(--ct-color-surface);
     box-shadow: var(--ct-shadow-sm);
     overflow: hidden;
-    transition: transform var(--ct-duration) var(--ct-ease), box-shadow var(--ct-duration) var(--ct-ease),
+    transition:
+        transform var(--ct-duration) var(--ct-ease),
+        box-shadow var(--ct-duration) var(--ct-ease),
         border-color var(--ct-duration) var(--ct-ease);
 
     &:hover {
@@ -54,6 +56,7 @@
     }
 
     .card-footer {
+        // stylelint-disable-next-line declaration-no-important
         background-color: transparent !important; // Core uses the bg-white utility class.
         padding-inline: var(--ct-space-4);
     }

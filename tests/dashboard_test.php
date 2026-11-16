@@ -74,4 +74,40 @@ final class dashboard_test extends \advanced_testcase {
         $this->assertFalse($data['hascourses']);
         $this->assertSame([], $data['courses']);
     }
+
+    /**
+     * Names with HTML special characters are escaped exactly once and markup never reaches the page.
+     */
+    public function test_strings_are_escaped_once(): void {
+        global $PAGE;
+        $this->resetAfterTest();
+
+        $gen = $this->getDataGenerator();
+        $user = $gen->create_user(['firstname' => "O'Brien"]);
+        $category = $gen->create_category(['name' => 'R&D <b>lab</b>']);
+        $course = $gen->create_course([
+            'fullname' => 'Maths & <script>alert(1)</script>Stats',
+            'category' => $category->id,
+        ]);
+        $gen->enrol_user($user->id, $course->id, 'student');
+        $this->setUser($user);
+
+        $renderer = $PAGE->get_renderer('core');
+        $data = (new dashboard($user))->export_for_template($renderer);
+
+        // Exported as plain text: tags stripped, no entities.
+        $this->assertSame("Hello, O'Brien", $data['greeting']);
+        $this->assertSame('R&D lab', $data['courses'][0]['category']);
+        $this->assertSame('Maths & alert(1)Stats', $data['courses'][0]['fullname']);
+
+        // Rendered: escaped once by the template.
+        $html = $renderer->render_from_template('theme_customboost/dashboard', $data);
+        $this->assertStringContainsString('R&amp;D lab', $html);
+        $this->assertStringContainsString('Maths &amp; alert(1)Stats', $html);
+        $this->assertMatchesRegularExpression('/Hello, O(&#39;|&#039;|&apos;)Brien/', $html);
+        $this->assertStringNotContainsString('<script>alert', $html);
+        $this->assertStringNotContainsString('<b>lab', $html);
+        $this->assertStringNotContainsString('&amp;amp;', $html);
+        $this->assertStringNotContainsString('&amp;#', $html);
+    }
 }

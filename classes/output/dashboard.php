@@ -85,6 +85,9 @@ class dashboard implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output): array {
         global $CFG;
+        // Every string is exported as plain text (tags stripped, not entity-escaped) and the template escapes it once
+        // with {{ }}. Escaping here as well would show "&amp;" or "&#039;" in names such as "R&D" or "O'Brien".
+        $plain = ['escape' => false];
         $cards = [];
         foreach ($this->get_courses() as $course) {
             $context = \context_course::instance($course->id);
@@ -96,14 +99,12 @@ class dashboard implements renderable, templatable {
                 $image = $output->get_generated_image_for_id($course->id);
             }
             $category = core_course_category::get($course->category, IGNORE_MISSING, true);
-            $fullname = format_string($course->fullname, true, ['context' => $context]);
             $cards[] = [
                 'id' => $course->id,
-                'fullname' => $fullname,
-                'continuelabel' => get_string('continuecoursename', 'theme_customboost', $fullname),
+                'fullname' => format_string($course->fullname, true, ['context' => $context] + $plain),
                 'viewurl' => (new \core\url('/course/view.php', ['id' => $course->id]))->out(false),
                 'image' => $image,
-                'category' => $category ? $category->get_formatted_name() : '',
+                'category' => $category ? $category->get_formatted_name($plain) : '',
                 'hasprogress' => $hasprogress,
                 'progress' => $percentage,
                 'progresstext' => get_string('progresspercent', 'theme_customboost', $percentage),
@@ -114,7 +115,7 @@ class dashboard implements renderable, templatable {
         }
 
         return [
-            'greeting' => get_string('greeting', 'theme_customboost', format_string($this->user->firstname)),
+            'greeting' => get_string('greeting', 'theme_customboost', format_string($this->user->firstname, true, $plain)),
             'courses' => $cards,
             'hascourses' => !empty($cards),
             // My courses is optional in 5.3 (off by default); without it the list is the overview block on this page.

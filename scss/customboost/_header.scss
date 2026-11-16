@@ -3,7 +3,9 @@
 .navbar.fixed-top.ct-navbar {
     background-color: var(--ct-color-header-bg);
     border-bottom: 1px solid var(--ct-color-border);
+    // stylelint-disable-next-line csstree/validator
     padding-top: env(safe-area-inset-top);
+    // stylelint-disable-next-line csstree/validator
     padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
     height: calc(#{$navbar-height} + 1px + env(safe-area-inset-top));
 

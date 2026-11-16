@@ -23,27 +23,41 @@ body {
     background-color: var(--ct-color-bg);
 }
 
-h1, h2, h3, h4, h5, h6,
-.h1, .h2, .h3, .h4, .h5, .h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
     color: var(--ct-color-text);
     font-family: var(--ct-font-family-heading);
     letter-spacing: var(--ct-letter-spacing-tight);
     line-height: var(--ct-line-height-tight);
 }
 
-h1, .h1 {
+h1,
+.h1 {
     font-size: var(--ct-font-size-3xl);
 }
 
-h2, .h2 {
+h2,
+.h2 {
     font-size: var(--ct-font-size-2xl);
 }
 
-h3, .h3 {
+h3,
+.h3 {
     font-size: var(--ct-font-size-xl);
 }
 
-h4, .h4 {
+h4,
+.h4 {
     font-size: var(--ct-font-size-lg);
 }
 
@@ -54,6 +68,7 @@ a {
 
 .text-muted,
 .dimmed_text {
+    // stylelint-disable-next-line declaration-no-important
     color: var(--ct-color-text-muted) !important; // Bootstrap utility uses !important; matched to keep AA.
 }
 

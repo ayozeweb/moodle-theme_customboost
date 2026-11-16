@@ -1,6 +1,24 @@
 # STATUS · theme_customboost
 
 ## Current milestone
+**F0 · Close review findings** (plan phase F0, version 0.1.1): done locally; waiting for the GitHub Actions run.
+
+## F0 · Done
+- GitHub Actions was failing on every push: `phpcs` (language string order) and `grunt` (80 stylelint problems in
+  the SCSS). Both fixed; stylelint is now run locally with Moodle's `.stylelintrc`. PHPUnit (PHP 8.3 and 8.4,
+  PostgreSQL 17), Mustache lint, PHPDoc and validation were already green on GitHub.
+- H-01/H-02: one escaping convention. PHP exports plain text (`format_string(..., ['escape' => false])`) and the
+  templates escape once with `{{ }}`. Covered by PHPUnit and Behat.
+- H-04: 1 MB limit for the login image. H-05: palettes cached per request.
+- H-06: `cli/build_css.php` builds `style/moodle.css` keeping the `[[pix]]`/`[[font]]` placeholders. Decision: the
+  file is a release artefact, not tracked in Git (1.3 MB that would go stale on every SCSS change).
+- H-08: 13 Behat scenarios; 11 run locally (green), the 2 `@javascript` ones only run in CI.
+- New finding H-09: `editor_scss` pointed to a missing `scss/editor.scss` (PHP warning, unstyled editor). Added.
+- Removed three unused strings (`continuecourse`, `continuecoursename`, `skiptocontent`).
+- Tests: 29 PHPUnit tests / 169 assertions; version bumped to 0.1.1.
+- H-03 (inline script for the automatic preset) accepted and documented: same mechanism as Boost.
+
+## Previous milestone
 **M3 · Tuning plan and administrator documentation**: done. Version 0.1.0 (ALPHA) is installable and complete for
 the requested scope; the road to 1.0.0 is in `docs/PLAN-PUESTA-A-PUNTO.md`.
 
@@ -11,7 +29,7 @@ the requested scope; the road to 1.0.0 is in `docs/PLAN-PUESTA-A-PUNTO.md`.
   accessibility, compatibility, performance), roadmap F0-F5 with exit criteria, risks and a report template.
 - Code review while writing the plan found 8 items (H-01 to H-08 in the plan). None is exploitable by an
   unprivileged user; H-02 (double escaping of the greeting and the category name) is a visible defect for names
-  with `&` or `'`. They are **not fixed yet**: phase F0 of the plan.
+  with `&` or `'`. Fixed in F0 (above).
 
 ## Done
 - Child theme of Boost for Moodle 5.3 (`requires` 2026100500, ALPHA, 0.1.0) with en/es strings and a null Privacy provider.
@@ -67,7 +85,9 @@ the requested scope; the road to 1.0.0 is in `docs/PLAN-PUESTA-A-PUNTO.md`.
 - None.
 
 ## Next steps
-- Phase F0 of the plan: close H-01 to H-08 and get the GitHub Actions workflow green.
+- Confirm the GitHub Actions run is green (including the two `@javascript` scenarios).
+- Phase F1 of the plan: full core page walk-through in both presets, visual regression, automated touch-target
+  and overflow checks, axe in CI.
 
 ## Later ideas
 - Hero image per course category on the personal area cards.

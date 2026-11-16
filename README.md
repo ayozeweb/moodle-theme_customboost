@@ -106,7 +106,9 @@ Capturas reales del tema en Moodle 5.3 a 360, 768 y 1280 px, en claro y oscuro, 
 - Los colores se generan en `classes/tokens.php`; el resto de tokens en `scss/customboost/_tokens.scss`.
 - Plantillas sobrescritas: solo `theme_boost/navbar` (marca visible en móvil). El acceso usa su propio layout y
   las tarjetas del área personal se añaden desde `core_renderer::full_header()`.
-- Tests: `vendor/bin/phpunit --testsuite theme_customboost_testsuite` (o `moodle-plugin-ci phpunit`).
+- Tests: `vendor/bin/phpunit --testsuite theme_customboost_testsuite` y `vendor/bin/behat --tags=@theme_customboost`
+  (o `moodle-plugin-ci phpunit` / `behat`). Estilo: `phpcs --standard=moodle` y `stylelint` con la configuración de Moodle.
+- Al preparar una versión: `php theme/customboost/cli/build_css.php` genera el CSS precompilado de respaldo.
   CI con GitHub Actions y `moodle-plugin-ci` en `.github/workflows/ci.yml`.
 
 Estado del proyecto y decisiones: [STATUS.md](STATUS.md).

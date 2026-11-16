@@ -29,7 +29,6 @@
             {
                 "id": 2,
                 "fullname": "Digital marketing",
-                "continuelabel": "Continue Digital marketing",
                 "viewurl": "https://example.com/course/view.php?id=2",
                 "image": "https://example.com/image.jpg",
                 "category": "Marketing",
@@ -74,7 +73,7 @@
                                 <span class="ct-course-card-category"><span class="visually-hidden">{{#str}}coursecategory, theme_customboost{{/str}}: </span>{{category}}</span>
                             {{/category}}
                             <h4 class="ct-course-card-title">
-                                <a href="{{viewurl}}" class="ct-course-card-link">{{{fullname}}}</a>
+                                <a href="{{viewurl}}" class="ct-course-card-link">{{fullname}}</a>
                             </h4>
                             {{#hasprogress}}
                                 <div class="ct-course-card-progress">

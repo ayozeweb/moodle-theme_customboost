@@ -92,7 +92,7 @@ if ($ADMIN->fulltree) {
         get_string('loginimage_desc', 'theme_customboost'),
         'loginimage',
         0,
-        ['maxfiles' => 1, 'accepted_types' => ['.jpg', '.jpeg', '.png', '.webp', '.avif']]
+        ['maxfiles' => 1, 'accepted_types' => ['.jpg', '.jpeg', '.png', '.webp', '.avif'], 'maxbytes' => 1048576]
     );
     $setting->set_updatedcallback('theme_reset_all_caches');
     $page->add($setting);

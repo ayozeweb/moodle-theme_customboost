@@ -90,6 +90,12 @@ class tokens {
     public static function build(?string $brand = null, ?string $accent = null): array {
         $brand = self::normalise_hex($brand) ?? self::DEFAULT_BRAND;
         $accent = self::normalise_hex($accent) ?? self::DEFAULT_ACCENT;
+        // Built on every page for the theme-color meta tags: keep the result for the rest of the request.
+        static $cache = [];
+        $key = $brand . '|' . $accent;
+        if (isset($cache[$key])) {
+            return $cache[$key];
+        }
         $adjusted = [];
 
         $light = self::LIGHT;
@@ -173,7 +179,8 @@ class tokens {
         }
         unset($palette);
 
-        return ['light' => $light, 'dark' => $dark, 'adjusted' => $adjusted];
+        $cache[$key] = ['light' => $light, 'dark' => $dark, 'adjusted' => $adjusted];
+        return $cache[$key];
     }
 
     /**

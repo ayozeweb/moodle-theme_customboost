@@ -8,8 +8,11 @@
     align-items: center;
     justify-content: center;
     gap: var(--ct-space-2);
-    transition: background-color var(--ct-duration-fast) var(--ct-ease), border-color var(--ct-duration-fast) var(--ct-ease),
-        color var(--ct-duration-fast) var(--ct-ease), box-shadow var(--ct-duration-fast) var(--ct-ease);
+    transition:
+        background-color var(--ct-duration-fast) var(--ct-ease),
+        border-color var(--ct-duration-fast) var(--ct-ease),
+        color var(--ct-duration-fast) var(--ct-ease),
+        box-shadow var(--ct-duration-fast) var(--ct-ease);
 
     &.btn-sm {
         min-height: 36px;
@@ -121,8 +124,8 @@
     background-color: var(--ct-color-surface);
     border-color: var(--ct-color-border-strong);
     color: var(--ct-color-text);
-    // 16px stops iOS zooming into the field on focus.
-    font-size: max(1rem, 16px);
+    // 16px (the root size) stops iOS zooming into the field on focus.
+    font-size: 1rem;
 
     &:focus {
         border-color: var(--ct-color-primary);
