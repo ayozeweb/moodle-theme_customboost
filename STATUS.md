@@ -1,8 +1,17 @@
 # STATUS · theme_customboost
 
 ## Current milestone
-**M2 · Dark preset review, quality and captures**: done. Version 0.1.0 (ALPHA) is installable and complete for the
-requested scope.
+**M3 · Tuning plan and administrator documentation**: done. Version 0.1.0 (ALPHA) is installable and complete for
+the requested scope; the road to 1.0.0 is in `docs/PLAN-PUESTA-A-PUNTO.md`.
+
+## M3 · Done
+- `docs/GUIA-ADMINISTRACION.md`: full administrator guide in Spanish (install, every setting, recipes,
+  troubleshooting, FAQ, settings reference). Documents only what exists in 0.1.0.
+- `docs/PLAN-PUESTA-A-PUNTO.md`: verification plan (functional, mobile, administration/customisation, security,
+  accessibility, compatibility, performance), roadmap F0-F5 with exit criteria, risks and a report template.
+- Code review while writing the plan found 8 items (H-01 to H-08 in the plan). None is exploitable by an
+  unprivileged user; H-02 (double escaping of the greeting and the category name) is a visible defect for names
+  with `&` or `'`. They are **not fixed yet**: phase F0 of the plan.
 
 ## Done
 - Child theme of Boost for Moodle 5.3 (`requires` 2026100500, ALPHA, 0.1.0) with en/es strings and a null Privacy provider.
@@ -57,7 +66,10 @@ requested scope.
 ## Blockers
 - None.
 
-## Next steps (ideas)
+## Next steps
+- Phase F0 of the plan: close H-01 to H-08 and get the GitHub Actions workflow green.
+
+## Later ideas
 - Hero image per course category on the personal area cards.
 - Course page header with cover image when format_customtiles is not in use.
 - Behat scenarios for the login layout and the dashboard cards.

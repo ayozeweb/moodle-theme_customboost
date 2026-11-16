@@ -67,6 +67,15 @@ Informe de contraste de la configuración actual (código de salida 1 si algo fa
 php public/theme/customboost/cli/contrast.php
 ```
 
+## Documentación
+
+| Documento | Para quién | Contenido |
+|---|---|---|
+| [Guía de administración](docs/GUIA-ADMINISTRACION.md) | Administradores de Moodle | Instalación, todos los ajustes paso a paso, recetas, solución de problemas y preguntas frecuentes |
+| [Plan de puesta a punto](docs/PLAN-PUESTA-A-PUNTO.md) | Equipo del proyecto | Verificación, móvil, administración personalizable, seguridad, accesibilidad, compatibilidad y hoja de ruta hasta la 1.0 |
+| [Design tokens](docs/tokens.md) | Desarrolladores | Contrato `--ct-*` e informe de contraste |
+| [STATUS.md](STATUS.md) | Equipo del proyecto | Estado, decisiones y siguientes pasos |
+
 ## Design tokens
 
 Todos los tokens (`--ct-color-*`, `--ct-font-*`, `--ct-radius-*`, `--ct-space-*`, `--ct-shadow-*`, movimiento y
