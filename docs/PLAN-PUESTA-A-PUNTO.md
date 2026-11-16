@@ -103,7 +103,7 @@ Layout *embedded* y *popup*.
 |---|---|---|
 | AUT-01 ✅ | Acceso: se muestran imagen, título y lema configurados; valores por defecto si están vacíos | Behat |
 | AUT-02 ✅ | Área personal: tarjetas, progreso, estado vacío, ajuste desactivado | Behat |
-| AUT-03 🟡 | Cabecera móvil: abrir y cerrar el panel, marca visible, sin scroll horizontal (viewport 360). Escrito; solo se ejecuta en el CI | Behat `@javascript` |
+| AUT-03 ✅ | Cabecera móvil: abrir y cerrar el panel, marca visible, sin scroll horizontal (viewport 360). Se ejecuta en el CI | Behat `@javascript` |
 | AUT-04 ✅ | Preset claro y oscuro, y cesión a los modos de Boost: atributo en `<html>` | Behat |
 | AUT-05 ✅ | Escapado: nombre de sitio, categoría y nombre de usuario con `<`, `&`, `'` (cierra H-01 y H-02) | PHPUnit |
 | AUT-06 ✅ | `theme_customboost_pluginfile`: solo sirve `loginimage` en contexto de sistema | PHPUnit |

@@ -1,7 +1,8 @@
 # STATUS · theme_customboost
 
 ## Current milestone
-**F0 · Close review findings** (plan phase F0, version 0.1.1): done locally; waiting for the GitHub Actions run.
+**F0 · Close review findings** (plan phase F0, version 0.1.1): done. GitHub Actions is green on PHP 8.3 and 8.4
+(PostgreSQL 17): phpcs, PHPDoc, validation, Mustache lint, Grunt, 29 PHPUnit tests and 13 Behat scenarios.
 
 ## F0 · Done
 - GitHub Actions was failing on every push: `phpcs` (language string order) and `grunt` (80 stylelint problems in
@@ -12,7 +13,7 @@
 - H-04: 1 MB limit for the login image. H-05: palettes cached per request.
 - H-06: `cli/build_css.php` builds `style/moodle.css` keeping the `[[pix]]`/`[[font]]` placeholders. Decision: the
   file is a release artefact, not tracked in Git (1.3 MB that would go stale on every SCSS change).
-- H-08: 13 Behat scenarios; 11 run locally (green), the 2 `@javascript` ones only run in CI.
+- H-08: 13 Behat scenarios; 11 run locally and all 13 (including the 2 `@javascript` mobile ones) pass in CI.
 - New finding H-09: `editor_scss` pointed to a missing `scss/editor.scss` (PHP warning, unstyled editor). Added.
 - Removed three unused strings (`continuecourse`, `continuecoursename`, `skiptocontent`).
 - Tests: 29 PHPUnit tests / 169 assertions; version bumped to 0.1.1.
@@ -85,7 +86,6 @@ the requested scope; the road to 1.0.0 is in `docs/PLAN-PUESTA-A-PUNTO.md`.
 - None.
 
 ## Next steps
-- Confirm the GitHub Actions run is green (including the two `@javascript` scenarios).
 - Phase F1 of the plan: full core page walk-through in both presets, visual regression, automated touch-target
   and overflow checks, axe in CI.
 
