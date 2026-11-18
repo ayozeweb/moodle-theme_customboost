@@ -61,3 +61,8 @@ Feature: Course cards on the personal area
       | enablemycourses | 1 |
     And I reload the page
     And "All my courses" "link" should exist
+
+  Scenario: Pages that reuse the dashboard layout do not show the course cards
+    When I log in as "ana"
+    And I visit "/message/index.php"
+    Then ".ct-dashboard-hero" "css_element" should not exist

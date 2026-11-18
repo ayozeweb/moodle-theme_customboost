@@ -43,6 +43,13 @@
         font-size: var(--ct-font-size-sm);
     }
 
+    // The switch's hit box is its .mds-switch wrapper (Boost stretches the hidden input over it): make it 44px high.
+    .editmode-switch-form .mds-switch {
+        min-height: var(--ct-touch-target);
+        display: flex;
+        align-items: center;
+    }
+
     // The edit mode switch keeps its label for screen readers but drops it visually on phones.
     .editmode-switch-form label {
         @include media-breakpoint-down(md) {
@@ -122,7 +129,7 @@
 .ct-navbar .primary-navigation,
 .secondary-navigation {
     .mds-nav-pill {
-        min-height: 40px;
+        min-height: var(--ct-touch-target);
         padding-inline: var(--ct-space-3);
         border-radius: var(--ct-radius-pill);
     }

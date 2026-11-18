@@ -30,6 +30,10 @@ $input-btn-padding-y: .5625rem;
 $input-btn-padding-x: 1rem;
 $btn-font-weight: 600;
 
+// Boost prints secondary text in $gray-600 (#6a737b), chosen for a white page: on this theme's slightly tinted canvas
+// it falls to 4.47:1. One step darker keeps every surface of the light preset above 4.5:1 (checked by the audit).
+$gray-600: #5c656d;
+
 $link-decoration: none;
 $link-hover-decoration: underline;
 $enable-shadows: false;

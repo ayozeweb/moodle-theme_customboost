@@ -1,0 +1,79 @@
+// Dark preset patches for core plugins whose own stylesheets still use literal colours.
+//
+// Moodle 5.3's dark mode is experimental and these plugins have not been converted yet, so pages fail contrast with
+// Boost's dark mode as well. The theme offers a dark preset as a feature, so it fixes them here, only in dark mode
+// and only with the tokens. Remove each rule once core fixes the plugin (re-run tests/audit in dark to check).
+
+[data-bs-theme="dark"] {
+    // Search results: .highlight is compiled from the light $info.
+    .highlight {
+        color: var(--ct-color-info);
+    }
+
+    // mod_assign: status cells forced to black, and a white grading table header and rows.
+    .path-mod-assign td.submissionnotgraded,
+    .path-mod-assign div.submissionnotgraded {
+        color: var(--ct-color-text);
+    }
+
+    // Status cells: pale fills with black text. Same meaning, tinted from the tokens (text on *-subtle is AA-tested).
+    .path-mod-assign {
+        @each $status, $tone in (
+            "submissionstatus": "surface-2",
+            "submissionreopened": "surface-2",
+            "submissionstatusdraft": "warning-subtle",
+            "submissionlocked": "warning-subtle",
+            "submissionstatussubmitted": "success-subtle",
+            "submissiongraded": "success-subtle",
+            "earlysubmission": "success-subtle",
+            "latesubmission": "danger-subtle",
+            "gradingreminder": "danger-subtle"
+        ) {
+            td.#{$status},
+            div.#{$status},
+            a:link.#{$status} {
+                background-color: var(--ct-color-#{$tone});
+                color: var(--ct-color-text);
+            }
+        }
+    }
+
+    .path-mod-assign .gradingtable thead th,
+    .path-mod-assign .gradingtable tr.unselectedrow td {
+        background-color: var(--ct-color-surface);
+    }
+
+    .path-mod-assign .gradingtable tr.selectedrow td {
+        background-color: var(--ct-color-primary-subtle);
+    }
+
+    // gradereport_user: a #f8f9fa frame around the report, #f8f9fa headers and category rows.
+    .user-report-container {
+        background-color: var(--ct-color-surface-sunken);
+    }
+
+    .path-grade-report-user .user-grade,
+    .grade-report-user .user-grade {
+        thead th,
+        td,
+        .baggt,
+        .baggb {
+            background-color: var(--ct-color-surface-2);
+            color: var(--ct-color-text);
+        }
+
+        // White item and category cells.
+        tbody tr.spacer,
+        td.item,
+        th.column-itemname,
+        th.category {
+            background-color: var(--ct-color-surface);
+            color: var(--ct-color-text);
+        }
+
+        th,
+        td {
+            border-color: var(--ct-color-border);
+        }
+    }
+}

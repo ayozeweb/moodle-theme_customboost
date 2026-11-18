@@ -52,7 +52,9 @@
     --#{$prefix}btn-active-border-color: var(--ct-color-primary-hover);
 }
 
-.btn-secondary {
+// Boost's dark mode styles .btn-secondary with an attribute selector; match it so the token look wins in both modes.
+.btn-secondary,
+[data-bs-theme] .btn-secondary {
     --#{$prefix}btn-color: var(--ct-color-text);
     --#{$prefix}btn-bg: var(--ct-color-surface-2);
     --#{$prefix}btn-border-color: var(--ct-color-border);
@@ -233,4 +235,35 @@
             text-decoration: underline;
         }
     }
+}
+
+// WCAG 2.5.8 (target size, minimum): small core controls that end up too close to their neighbours with this theme's
+// typography are given a 24px box. Links inside sentences are exempt and are not touched.
+.btn.btn-link,
+.courseindex .courseindex-chevron,
+.quickeditlink,
+a[id^="action_link"],
+.table th > a,
+.generaltable th > a,
+.flexible th > a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    min-height: 24px;
+}
+
+// Pagination and the initials bar: adjacent items overlap by their 1px border, so 24px is not enough to clear 2.5.8.
+.pagination .page-link {
+    min-width: 2rem;
+    min-height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// The accepted file types under a file picker are printed with .text-dark straight on the page, which is dark in the
+// dark preset. Same fix as Boost's for .bg-light .text-dark: re-point the variable the utility reads.
+[data-bs-theme="dark"] .form-filetypes-descriptions .text-dark {
+    --#{$prefix}dark-rgb: var(--ct-color-text-rgb);
 }

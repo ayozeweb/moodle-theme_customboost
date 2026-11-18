@@ -108,10 +108,51 @@ a {
     }
 }
 
-// Long words and URLs never cause horizontal scroll on 360px screens.
+// Long words and URLs never cause horizontal scroll on 360px screens. break-word rather than anywhere: anywhere also
+// shrinks the min-content width, so table columns and buttons collapsed and split ordinary words ("Rang-e").
 #region-main {
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     min-width: 0;
+}
+
+// Activity dates and inline selects that do not wrap pushed some pages 1-5px past the viewport at 360px. Scoped to
+// #page because the activity header sits outside #region-main.
+#page {
+    .activity-dates,
+    .date-item {
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: break-word;
+    }
+
+    .date-item {
+        flex-wrap: wrap;
+        white-space: normal;
+    }
+
+    .mform .fitem,
+    .mform .felement,
+    select.form-select,
+    select.form-control,
+    .custom-select {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    // A select with a start margin that wraps onto its own line.
+    select.form-select.ms-2 {
+        max-width: calc(100% - .5rem);
+    }
+
+    .d-flex.flex-wrap > select.form-select {
+        flex: 0 1 auto;
+    }
+
+    // Nested flex rows (bulk action bars) keep the default min-width: auto and grow past the page.
+    .d-flex.flex-wrap > .d-flex {
+        min-width: 0;
+        max-width: 100%;
+    }
 }
 
 #region-main,

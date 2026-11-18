@@ -151,6 +151,33 @@
         min-height: 48px;
     }
 
+    // Core login-flow forms (forgotten password, sign-up) use a fixed 30em box and fields with a fixed size, which
+    // do not fit a phone. As a flex item the sheet would otherwise grow to their width.
+    min-width: 0;
+
+    .boxwidthnormal,
+    .boxwidthwide,
+    .mform fieldset,
+    .mform .form-control,
+    .mform .fitem > div {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .boxwidthnormal,
+    .boxwidthwide {
+        width: auto;
+    }
+
+    // Secondary links next to the form are full 44px targets, not just their line of text.
+    .login-form a,
+    .login-cookiesnotice .btn-link,
+    .login-signup a {
+        display: inline-flex;
+        align-items: center;
+        min-height: var(--ct-touch-target);
+    }
+
     #loginbtn {
         min-height: 48px;
         font-size: var(--ct-font-size-md);

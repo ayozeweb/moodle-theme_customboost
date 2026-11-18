@@ -17,14 +17,12 @@
     --#{$prefix}border-radius: var(--ct-radius-md);
     --#{$prefix}heading-color: var(--ct-color-text);
 
-    --#{$prefix}primary: var(--ct-color-primary);
-    --#{$prefix}primary-rgb: var(--ct-color-primary-rgb);
+    // Not bridged on purpose: --bs-primary(-rgb) and the status --bs-*-rgb. They paint the .bg-* fills that carry
+    // white text (badges, alerts, buttons in core markup). Boost keeps them saturated in both modes; pointing them at
+    // the dark tokens (light tints) dropped white text on .bg-success to 1.9:1. Their light values already come from
+    // the tokens through the SCSS variables ($primary, $success...).
     --#{$prefix}primary-text-emphasis: var(--ct-color-on-primary-subtle);
     --#{$prefix}primary-bg-subtle: var(--ct-color-primary-subtle);
-    --#{$prefix}success-rgb: var(--ct-color-success-rgb);
-    --#{$prefix}warning-rgb: var(--ct-color-warning-rgb);
-    --#{$prefix}danger-rgb: var(--ct-color-danger-rgb);
-    --#{$prefix}info-rgb: var(--ct-color-info-rgb);
 
     --#{$prefix}link-color: var(--ct-color-link);
     --#{$prefix}link-color-rgb: var(--ct-color-primary-rgb);
@@ -59,4 +57,6 @@
     --#{$prefix}gray-100: var(--ct-color-bg);
     --#{$prefix}gray-200: var(--ct-color-surface-2);
     --#{$prefix}gray-300: var(--ct-color-border);
+    // Boost's secondary text colour (muted labels, "Collapse all", metadata).
+    --#{$prefix}gray-600: var(--ct-color-text-muted);
 }

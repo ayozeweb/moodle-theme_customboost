@@ -1,0 +1,15 @@
+{
+  "name": "theme-customboost-audit",
+  "private": true,
+  "description": "Responsive, touch target, accessibility and visual regression audit for theme_customboost (test sites only).",
+  "type": "module",
+  "scripts": {
+    "audit": "node audit.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "4.10.3",
+    "pixelmatch": "7.1.0",
+    "playwright": "1.63.0",
+    "pngjs": "7.0.0"
+  }
+}
