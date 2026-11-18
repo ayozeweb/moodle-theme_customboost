@@ -172,7 +172,7 @@
     // Secondary links next to the form are full 44px targets, not just their line of text.
     .login-form a,
     .login-cookiesnotice .btn-link,
-    .login-signup a {
+    .login-container a[href*="signup.php"] {
         display: inline-flex;
         align-items: center;
         min-height: var(--ct-touch-target);

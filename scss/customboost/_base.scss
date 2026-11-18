@@ -148,6 +148,12 @@ a {
         flex: 0 1 auto;
     }
 
+    // Toolbars of icon buttons (content bank) are wider with 44px buttons: let them wrap.
+    .cb-toolbar-container {
+        flex-wrap: wrap;
+        row-gap: var(--ct-space-2);
+    }
+
     // Nested flex rows (bulk action bars) keep the default min-width: auto and grow past the page.
     .d-flex.flex-wrap > .d-flex {
         min-width: 0;

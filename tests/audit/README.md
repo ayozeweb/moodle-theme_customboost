@@ -52,6 +52,7 @@ Opciones:
 | `--widths=360` | Solo esos anchos |
 | `--visual=login,course` | Páginas con regresión visual (`none` para ninguna) |
 | `--update-baseline` | Guarda las capturas actuales como referencia |
+| `--report=nombre` | Nombre del informe (por defecto `report`), para que una pasada parcial no sobrescriba la completa |
 
 Sin `AUDIT_PASSWORD_ADMIN` se omiten las páginas de administración.
 

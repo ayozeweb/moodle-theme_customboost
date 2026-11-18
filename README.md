@@ -73,6 +73,8 @@ php public/theme/customboost/cli/contrast.php
 |---|---|---|
 | [Guía de administración](docs/GUIA-ADMINISTRACION.md) | Administradores de Moodle | Instalación, todos los ajustes paso a paso, recetas, solución de problemas y preguntas frecuentes |
 | [Plan de puesta a punto](docs/PLAN-PUESTA-A-PUNTO.md) | Equipo del proyecto | Verificación, móvil, administración personalizable, seguridad, accesibilidad, compatibilidad y hoja de ruta hasta la 1.0 |
+| [Informe de verificación F1](docs/informes/2026-11-18.md) | Equipo del proyecto | Resultado del recorrido de 34 páginas en claro y oscuro, defectos corregidos y pendientes |
+| [Auditoría de páginas](tests/audit/README.md) | Desarrolladores | Cómo repetir el recorrido (desbordes, objetivos táctiles, axe, regresión visual) |
 | [Design tokens](docs/tokens.md) | Desarrolladores | Contrato `--ct-*` e informe de contraste |
 | [STATUS.md](STATUS.md) | Equipo del proyecto | Estado, decisiones y siguientes pasos |
 

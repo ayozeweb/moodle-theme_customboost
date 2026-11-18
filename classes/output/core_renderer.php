@@ -31,9 +31,11 @@ class core_renderer extends \theme_boost\output\core_renderer {
      */
     public function full_header() {
         $header = parent::full_header();
-        // Other pages (messaging, for one) reuse the mydashboard layout: only the dashboard itself gets the cards.
+        // Only the dashboard gets the cards. Both checks are needed: messaging reuses the mydashboard layout and
+        // My courses reuses the my-index page type.
         if (
-            $this->page->pagetype !== 'my-index' || !isloggedin() || isguestuser()
+            $this->page->pagelayout !== 'mydashboard' || $this->page->pagetype !== 'my-index'
+                || !isloggedin() || isguestuser()
                 || !get_config('theme_customboost', 'dashboardcourses')
         ) {
             return $header;

@@ -61,7 +61,8 @@ function theme_customboost_get_pre_scss($theme): string {
 
     $scss = "\$primary: {$light['primary']};\n";
     $scss .= "\$success: {$light['success']};\n";
-    $scss .= "\$warning: {$light['warning']};\n";
+    // Not $warning: core uses it mostly as a fill under dark text (.bg-warning.text-dark), which needs Boost's yellow.
+    // The theme's warning text colour reaches .text-warning through the custom property instead (_components.scss).
     $scss .= "\$danger: {$light['danger']};\n";
     $scss .= "\$info: {$light['info']};\n";
     // Boost derives its dark surfaces from these; aligning them keeps core components and tokens on one palette.

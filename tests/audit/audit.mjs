@@ -29,7 +29,7 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import {chromium} from 'playwright';
+import {chromium, request} from 'playwright';
 import {PNG} from 'pngjs';
 import pixelmatch from 'pixelmatch';
 import fs from 'node:fs';
@@ -206,6 +206,32 @@ function compare(file, baseline, diffFile) {
     return ratio;
 }
 
+const reportName = args.report || 'report';
+
+// Right after a cache purge Moodle serves Boost's precompiled CSS while it compiles the theme: measuring then would
+// audit the wrong stylesheet. Wait until the served stylesheet is the theme's own.
+async function waitForThemeCss() {
+    const api = await request.newContext();
+    try {
+        for (let i = 0; i < 60; i++) {
+            try {
+                const html = await (await api.get(base + '/login/index.php')).text();
+                const href = (html.match(/href="([^"]*\/theme\/styles\.php\/[^"]+)"/) || [])[1];
+                if (href && (await (await api.get(href.replace(/&amp;/g, '&'))).text()).includes('.ct-login-grid')) {
+                    return;
+                }
+            } catch (e) {
+                // The built-in PHP server drops connections under load: try again.
+            }
+            await new Promise((r) => setTimeout(r, 5000));
+        }
+        throw new Error('The theme stylesheet was not served after 5 minutes');
+    } finally {
+        await api.dispose();
+    }
+}
+await waitForThemeCss();
+
 const browser = await chromium.launch();
 const sessions = {};
 
@@ -252,7 +278,9 @@ async function setEditing(page, on) {
     if (!(await toggle.count()) || (await toggle.isChecked()) === on) {
         return;
     }
-    await Promise.all([page.waitForLoadState('networkidle'), toggle.evaluate((el) => el.click())]);
+    await toggle.evaluate((el) => el.click());
+    // The switch saves the preference and reloads the page asynchronously: wait for the result, not for the click.
+    await page.waitForFunction((value) => document.body.classList.contains('editing') === value, on, {timeout: 30000});
     await page.waitForLoadState('networkidle');
 }
 
@@ -278,10 +306,20 @@ for (const width of widths) {
             }
         });
         const entry = {id: p.id, width, mode, url: p.url, user: p.user};
+        let actions = [];
         try {
             await page.goto(base + p.url, {waitUntil: 'networkidle', timeout: 60000});
-            if (p.action === 'edit') {
-                await setEditing(page, true);
+            // Actions, comma separated: "edit" turns editing on, "click:<selector>" clicks the first match (a button
+            // that opens a modal, or submits a form) and waits for the page to settle.
+            actions = (p.action || '').split(',').filter(Boolean);
+            for (const action of actions) {
+                if (action === 'edit') {
+                    await setEditing(page, true);
+                } else if (action.startsWith('click:')) {
+                    await page.locator(action.slice(6)).first().click();
+                    await page.waitForLoadState('networkidle');
+                    await page.waitForTimeout(800);
+                }
             }
             await page.waitForTimeout(300);
             entry.title = await page.title();
@@ -314,7 +352,8 @@ for (const width of widths) {
                     entry.visualdiff = compare(shot, ref, path.join(outDir, `${p.id}-${width}.diff.png`));
                 }
             }
-            if (p.action === 'edit') {
+            if (actions.includes('edit')) {
+                await page.goto(base + p.url, {waitUntil: 'networkidle', timeout: 60000});
                 await setEditing(page, false);
             }
         } catch (e) {
@@ -331,7 +370,7 @@ for (const width of widths) {
 }
 await browser.close();
 
-fs.writeFileSync(path.join(outDir, 'report.json'), JSON.stringify(report, null, 2));
+fs.writeFileSync(path.join(outDir, reportName + '.json'), JSON.stringify(report, null, 2));
 
 // Markdown summary.
 const lines = [`# Audit · ${mode} · ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`, '',
@@ -372,5 +411,5 @@ for (const e of report) {
         lines.push(`### ${e.id} · ${e.width}px`, ...notes, '');
     }
 }
-fs.writeFileSync(path.join(outDir, 'report.md'), lines.join('\n') + '\n');
-console.log(`Report: ${path.join(outDir, 'report.md')}`);
+fs.writeFileSync(path.join(outDir, reportName + '.md'), lines.join('\n') + '\n');
+console.log(`Report: ${path.join(outDir, reportName + '.md')}`);

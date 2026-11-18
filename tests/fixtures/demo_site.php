@@ -45,6 +45,14 @@ if ($options['help'] || !$options['confirm']) {
 \core\cron::setup_user();
 set_config('enablecompletion', 1);
 set_config('enablemycourses', 1);
+// Self registration and the guest button, so that the audit covers every login-flow screen.
+$auths = get_enabled_auth_plugins();
+if (!in_array('email', $auths)) {
+    $auths[] = 'email';
+    set_config('auth', implode(',', $auths));
+}
+set_config('registerauth', 'email');
+set_config('guestloginbutton', 1);
 $gen = new testing_data_generator();
 
 // Users.
@@ -121,6 +129,9 @@ if (!$DB->record_exists('course', ['shortname' => 'DEMO'])) {
         'category' => $categories[2]->id, 'enablecompletion' => 1, 'numsections' => 3]);
     $gen->enrol_user($users['ana']->id, $course->id, 'student');
     $gen->enrol_user($users['prof']->id, $course->id, 'editingteacher');
+    $fs->create_file_from_pathname(['contextid' => context_course::instance($course->id)->id, 'component' => 'course',
+        'filearea' => 'overviewfiles', 'itemid' => 0, 'filepath' => '/', 'filename' => 'cover.jpg'],
+        __DIR__ . '/images/course2.jpg');
 
     $gen->create_module('label', ['course' => $course->id, 'section' => 1,
         'intro' => '<p><strong>Welcome.</strong> This section shows text, links and a table.</p>'

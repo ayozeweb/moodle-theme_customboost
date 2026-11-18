@@ -38,6 +38,8 @@ final class lib_test extends \advanced_testcase {
         $scss = theme_customboost_get_pre_scss(\theme_config::load('customboost'));
         $this->assertStringContainsString('$primary: #0f6cbf;', $scss);
         $this->assertStringContainsString('$navbar-height: 56px;', $scss);
+        // $warning stays Boost's yellow: core uses it as a fill under dark text (.bg-warning.text-dark).
+        $this->assertStringNotContainsString('$warning:', $scss);
     }
 
     /**
@@ -72,6 +74,9 @@ final class lib_test extends \advanced_testcase {
             $this->assertStringContainsString('--ct-color-primary:', $css);
             $this->assertStringContainsString('--ct-radius-lg:', $css);
             $this->assertStringContainsString('[data-bs-theme="dark"]', $css);
+            // The yellow warning fill survives, and .text-warning is re-pointed to the theme's readable token.
+            $this->assertMatchesRegularExpression('/--bs-warning-rgb:\\s*240,\\s*173,\\s*78/', $css);
+            $this->assertMatchesRegularExpression('/\\.text-warning\\s*\\{\\s*--bs-warning-rgb:\\s*var\\(--ct-color-warning-rgb\\)/', $css);
         }
     }
 

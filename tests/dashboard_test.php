@@ -110,4 +110,70 @@ final class dashboard_test extends \advanced_testcase {
         $this->assertStringNotContainsString('&amp;amp;', $html);
         $this->assertStringNotContainsString('&amp;#', $html);
     }
+
+    /**
+     * Thirty courses: the limit is respected, recent ones come first and finished ones only appear if visited.
+     */
+    public function test_many_courses_limit_and_order(): void {
+        global $DB, $PAGE;
+        $this->resetAfterTest();
+        $gen = $this->getDataGenerator();
+        $user = $gen->create_user();
+        $courses = [];
+        for ($i = 1; $i <= 30; $i++) {
+            $courses[$i] = $gen->create_course(['fullname' => sprintf('Course %02d', $i)]);
+            $gen->enrol_user($user->id, $courses[$i]->id, 'student');
+        }
+        // Finished course, never visited: must not fill an empty slot.
+        $finished = $gen->create_course(['fullname' => 'Course 00 finished', 'startdate' => time() - 2 * YEARSECS,
+            'enddate' => time() - YEARSECS]);
+        $gen->enrol_user($user->id, $finished->id, 'student');
+        // Two recent visits, the newest first.
+        $DB->insert_record('user_lastaccess', ['userid' => $user->id, 'courseid' => $courses[17]->id, 'timeaccess' => time() - 60]);
+        $DB->insert_record('user_lastaccess', ['userid' => $user->id, 'courseid' => $courses[23]->id, 'timeaccess' => time()]);
+        $this->setUser($user);
+
+        $data = (new dashboard($user, 12))->export_for_template($PAGE->get_renderer('core'));
+        $names = array_column($data['courses'], 'fullname');
+
+        $this->assertCount(12, $names);
+        $this->assertSame(['Course 23', 'Course 17'], array_slice($names, 0, 2));
+        $this->assertNotContains('Course 00 finished', $names);
+        $this->assertSame(count($names), count(array_unique($names)));
+    }
+
+    /**
+     * Card states: no completion tracking, completed, hidden course.
+     */
+    public function test_card_states(): void {
+        global $CFG, $PAGE;
+        require_once($CFG->libdir . '/completionlib.php');
+        $this->resetAfterTest();
+        $CFG->enablecompletion = 1;
+        $gen = $this->getDataGenerator();
+        $user = $gen->create_user();
+        $plain = $gen->create_course(['fullname' => 'No tracking', 'enablecompletion' => 0]);
+        $done = $gen->create_course(['fullname' => 'Done', 'enablecompletion' => 1]);
+        $hidden = $gen->create_course(['fullname' => 'Hidden', 'visible' => 0]);
+        // Completion is only tracked for students; the hidden course is only listed for its teachers.
+        $gen->enrol_user($user->id, $plain->id, 'student');
+        $gen->enrol_user($user->id, $done->id, 'student');
+        $gen->enrol_user($user->id, $hidden->id, 'editingteacher');
+        $page = $gen->create_module('page', ['course' => $done->id, 'completion' => COMPLETION_TRACKING_MANUAL]);
+        (new \completion_info($done))->update_state(get_coursemodule_from_instance('page', $page->id), COMPLETION_COMPLETE,
+            $user->id);
+        $this->setUser($user);
+
+        $cards = [];
+        foreach ((new dashboard($user))->export_for_template($PAGE->get_renderer('core'))['courses'] as $card) {
+            $cards[$card['fullname']] = $card;
+        }
+
+        $this->assertFalse($cards['No tracking']['hasprogress']);
+        $this->assertTrue($cards['Done']['completed']);
+        $this->assertSame(100, $cards['Done']['progress']);
+        $this->assertTrue($cards['Hidden']['hidden']);
+        // Without a course image every card still gets a generated pattern.
+        $this->assertStringStartsWith('data:image/svg+xml', $cards['No tracking']['image']);
+    }
 }

@@ -3,7 +3,7 @@
 Guía completa para instalar, configurar y mantener el tema **Custom Boost** (`theme_customboost`) en tu Moodle.
 No hace falta saber programar: cada apartado indica dónde hacer clic y qué resultado esperar.
 
-> Versión documentada: **0.1.1 (alfa)** para **Moodle 5.3**. Las opciones marcadas como *previstas* todavía no
+> Versión documentada: **0.2.0 (alfa)** para **Moodle 5.3**. Las opciones marcadas como *previstas* todavía no
 > existen; están descritas en el [plan de puesta a punto](PLAN-PUESTA-A-PUNTO.md).
 
 ## Índice
@@ -399,6 +399,17 @@ analítica.
 *Automático* usa un pequeño script en línea para leer la preferencia claro/oscuro del dispositivo (igual que Boost).
 Si tu CSP prohíbe scripts en línea, usa el preset *Claro* u *Oscuro*.
 
+**¿El modo oscuro funciona en todas las páginas de Moodle?** En las más usadas, sí: el tema se ha revisado en
+34 páginas (curso, actividades, calificaciones, participantes, calendario, mensajería, perfil, administración…)
+a 360, 768 y 1280 px. El modo oscuro de Moodle 5.3 es experimental y algunas extensiones del core todavía usan
+colores fijos; el tema corrige los de la tarea y el informe de calificaciones del usuario. Si encuentras texto
+ilegible en otra página en oscuro, abre una incidencia con la URL y una captura.
+
+**¿Hay problemas de accesibilidad conocidos?** Los que quedan vienen de Moodle y ocurren igual con Boost: el
+calificador y la lista de entregas de una tarea son tablas anchas que obligan a desplazarse en horizontal en el
+móvil, el botón de borrado masivo en modo edición queda pequeño a 360 px y la página de mensajes tiene un elemento
+enfocable oculto. Están detallados en el [informe de verificación](informes/2026-11-18.md).
+
 **¿El editor de texto usa el aspecto del tema?** Sí en tipografía y formas. Los colores de marca no se aplican
 dentro del área de edición.
 
@@ -407,7 +418,7 @@ dentro del área de edición.
 **¿Es compatible con otros formatos de curso y extensiones?** Sí, con cualquiera que funcione con Boost. Está
 preparado para compartir estilos con `format_customtiles` mediante los tokens `--ct-*`.
 
-**¿Puedo usarlo en producción?** La versión 0.1.1 es alfa. Pruébala antes en un entorno de pruebas; el
+**¿Puedo usarlo en producción?** La versión 0.2.0 es alfa. Pruébala antes en un entorno de pruebas; el
 [plan de puesta a punto](PLAN-PUESTA-A-PUNTO.md) detalla lo que falta para la versión estable.
 
 **¿Funciona con idiomas de derecha a izquierda?** Moodle genera la hoja de estilos RTL automáticamente; aún no

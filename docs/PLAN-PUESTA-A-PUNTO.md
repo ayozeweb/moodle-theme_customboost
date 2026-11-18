@@ -37,7 +37,8 @@ compatibilidad móvil, administración muy personalizable, seguridad, accesibili
 | Contraste AA de los presets | `tests/tokens_test.php` (10 colores de marca) y `cli/contrast.php` (98 parejas) |
 | Sin scroll horizontal a 360 px | Script de capturas en acceso, área personal, Mis cursos y curso |
 | Estilo de código | `phpcs` con moodle-cs 3.7.0: 0 errores, 0 avisos |
-| Tests | 29 tests PHPUnit (tokens, tarjetas, preset, escapado, archivos, compilación SCSS, privacidad, idiomas) y 13 escenarios Behat |
+| Tests | 31 tests PHPUnit (tokens, tarjetas, preset, escapado, archivos, compilación SCSS, privacidad, idiomas) y 24 escenarios Behat, 8 de ellos con axe (contraste incluido) en claro y oscuro |
+| Recorrido de páginas | `tests/audit`: 34 páginas × 360/768/1280 px × claro/oscuro, comparado con Boost. Informe: [docs/informes/2026-11-18.md](informes/2026-11-18.md) |
 
 ### Hallazgos de la revisión previa del código
 
@@ -67,23 +68,23 @@ Roles: **I** invitado/no identificado · **E** estudiante · **P** profesor · *
 
 | Id | Prueba | Rol | Resultado esperado | Estado |
 |---|---|---|---|---|
-| FUN-01 | Instalar en un 5.3 limpio (Git y ZIP) | A | Sin avisos; ajustes con valores por defecto | 🟡 solo Git/CLI |
-| FUN-02 | Actualizar desde 0.1.0 conservando ajustes | A | Ajustes e imagen intactos | ⬜ |
-| FUN-03 | Desinstalar | A | Se borran ajustes y archivos; el sitio vuelve al tema anterior | ⬜ |
-| FUN-04 | Acceso: usuario y contraseña correctos e incorrectos | I | Mensaje de error visible y anunciado; foco en el error | 🟡 |
-| FUN-05 | Acceso con OAuth 2, registro por correo, recuperación de contraseña, acceso de invitados, MFA | I | Todas las pantallas del flujo usan el layout y son utilizables a 360 px | ⬜ |
-| FUN-06 | Acceso con imagen propia (JPG, PNG, WebP, AVIF; vertical y horizontal) | A/I | Imagen cubre el panel; texto legible | ⬜ |
-| FUN-07 | Acceso con título/lema vacíos, largos (200 caracteres) y con multilang | A/I | Sin desbordes; valores por defecto correctos | ⬜ |
-| FUN-08 | Área personal con 0, 1, 6 y 30 cursos | E | Estado vacío, límite respetado, orden por último acceso | 🟡 (test unitario) |
-| FUN-09 | Tarjeta de curso sin imagen, sin finalización, oculto, finalizado | E/P | Patrón generado; sin barra; atenuado; etiqueta «Completado» | 🟡 |
+| FUN-01 | Instalar en un 5.3 limpio (Git y ZIP) | A | Sin avisos; ajustes con valores por defecto | ✅ Git/CLI; el ZIP pasa el validador del instalador de Moodle (413 KB) |
+| FUN-02 | Actualizar desde 0.1.0 conservando ajustes | A | Ajustes e imagen intactos | ✅ 0.1.0 → 0.1.1 → 0.2.0 |
+| FUN-03 | Desinstalar | A | Se borran ajustes y archivos; el sitio vuelve al tema anterior | ✅ 12 ajustes → 0; reinstalación limpia |
+| FUN-04 | Acceso: usuario y contraseña correctos e incorrectos | I | Mensaje de error visible y anunciado; foco en el error | ✅ Behat (`role=alert` dentro de la hoja) |
+| FUN-05 | Acceso con OAuth 2, registro por correo, recuperación de contraseña, acceso de invitados, MFA | I | Todas las pantallas del flujo usan el layout y son utilizables a 360 px | 🟡 recuperación, registro e invitados auditados; OAuth 2 y MFA necesitan un proveedor real |
+| FUN-06 | Acceso con imagen propia (JPG, PNG, WebP, AVIF; vertical y horizontal) | A/I | Imagen cubre el panel; texto legible | 🟡 subida y uso de JPG (Behat); faltan los demás formatos y la vertical |
+| FUN-07 | Acceso con título/lema vacíos, largos (200 caracteres) y con multilang | A/I | Sin desbordes; valores por defecto correctos | ✅ Behat |
+| FUN-08 | Área personal con 0, 1, 6 y 30 cursos | E | Estado vacío, límite respetado, orden por último acceso | ✅ PHPUnit (0, 3, 30) y Behat |
+| FUN-09 | Tarjeta de curso sin imagen, sin finalización, oculto, finalizado | E/P | Patrón generado; sin barra; atenuado; etiqueta «Completado» | ✅ PHPUnit |
 | FUN-10 | Botón «Todos mis cursos» con Mis cursos activado y desactivado | E | Visible solo si está activado | ✅ |
-| FUN-11 | Desactivar tarjetas en ajustes | A/E | Área personal estándar con su encabezado | ⬜ |
-| FUN-12 | Área personal en modo de edición (añadir, mover bloques) | E | Las tarjetas no interfieren con arrastrar y soltar | ⬜ |
-| FUN-13 | Presets claro, oscuro y automático con modos de Boost desactivados | A/E | `data-bs-theme` correcto; automático sigue al sistema | 🟡 (test unitario) |
-| FUN-14 | Modos de color de Boost activados: selector, preferencia, cookie en acceso | E/I | Boost decide; el preset del tema no interfiere | ⬜ |
+| FUN-11 | Desactivar tarjetas en ajustes | A/E | Área personal estándar con su encabezado | ✅ Behat |
+| FUN-12 | Área personal en modo de edición (añadir, mover bloques) | E | Las tarjetas no interfieren con arrastrar y soltar | 🟡 añadir bloque (Behat); mover con arrastrar no probado |
+| FUN-13 | Presets claro, oscuro y automático con modos de Boost desactivados | A/E | `data-bs-theme` correcto; automático sigue al sistema | ✅ Behat y Playwright (automático cambia en vivo; sin JS queda en claro) |
+| FUN-14 | Modos de color de Boost activados: selector, preferencia, cookie en acceso | E/I | Boost decide; el preset del tema no interfiere | 🟡 selector y preferencia (Behat); cookie en acceso no probada |
 | FUN-15 | Cambiar color de marca/acento a valores hostiles | A | Se ajusta; «Colores en uso» lo refleja; CSS recompilado | ✅ |
-| FUN-16 | SCSS propio válido e inválido | A | Válido: se aplica. Inválido: rechazado al guardar | ⬜ |
-| FUN-17 | Páginas del core en ambos presets (ver lista 2.2) | E/P/A | Sin texto ilegible, sin elementos rotos | 🟡 |
+| FUN-16 | SCSS propio válido e inválido | A | Válido: se aplica. Inválido: rechazado al guardar | ✅ Behat |
+| FUN-17 | Páginas del core en ambos presets (ver lista 2.2) | E/P/A | Sin texto ilegible, sin elementos rotos | ✅ 34 páginas sin fallos atribuibles al tema; ver el informe para lo no cubierto |
 
 ### 2.2 Recorrido de páginas del core
 
@@ -108,7 +109,7 @@ Layout *embedded* y *popup*.
 | AUT-05 ✅ | Escapado: nombre de sitio, categoría y nombre de usuario con `<`, `&`, `'` (cierra H-01 y H-02) | PHPUnit |
 | AUT-06 ✅ | `theme_customboost_pluginfile`: solo sirve `loginimage` en contexto de sistema | PHPUnit |
 | AUT-07 ✅ | Compilación SCSS completa sin errores con valores por defecto y con colores hostiles | PHPUnit |
-| AUT-08 | Regresión visual: capturas de referencia a 360/768/1280 en claro y oscuro, umbral de diferencia del 0,1 % | Playwright |
+| AUT-08 ✅ | Regresión visual: capturas de referencia a 360/768/1280 en claro y oscuro, umbral de diferencia del 0,1 % (`tests/audit/baseline`, local) | Playwright |
 | AUT-09 ✅ | Proveedor de privacidad (`null_provider`) | PHPUnit |
 
 **Criterio de aceptación:** FUN-01 a FUN-17 en ✅; AUT-01 a AUT-09 en verde en CI con PHP 8.3 y 8.4.
@@ -140,8 +141,8 @@ con un servicio de dispositivos reales.
 
 | Id | Comprobación | Método | Criterio | Estado |
 |---|---|---|---|---|
-| MOV-01 | Sin scroll horizontal en ninguna página del recorrido 2.2 | Script: `scrollWidth <= innerWidth` a 320, 344, 360, 375, 412, 768 | 0 páginas con desborde | 🟡 4 páginas a 360 |
-| MOV-02 | Objetivos táctiles | Script que mide todo `a`, `button`, `input`, `[role=button]` visible | ≥ 44 × 44 px en cabecera, navegación, formularios y tarjetas; ≥ 24 px en el resto (WCAG 2.5.8) | ⬜ |
+| MOV-01 | Sin scroll horizontal en ninguna página del recorrido 2.2 | Script: `scrollWidth <= innerWidth` a 320, 344, 360, 375, 412, 768 | 0 páginas con desborde | 🟡 0 atribuibles al tema a 360/768/1280; quedan las dos tablas de datos del core (exentas de 1.4.10) y faltan 320, 344, 375 y 412 |
+| MOV-02 | Objetivos táctiles | Script que mide todo `a`, `button`, `input`, `[role=button]` visible | ≥ 44 × 44 px en cabecera, navegación, formularios y tarjetas; ≥ 24 px en el resto (WCAG 2.5.8) | ✅ automatizado en `tests/audit`; queda un botón del core (borrado masivo a 360 px) |
 | MOV-03 | Separación entre objetivos | Mismo script | ≥ 8 px entre objetivos adyacentes de la cabecera | ⬜ |
 | MOV-04 | Zonas seguras | iPhone con muesca, vertical y horizontal | Nada bajo la muesca ni bajo el indicador de inicio | ⬜ |
 | MOV-05 | Teclado virtual | Acceso y formularios en iOS y Android | El campo enfocado y el botón de enviar quedan visibles; sin zoom al enfocar (texto ≥ 16 px) | ⬜ |
@@ -380,8 +381,8 @@ Anexo IV de la Orden TMS/369/2019 que usa `format_customtiles`.
 | Id | Comprobación | Herramienta | Criterio | Estado |
 |---|---|---|---|---|
 | ACC-01 | Contraste de los tokens | PHPUnit + `cli/contrast.php` | 100 % de las parejas | ✅ |
-| ACC-02 | Reglas axe en acceso, área personal, Mis cursos, curso y ajustes, en claro y oscuro, a 360 y 1280 | `@axe-core/playwright` en CI | 0 infracciones graves o críticas atribuibles al tema | ⬜ |
-| ACC-03 | Pasos de accesibilidad de Behat (`the page should meet accessibility standards`) en AUT-01 a AUT-04 | Behat | En verde | ⬜ |
+| ACC-02 ✅ | Reglas axe en acceso, área personal, Mis cursos, curso y ajustes, en claro y oscuro, a 360 y 1280 | Behat con axe en CI (`accessibility.feature`) y `tests/audit` en local | 0 infracciones graves o críticas atribuibles al tema | ⬜ |
+| ACC-03 | Pasos de accesibilidad de Behat (`the page should meet accessibility standards`) en AUT-01 a AUT-04 | Behat | En verde | ✅ |
 | ACC-04 | Contraste real en pantalla (texto sobre imagen, estados hover/foco/deshabilitado) | Script de muestreo de píxeles sobre capturas | ≥ 4,5:1 texto; ≥ 3:1 componentes | ⬜ |
 | ACC-05 | HTML válido de las plantillas propias | Validador Nu | Sin errores | ⬜ |
 
@@ -528,7 +529,7 @@ exista el formato; sin regresiones en COM-30.
 | Fase | Versión | Contenido | Sale cuando… |
 |---|---|---|---|
 | **F0 · Cierre de hallazgos** | 0.1.1 alfa | H-01 a H-08; tests AUT-05, 06, 07, 09; CI en GitHub en verde (incluidos `mustache` y `grunt`) | CI verde en PHP 8.3 y 8.4; 0 hallazgos abiertos de gravedad media |
-| **F1 · Verificación base** | 0.2.0 alfa | Recorrido 2.2 completo en claro y oscuro; Behat AUT-01 a 04; regresión visual AUT-08; MOV-01 y MOV-02 automatizados; axe en CI (ACC-02) | FUN-01 a 17 en ✅; 0 infracciones graves de axe |
+| **F1 · Verificación base** ✅ 2026-11-18 | 0.2.0 alfa | Recorrido 2.2 completo en claro y oscuro; Behat AUT-01 a 04; regresión visual AUT-08; MOV-01 y MOV-02 automatizados; axe en CI (ACC-02) | FUN-01 a 17 en ✅; 0 infracciones graves de axe |
 | **F2 · Administración P1** | 0.5.0 beta | Nueva estructura de pestañas; ajustes P1 de marca, tipografía, formas, acceso, área personal, pie y avanzado; vista previa en vivo (ADM-X1 a X3); guía actualizada | ADM-V1 a V9 en ✅; migración desde 0.1.0 probada |
 | **F3 · Móvil y accesibilidad** | 0.7.0 beta | MOV-03 a 16 en dispositivos reales; ACC-10 a 37; preset de alto contraste; declaración de accesibilidad | Criterios de los apartados 3 y 6 cumplidos |
 | **F4 · Seguridad y compatibilidad** | 0.9.0 RC | SEG-01 a 20 (incluido ZAP y revisión por pares); matriz de CI completa; navegadores; RTL; extensiones; rendimiento | Criterios de los apartados 5, 7 y 8 cumplidos; 0 defectos críticos o altos abiertos |

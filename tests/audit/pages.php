@@ -37,12 +37,14 @@ foreach (get_fast_modinfo($course)->get_cms() as $cm) {
 }
 $discussion = $DB->get_field('forum_discussions', 'id', ['course' => $course->id], IGNORE_MULTIPLE);
 $c = $course->id;
+$coursecontext = context_course::instance($c)->id;
 
-// Each page: an id used in file names, the URL, who views it (anon, ana = student, prof = teacher, admin) and an
-// optional action run before the checks ("edit" turns editing on).
+// Each page: an id used in file names, the URL, who views it (anon, ana = student, prof = teacher, admin) and optional
+// actions run before the checks, comma separated: "edit" turns editing on, "click:<selector>" clicks a button.
 $pages = [
     ['login', '/login/index.php', 'anon'],
     ['forgotpassword', '/login/forgot_password.php', 'anon'],
+    ['signup', '/login/signup.php', 'anon'],
     ['sitehome', '/index.php?redirect=0', 'ana'],
     ['dashboard', '/my/', 'ana'],
     ['mycourses', '/my/courses.php', 'ana'],
@@ -50,18 +52,22 @@ $pages = [
     ['search', '/course/search.php?search=web', 'ana'],
     ['course', "/course/view.php?id={$c}", 'ana'],
     ['course-edit', "/course/view.php?id={$c}", 'prof', 'edit'],
+    ['activity-chooser', "/course/view.php?id={$c}", 'prof', 'edit,click:[data-action="open-addingcontent"],click:.dropdown-menu.show [data-action="open-chooser"]'],
+    ['contentbank', "/contentbank/index.php?contextid={$coursecontext}", 'prof'],
     ['book', "/mod/book/view.php?id={$cms['book']}", 'ana'],
     ['assign', "/mod/assign/view.php?id={$cms['assign']}", 'ana'],
     ['assign-grading', "/mod/assign/view.php?id={$cms['assign']}&action=grading", 'prof'],
     ['forum', "/mod/forum/discuss.php?d={$discussion}", 'ana'],
     ['choice', "/mod/choice/view.php?id={$cms['choice']}", 'ana'],
     ['quiz', "/mod/quiz/view.php?id={$cms['quiz']}", 'ana'],
+    ['quiz-attempt', "/mod/quiz/view.php?id={$cms['quiz']}", 'ana', 'click:form[action*="startattempt.php"] [type=submit]'],
     ['grades-user', "/grade/report/user/index.php?id={$c}", 'ana'],
     ['grades-grader', "/grade/report/grader/index.php?id={$c}", 'prof'],
     ['participants', "/user/index.php?id={$c}", 'prof'],
     ['course-settings', "/course/edit.php?id={$c}", 'prof'],
     ['calendar', '/calendar/view.php?view=month', 'ana'],
     ['messages', '/message/index.php', 'ana'],
+    ['notifications', '/message/output/popup/notifications.php', 'ana'],
     ['profile', '/user/profile.php', 'ana'],
     ['preferences', '/user/preferences.php', 'ana'],
     ['privatefiles', '/user/files.php', 'ana'],
@@ -71,6 +77,11 @@ $pages = [
     ['admin-users', '/admin/user.php', 'admin'],
     ['admin-theme', '/admin/settings.php?section=themesettingcustomboost', 'admin'],
 ];
+
+// Self registration only exists when an authentication plugin offers it.
+if (empty($CFG->registerauth)) {
+    $pages = array_values(array_filter($pages, fn($p) => $p[0] !== 'signup'));
+}
 
 echo json_encode(array_map(fn($p) => [
     'id' => $p[0],

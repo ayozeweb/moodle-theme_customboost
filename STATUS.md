@@ -1,10 +1,33 @@
 # STATUS · theme_customboost
 
 ## Current milestone
-**F0 · Close review findings** (plan phase F0, version 0.1.1): done. GitHub Actions is green on PHP 8.3 and 8.4
-(PostgreSQL 17): phpcs, PHPDoc, validation, Mustache lint, Grunt, 29 PHPUnit tests and 13 Behat scenarios.
+**F1 · Base verification** (plan phase F1, version 0.2.0): done. Report: `docs/informes/2026-11-18.md`.
 
-## F0 · Done
+## F1 · Done
+- `tests/audit`: Playwright + axe audit of 34 pages at 360/768/1280 px in both presets (overflow, touch targets,
+  WCAG 2.2 AA, JS errors, visual regression against `tests/audit/baseline`). Every run is compared with Boost to
+  tell theme findings from core ones. `tests/fixtures/demo_site.php` creates the demo data.
+- Theme-caused findings fixed (all of them): course cards shown on the messaging page (same layout), muted text
+  at 4.47:1 on the tinted canvas, 40px nav pills and edit switch, small core controls too close together, login-flow
+  forms wider than a phone, 1-70px overflows at 360px, words split by `overflow-wrap: anywhere`, invalid ARIA in the
+  settings tabs, white text on light fills in dark mode, secondary button and file-type hints in dark mode, the
+  yellow `.bg-warning` fill lost to a brown text colour (2.55:1), and links inside alerts in dark mode.
+- Dark preset patches for core plugins with literal colours (`_dark-core.scss`): mod_assign, gradereport_user and
+  search highlights. They fail with Boost's dark mode too; the theme fixes them because it offers a dark preset.
+- Remaining findings are core and identical with Boost: two wide data tables (grader, assignment submissions; exempt
+  from WCAG 1.4.10), the bulk delete button at 360px in edit mode, a focusable hidden element on the messaging page,
+  and the developer exception page (debug display only).
+- Behat: 24 scenarios (8 with axe, contrast included, in both presets), all green locally with headless Chrome and
+  in CI. New: administration.feature (wrong password, multilang and long texts, login image upload, invalid SCSS,
+  editing mode, Boost colour modes with the user selector).
+- PHPUnit: 31 tests / 183 assertions (30 courses with limit and order, card states, warning fill regression).
+- Verified by hand: install from ZIP (installer validator), upgrade 0.1.0 → 0.2.0, uninstall and reinstall,
+  automatic preset following the system in real time.
+- Packaging: `.gitattributes` keeps screenshots and visual baselines out of the ZIP (15 MB → 413 KB).
+
+## Previous milestones
+
+### F0 · Done
 - GitHub Actions was failing on every push: `phpcs` (language string order) and `grunt` (80 stylelint problems in
   the SCSS). Both fixed; stylelint is now run locally with Moodle's `.stylelintrc`. PHPUnit (PHP 8.3 and 8.4,
   PostgreSQL 17), Mustache lint, PHPDoc and validation were already green on GitHub.
@@ -19,11 +42,10 @@
 - Tests: 29 PHPUnit tests / 169 assertions; version bumped to 0.1.1.
 - H-03 (inline script for the automatic preset) accepted and documented: same mechanism as Boost.
 
-## Previous milestone
-**M3 · Tuning plan and administrator documentation**: done. Version 0.1.0 (ALPHA) is installable and complete for
-the requested scope; the road to 1.0.0 is in `docs/PLAN-PUESTA-A-PUNTO.md`.
+### M3 · Tuning plan and administrator documentation
 
-## M3 · Done
+Version 0.1.0 (ALPHA) was installable and complete for the requested scope; the road to 1.0.0 is in
+`docs/PLAN-PUESTA-A-PUNTO.md`.
 - `docs/GUIA-ADMINISTRACION.md`: full administrator guide in Spanish (install, every setting, recipes,
   troubleshooting, FAQ, settings reference). Documents only what exists in 0.1.0.
 - `docs/PLAN-PUESTA-A-PUNTO.md`: verification plan (functional, mobile, administration/customisation, security,
@@ -86,8 +108,9 @@ the requested scope; the road to 1.0.0 is in `docs/PLAN-PUESTA-A-PUNTO.md`.
 - None.
 
 ## Next steps
-- Phase F1 of the plan: full core page walk-through in both presets, visual regression, automated touch-target
-  and overflow checks, axe in CI.
+- Phase F2 of the plan: administration P1 settings with live preview (recommended model: Fable 5.2, see the plan).
+- F1 leftovers, not blocking: OAuth 2 / MFA login screens, PNG/WebP/AVIF and portrait login images, block drag and
+  drop, the colour mode cookie on the login page, overflow at 320/344/375/412 px.
 
 ## Later ideas
 - Hero image per course category on the personal area cards.

@@ -177,6 +177,13 @@
             --#{$prefix}alert-link-color: var(--ct-color-text);
         }
     }
+
+    // Plain links in an alert (core prints many without .alert-link) take the alert's text colour, which is AA on
+    // every tint, and an underline to tell them apart. Core colours them with a literal blue that fails in dark mode.
+    a:not(.btn) {
+        color: var(--#{$prefix}alert-link-color, var(--ct-color-text));
+        text-decoration: underline;
+    }
 }
 
 // Tables.
@@ -219,20 +226,26 @@
     }
 }
 
-// Boost's dark mode underlines every link in #region-main because prose links cannot be told apart from text by
-// colour alone on a dark page (WCAG 1.4.1). That reasoning applies to links inside text, not to standalone links
-// that are identified by their position (card titles, section and activity names), so these keep the light mode
-// look and are underlined on hover/focus instead.
-[data-bs-theme="dark"] #region-main {
-    .course-card a.coursename,
-    .ct-course-card a.ct-course-card-link,
-    .course-section .sectionname a,
-    .activity-item .activityname a {
-        text-decoration: none;
+// Boost's dark mode underlines every link in #page-header and #region-main because prose links cannot be told apart
+// from text by colour alone on a dark page (WCAG 1.4.1). That reasoning applies to links inside text, not to
+// standalone links identified by their position (card titles, section and activity names), so these keep the light
+// mode look and are underlined on hover/focus instead. Boost's selector chains five :not() (specificity 1,6,1), so
+// the same chain is repeated here to win without !important.
+$ct-boost-dark-link-not: ":not(.btn):not(.nav-link):not(.dropdown-item):not(.list-group-item):not(.page-link)";
 
-        &:hover,
-        &:focus-visible {
-            text-decoration: underline;
+[data-bs-theme="dark"] {
+    #page-header,
+    #region-main {
+        .course-card a.coursename#{$ct-boost-dark-link-not},
+        .ct-course-card a.ct-course-card-link#{$ct-boost-dark-link-not},
+        .course-section .sectionname a#{$ct-boost-dark-link-not},
+        .activity-item .activityname a#{$ct-boost-dark-link-not} {
+            text-decoration: none;
+
+            &:hover,
+            &:focus-visible {
+                text-decoration: underline;
+            }
         }
     }
 }
@@ -241,6 +254,7 @@
 // typography are given a 24px box. Links inside sentences are exempt and are not touched.
 .btn.btn-link,
 .courseindex .courseindex-chevron,
+.courseindex .courseindex-link,
 .quickeditlink,
 a[id^="action_link"],
 .table th > a,
@@ -266,4 +280,10 @@ a[id^="action_link"],
 // dark preset. Same fix as Boost's for .bg-light .text-dark: re-point the variable the utility reads.
 [data-bs-theme="dark"] .form-filetypes-descriptions .text-dark {
     --#{$prefix}dark-rgb: var(--ct-color-text-rgb);
+}
+
+// .text-warning: Boost's yellow fill colour is unreadable as text on a light page (about 2:1). Same technique as
+// Boost's dark mode: re-point the variable inside the utility only, so .bg-warning keeps its yellow fill.
+.text-warning {
+    --#{$prefix}warning-rgb: var(--ct-color-warning-rgb);
 }
