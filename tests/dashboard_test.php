@@ -160,8 +160,11 @@ final class dashboard_test extends \advanced_testcase {
         $gen->enrol_user($user->id, $done->id, 'student');
         $gen->enrol_user($user->id, $hidden->id, 'editingteacher');
         $page = $gen->create_module('page', ['course' => $done->id, 'completion' => COMPLETION_TRACKING_MANUAL]);
-        (new \completion_info($done))->update_state(get_coursemodule_from_instance('page', $page->id), COMPLETION_COMPLETE,
-            $user->id);
+        (new \completion_info($done))->update_state(
+            get_coursemodule_from_instance('page', $page->id),
+            COMPLETION_COMPLETE,
+            $user->id
+        );
         $this->setUser($user);
 
         $cards = [];

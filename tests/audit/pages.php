@@ -38,6 +38,8 @@ foreach (get_fast_modinfo($course)->get_cms() as $cm) {
 $discussion = $DB->get_field('forum_discussions', 'id', ['course' => $course->id], IGNORE_MULTIPLE);
 $c = $course->id;
 $coursecontext = context_course::instance($c)->id;
+// The activity chooser opens from the "+" menu of a section, in editing mode.
+$openchooser = 'edit,click:[data-action="open-addingcontent"],click:.dropdown-menu.show [data-action="open-chooser"]';
 
 // Each page: an id used in file names, the URL, who views it (anon, ana = student, prof = teacher, admin) and optional
 // actions run before the checks, comma separated: "edit" turns editing on, "click:<selector>" clicks a button.
@@ -52,7 +54,7 @@ $pages = [
     ['search', '/course/search.php?search=web', 'ana'],
     ['course', "/course/view.php?id={$c}", 'ana'],
     ['course-edit', "/course/view.php?id={$c}", 'prof', 'edit'],
-    ['activity-chooser', "/course/view.php?id={$c}", 'prof', 'edit,click:[data-action="open-addingcontent"],click:.dropdown-menu.show [data-action="open-chooser"]'],
+    ['activity-chooser', "/course/view.php?id={$c}", 'prof', $openchooser],
     ['contentbank', "/contentbank/index.php?contextid={$coursecontext}", 'prof'],
     ['book', "/mod/book/view.php?id={$cms['book']}", 'ana'],
     ['assign', "/mod/assign/view.php?id={$cms['assign']}", 'ana'],

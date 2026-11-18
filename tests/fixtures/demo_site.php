@@ -129,9 +129,11 @@ if (!$DB->record_exists('course', ['shortname' => 'DEMO'])) {
         'category' => $categories[2]->id, 'enablecompletion' => 1, 'numsections' => 3]);
     $gen->enrol_user($users['ana']->id, $course->id, 'student');
     $gen->enrol_user($users['prof']->id, $course->id, 'editingteacher');
-    $fs->create_file_from_pathname(['contextid' => context_course::instance($course->id)->id, 'component' => 'course',
-        'filearea' => 'overviewfiles', 'itemid' => 0, 'filepath' => '/', 'filename' => 'cover.jpg'],
-        __DIR__ . '/images/course2.jpg');
+    $fs->create_file_from_pathname(
+        ['contextid' => context_course::instance($course->id)->id, 'component' => 'course',
+            'filearea' => 'overviewfiles', 'itemid' => 0, 'filepath' => '/', 'filename' => 'cover.jpg'],
+        __DIR__ . '/images/course2.jpg'
+    );
 
     $gen->create_module('label', ['course' => $course->id, 'section' => 1,
         'intro' => '<p><strong>Welcome.</strong> This section shows text, links and a table.</p>'
