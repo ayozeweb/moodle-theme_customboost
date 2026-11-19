@@ -17,6 +17,9 @@
 /**
  * Settings for theme_customboost.
  *
+ * Six tabs. Everything that changes the look (colours, logos, typography, shape) is on the first one, under a live
+ * preview, so that the preview can follow every change. The choices themselves live in classes/options.php.
+ *
  * @package    theme_customboost
  * @copyright  2026 Ayoze de Paz
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -24,139 +27,272 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// The tools page (contrast report, export, import, restore) sits next to the settings under Appearance > Themes.
+$ADMIN->add('themes', new admin_externalpage(
+    'theme_customboost_tools',
+    get_string('toolspage', 'theme_customboost'),
+    new \core\url('/theme/customboost/tools.php'),
+    'moodle/site:config'
+));
+
+use theme_customboost\admin\setting_preview;
 use theme_customboost\hook_listener;
+use theme_customboost\options;
 use theme_customboost\tokens;
 
 if ($ADMIN->fulltree) {
-    $settings = new theme_boost_admin_settingspage_tabs(
-        'themesettingcustomboost',
-        get_string('configtitle', 'theme_customboost')
+    $component = 'theme_customboost';
+    $str = fn(string $id, $a = null) => get_string($id, $component, $a);
+    // Every setting that changes the stylesheet recompiles it when saved.
+    $css = function (admin_setting $setting) use (&$page): void {
+        $setting->set_updatedcallback('theme_reset_all_caches');
+        $page->add($setting);
+    };
+    $choices = fn(string $option, string $prefix) => array_combine(
+        options::choices($option),
+        array_map(fn($value) => get_string($prefix . $value, 'theme_customboost'), options::choices($option))
     );
 
-    // Appearance: colour preset and brand colours.
-    $page = new admin_settingpage('theme_customboost_appearance', get_string('appearance', 'theme_customboost'));
+    $settings = new theme_boost_admin_settingspage_tabs('themesettingcustomboost', $str('configtitle'));
 
-    $choices = [
-        hook_listener::PRESET_LIGHT => get_string('preset_light', 'theme_customboost'),
-        hook_listener::PRESET_DARK => get_string('preset_dark', 'theme_customboost'),
-        hook_listener::PRESET_AUTO => get_string('preset_auto', 'theme_customboost'),
-    ];
-    $setting = new admin_setting_configselect(
+    // 1. Appearance: preview, colours, logos, typography and shape.
+    $page = new admin_settingpage('theme_customboost_appearance', $str('appearance'));
+
+    $page->add(new setting_preview('theme_customboost/preview', $str('preview'), $str('preview_desc')));
+
+    $page->add(new admin_setting_heading('theme_customboost/colours', $str('colours'), ''));
+
+    $css(new admin_setting_configselect(
         'theme_customboost/colourpreset',
-        get_string('colourpreset', 'theme_customboost'),
-        get_string('colourpreset_desc', 'theme_customboost'),
+        $str('colourpreset'),
+        $str('colourpreset_desc'),
         hook_listener::PRESET_LIGHT,
-        $choices
-    );
-    $setting->set_updatedcallback('theme_reset_all_caches');
-    $page->add($setting);
+        [
+            hook_listener::PRESET_LIGHT => $str('preset_light'),
+            hook_listener::PRESET_DARK => $str('preset_dark'),
+            hook_listener::PRESET_AUTO => $str('preset_auto'),
+        ]
+    ));
 
-    // Show the colours actually in use, after the automatic AA adjustment.
-    $palettes = tokens::build(
-        get_config('theme_customboost', 'brandcolour') ?: null,
-        get_config('theme_customboost', 'accentcolour') ?: null
-    );
-    $effective = get_string('effectivecolours', 'theme_customboost', (object) [
+    // The colours really in use after the AA adjustment, with a warning when the chosen ones had to change.
+    $palettes = options::palettes();
+    $inuse = $str('effectivecolours', (object) [
         'light' => $palettes['light']['primary'],
         'dark' => $palettes['dark']['primary'],
         'accentlight' => $palettes['light']['accent'],
         'accentdark' => $palettes['dark']['accent'],
     ]);
-
-    $setting = new admin_setting_configcolourpicker(
+    if (array_intersect(['primary-light', 'accent-light'], $palettes['adjusted'])) {
+        $inuse .= ' ' . $str('colouradjusted');
+    }
+    $css(new admin_setting_configselect(
+        'theme_customboost/palette',
+        $str('palette'),
+        $str('palette_desc') . ' ' . $inuse,
+        options::DEFAULTS['palette'],
+        $choices('palette', 'palette_')
+    ));
+    $css(new admin_setting_configcolourpicker(
         'theme_customboost/brandcolour',
-        get_string('brandcolour', 'theme_customboost'),
-        get_string('brandcolour_desc', 'theme_customboost') . ' ' . $effective,
+        $str('brandcolour'),
+        $str('brandcolour_desc'),
         tokens::DEFAULT_BRAND
-    );
-    $setting->set_updatedcallback('theme_reset_all_caches');
-    $page->add($setting);
-
-    $setting = new admin_setting_configcolourpicker(
+    ));
+    $css(new admin_setting_configcolourpicker(
         'theme_customboost/accentcolour',
-        get_string('accentcolour', 'theme_customboost'),
-        get_string('accentcolour_desc', 'theme_customboost'),
+        $str('accentcolour'),
+        $str('accentcolour_desc'),
         tokens::DEFAULT_ACCENT
-    );
-    $setting->set_updatedcallback('theme_reset_all_caches');
-    $page->add($setting);
+    ));
+    // Dependencies go on the tabs page, not the tab: theme_boost_admin_settingspage_tabs copies a tab's settings up but
+    // not its dependencies, and admin/settings.php only reads those of the top level page.
+    $settings->hide_if('theme_customboost/brandcolour', 'theme_customboost/palette', 'neq', options::PALETTE_CUSTOM);
+    $settings->hide_if('theme_customboost/accentcolour', 'theme_customboost/palette', 'neq', options::PALETTE_CUSTOM);
+
+    $page->add(new admin_setting_heading('theme_customboost/logos', $str('logos'), $str('logos_desc')));
+    $logotypes = ['maxfiles' => 1, 'accepted_types' => ['.svg', '.png', '.webp', '.jpg', '.jpeg']];
+    $css(new admin_setting_configstoredfile(
+        'theme_customboost/logodark',
+        $str('logodark'),
+        $str('logodark_desc'),
+        'logodark',
+        0,
+        $logotypes
+    ));
+    $css(new admin_setting_configstoredfile(
+        'theme_customboost/logocompactdark',
+        $str('logocompactdark'),
+        $str('logocompactdark_desc'),
+        'logocompactdark',
+        0,
+        $logotypes
+    ));
+
+    $page->add(new admin_setting_heading('theme_customboost/typography', $str('typography'), ''));
+    $css(new admin_setting_configselect(
+        'theme_customboost/fontfamily',
+        $str('fontfamily'),
+        $str('fontfamily_desc'),
+        options::DEFAULTS['fontfamily'],
+        $choices('fontfamily', 'font_')
+    ));
+    $css(new admin_setting_configselect(
+        'theme_customboost/fontsize',
+        $str('fontsize'),
+        $str('fontsize_desc'),
+        options::DEFAULTS['fontsize'],
+        $choices('fontsize', 'fontsize_')
+    ));
+
+    $page->add(new admin_setting_heading('theme_customboost/shape', $str('shape'), ''));
+    $css(new admin_setting_configselect(
+        'theme_customboost/radius',
+        $str('radius'),
+        $str('radius_desc'),
+        options::DEFAULTS['radius'],
+        $choices('radius', 'radius_')
+    ));
+    $css(new admin_setting_configselect(
+        'theme_customboost/density',
+        $str('density'),
+        $str('density_desc'),
+        options::DEFAULTS['density'],
+        $choices('density', 'density_')
+    ));
 
     $settings->add($page);
 
-    // Login page.
-    $page = new admin_settingpage('theme_customboost_login', get_string('loginpage', 'theme_customboost'));
+    // 2. Header.
+    $page = new admin_settingpage('theme_customboost_header', $str('header'));
+    $page->add(new admin_setting_configcheckbox(
+        'theme_customboost/showsitename',
+        $str('showsitename'),
+        $str('showsitename_desc'),
+        0
+    ));
+    $settings->add($page);
 
+    // 3. Login page.
+    $page = new admin_settingpage('theme_customboost_login', $str('loginpage'));
+    $css(new admin_setting_configselect(
+        'theme_customboost/loginlayout',
+        $str('loginlayout'),
+        $str('loginlayout_desc'),
+        options::DEFAULTS['loginlayout'],
+        $choices('loginlayout', 'loginlayout_')
+    ));
     $setting = new admin_setting_configstoredfile(
         'theme_customboost/loginimage',
-        get_string('loginimage', 'theme_customboost'),
-        get_string('loginimage_desc', 'theme_customboost'),
+        $str('loginimage'),
+        $str('loginimage_desc'),
         'loginimage',
         0,
         ['maxfiles' => 1, 'accepted_types' => ['.jpg', '.jpeg', '.png', '.webp', '.avif'], 'maxbytes' => 1048576]
     );
-    $setting->set_updatedcallback('theme_reset_all_caches');
+    // Large photos are scaled down when saved: the login page is the first thing every user loads.
+    $setting->set_updatedcallback('theme_customboost_process_login_image');
     $page->add($setting);
-
     $page->add(new admin_setting_configtext(
         'theme_customboost/logintitle',
-        get_string('logintitle', 'theme_customboost'),
-        get_string('logintitle_desc', 'theme_customboost'),
+        $str('logintitle'),
+        $str('logintitle_desc'),
         '',
         PARAM_TEXT
     ));
-
     $page->add(new admin_setting_configtextarea(
         'theme_customboost/logintagline',
-        get_string('logintagline', 'theme_customboost'),
-        get_string('logintagline_desc', 'theme_customboost'),
+        $str('logintagline'),
+        $str('logintagline_desc'),
         '',
         PARAM_TEXT
     ));
-
+    $page->add(new admin_setting_confightmleditor(
+        'theme_customboost/loginfootertext',
+        $str('loginfootertext'),
+        $str('loginfootertext_desc'),
+        ''
+    ));
     $settings->add($page);
 
-    // Dashboard.
-    $page = new admin_settingpage('theme_customboost_dashboard', get_string('dashboard', 'theme_customboost'));
-
+    // 4. Personal area.
+    $page = new admin_settingpage('theme_customboost_dashboard', $str('dashboard'));
     $page->add(new admin_setting_configcheckbox(
         'theme_customboost/dashboardcourses',
-        get_string('dashboardcourses', 'theme_customboost'),
-        get_string('dashboardcourses_desc', 'theme_customboost'),
+        $str('dashboardcourses'),
+        $str('dashboardcourses_desc'),
         1
     ));
-
+    $page->add(new admin_setting_configselect(
+        'theme_customboost/dashboardsource',
+        $str('dashboardsource'),
+        $str('dashboardsource_desc'),
+        options::DEFAULTS['dashboardsource'],
+        $choices('dashboardsource', 'dashboardsource_')
+    ));
     $page->add(new admin_setting_configselect(
         'theme_customboost/dashboardcoursecount',
-        get_string('dashboardcoursecount', 'theme_customboost'),
+        $str('dashboardcoursecount'),
         '',
         6,
         [3 => 3, 4 => 4, 6 => 6, 8 => 8, 12 => 12]
     ));
-
+    $page->add(new admin_setting_configmulticheckbox(
+        'theme_customboost/dashboardcardelements',
+        $str('dashboardcardelements'),
+        $str('dashboardcardelements_desc'),
+        array_fill_keys(explode(',', options::DEFAULTS['dashboardcardelements']), 1),
+        $choices('dashboardcardelements', 'cardelement_')
+    ));
+    $page->add(new admin_setting_configtext(
+        'theme_customboost/dashboardgreeting',
+        $str('dashboardgreeting'),
+        $str('dashboardgreeting_desc'),
+        '',
+        PARAM_TEXT
+    ));
+    $page->add(new admin_setting_configtext(
+        'theme_customboost/dashboardsubtitle',
+        $str('dashboardsubtitle'),
+        $str('dashboardsubtitle_desc'),
+        '',
+        PARAM_TEXT
+    ));
+    $dependent = ['dashboardsource', 'dashboardcoursecount', 'dashboardcardelements', 'dashboardgreeting', 'dashboardsubtitle'];
+    foreach ($dependent as $name) {
+        $settings->hide_if('theme_customboost/' . $name, 'theme_customboost/dashboardcourses');
+    }
     $settings->add($page);
 
-    // Advanced.
-    $page = new admin_settingpage('theme_customboost_advanced', get_string('advancedsettings', 'theme_customboost'));
+    // 5. Footer.
+    $page = new admin_settingpage('theme_customboost_footer', $str('footer'));
+    $page->add(new admin_setting_confightmleditor(
+        'theme_customboost/footertext',
+        $str('footertext'),
+        $str('footertext_desc'),
+        ''
+    ));
+    $settings->add($page);
 
-    $setting = new admin_setting_scsscode(
+    // 6. Advanced.
+    $page = new admin_settingpage('theme_customboost_advanced', $str('advancedsettings'));
+    $page->add(new admin_setting_description(
+        'theme_customboost/toolslink',
+        $str('tools'),
+        $str('tools_desc', (new \core\url('/theme/customboost/tools.php'))->out())
+    ));
+    $css(new admin_setting_scsscode(
         'theme_customboost/scsspre',
-        get_string('rawscsspre', 'theme_customboost'),
-        get_string('rawscsspre_desc', 'theme_customboost'),
+        $str('rawscsspre'),
+        $str('rawscsspre_desc'),
         '',
         PARAM_RAW
-    );
-    $setting->set_updatedcallback('theme_reset_all_caches');
-    $page->add($setting);
-
-    $setting = new admin_setting_scsscode(
+    ));
+    $css(new admin_setting_scsscode(
         'theme_customboost/scss',
-        get_string('rawscss', 'theme_customboost'),
-        get_string('rawscss_desc', 'theme_customboost'),
+        $str('rawscss'),
+        $str('rawscss_desc'),
         '',
         PARAM_RAW
-    );
-    $setting->set_updatedcallback('theme_reset_all_caches');
-    $page->add($setting);
-
+    ));
     $settings->add($page);
 }

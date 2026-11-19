@@ -23,6 +23,8 @@
     Example context (json):
     {
         "greeting": "Hello, Ana",
+        "subtitle": "Pick up where you left off.",
+        "sectiontitle": "Continue learning",
         "mycoursesurl": "https://example.com/my/courses.php",
         "hascourses": true,
         "courses": [
@@ -37,7 +39,9 @@
                 "progresstext": "40% complete",
                 "completed": false,
                 "notstarted": false,
-                "hidden": false
+                "hidden": false,
+                "enddate": "31/12/26",
+                "continue": true
             }
         ]
     }
@@ -46,7 +50,7 @@
     <div class="ct-dashboard-hero-head">
         <div class="ct-dashboard-hero-text">
             <h2 id="ct-dashboard-greeting" class="ct-dashboard-greeting">{{greeting}}</h2>
-            <p class="ct-dashboard-subtitle">{{#str}}greeting_subtitle, theme_customboost{{/str}}</p>
+            {{#subtitle}}<p class="ct-dashboard-subtitle">{{subtitle}}</p>{{/subtitle}}
         </div>
         {{#mycoursesurl}}
             <a class="btn btn-outline-secondary ct-dashboard-all" href="{{mycoursesurl}}">
@@ -57,7 +61,7 @@
     </div>
 
     {{#hascourses}}
-        <h3 class="ct-section-title" id="ct-dashboard-courses-title">{{#str}}coursesinprogress, theme_customboost{{/str}}</h3>
+        <h3 class="ct-section-title" id="ct-dashboard-courses-title">{{sectiontitle}}</h3>
         <div class="ct-course-scroller" tabindex="0" role="region" aria-labelledby="ct-dashboard-courses-title">
             <ul class="ct-course-grid" role="list">
                 {{#courses}}
@@ -83,6 +87,13 @@
                                     <span class="ct-course-card-progress-text" aria-hidden="true">{{#notstarted}}{{#str}}notstarted, theme_customboost{{/str}}{{/notstarted}}{{^notstarted}}{{progresstext}}{{/notstarted}}</span>
                                 </div>
                             {{/hasprogress}}
+                            {{#enddate}}
+                                <span class="ct-course-card-meta">{{#str}}cardenddate, theme_customboost, {{enddate}}{{/str}}</span>
+                            {{/enddate}}
+                            {{#continue}}
+                                {{! Visual cue only: the whole card is already the link, so this is not a second tab stop. }}
+                                <span class="btn btn-sm btn-primary ct-course-card-continue" aria-hidden="true">{{#str}}continuecourse, theme_customboost{{/str}}</span>
+                            {{/continue}}
                         </div>
                     </li>
                 {{/courses}}

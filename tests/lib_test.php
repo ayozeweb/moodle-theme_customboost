@@ -28,12 +28,14 @@ namespace theme_customboost;
 #[\PHPUnit\Framework\Attributes\CoversFunction('theme_customboost_get_extra_scss')]
 #[\PHPUnit\Framework\Attributes\CoversFunction('theme_customboost_get_main_scss_content')]
 #[\PHPUnit\Framework\Attributes\CoversFunction('theme_customboost_pluginfile')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('theme_customboost_process_login_image')]
 final class lib_test extends \advanced_testcase {
     /**
      * The pre SCSS takes its colours from the token builder.
      */
     public function test_pre_scss_uses_tokens(): void {
         $this->resetAfterTest();
+        set_config('palette', 'custom', 'theme_customboost');
         set_config('brandcolour', '#0f6cbf', 'theme_customboost');
         $scss = theme_customboost_get_pre_scss(\theme_config::load('customboost'));
         $this->assertStringContainsString('$primary: #0f6cbf;', $scss);
@@ -110,5 +112,31 @@ final class lib_test extends \advanced_testcase {
             'login image, course context' => ['loginimage', false],
             'traversal attempt' => ['../loginimage', true],
         ];
+    }
+
+    /**
+     * A login image wider than 2000px is scaled down when saved and keeps its name; smaller ones are left alone.
+     */
+    public function test_login_image_resize(): void {
+        $this->resetAfterTest();
+        $fs = get_file_storage();
+        $context = \context_system::instance();
+        $record = ['contextid' => $context->id, 'component' => 'theme_customboost', 'filearea' => 'loginimage',
+            'itemid' => 0, 'filepath' => '/'];
+        foreach ([3000 => 'big.jpg', 1200 => 'small.jpg'] as $width => $name) {
+            $image = imagecreatetruecolor($width, (int) ($width / 2));
+            ob_start();
+            imagejpeg($image);
+            $fs->create_file_from_string($record + ['filename' => $name], ob_get_clean());
+        }
+        set_config('loginimage', '/big.jpg', 'theme_customboost');
+
+        theme_customboost_process_login_image('theme_customboost/loginimage');
+
+        $files = [];
+        foreach ($fs->get_area_files($context->id, 'theme_customboost', 'loginimage', 0, 'filename', false) as $file) {
+            $files[$file->get_filename()] = $file->get_imageinfo()['width'];
+        }
+        $this->assertSame(['big.jpg' => 2000, 'small.jpg' => 1200], $files);
     }
 }

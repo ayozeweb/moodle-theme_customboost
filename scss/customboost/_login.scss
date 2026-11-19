@@ -238,3 +238,84 @@
         background-color: transparent;
     }
 }
+
+// Text under the form (legal notice, help desk).
+.ct-login-footertext {
+    max-width: 420px;
+    margin: var(--ct-space-5) auto 0;
+    color: var(--ct-color-text-muted);
+    font-size: var(--ct-font-size-sm);
+    text-align: center;
+
+    p:last-child {
+        margin-bottom: 0;
+    }
+}
+
+// Layout "no image": the form alone, centred on the page canvas.
+.ct-login-layout-plain {
+    background-color: var(--ct-color-bg);
+
+    #region-main.ct-login-main {
+        margin-top: 0;
+        align-items: center;
+        justify-content: center;
+        padding: var(--ct-space-6) var(--ct-gutter);
+    }
+
+    #region-main-box.ct-login-sheet {
+        flex: 0 1 480px;
+        border-radius: var(--ct-radius-xl);
+        box-shadow: var(--ct-shadow-md);
+        padding: var(--ct-space-6) var(--ct-gutter);
+    }
+}
+
+@include media-breakpoint-up(lg) {
+    // Layout "image on the right".
+    .ct-login-grid.ct-login-layout-right {
+        grid-template-columns: minmax(480px, 1fr) minmax(0, 1.15fr);
+
+        .ct-login-media {
+            order: 2;
+        }
+    }
+
+    // Layout "image covering the page": the image is the background and the form sits in a card on the right.
+    .ct-login-grid.ct-login-layout-cover {
+        position: relative;
+        grid-template-columns: minmax(0, 1fr);
+
+        .ct-login-media {
+            position: fixed;
+            inset: 0;
+            height: auto;
+        }
+
+        .ct-login-media-content {
+            position: absolute;
+            inset-inline-start: 0;
+            bottom: 0;
+            max-width: 46%;
+        }
+
+        #region-main.ct-login-main {
+            position: relative;
+            justify-content: flex-end;
+            padding: var(--ct-space-7) var(--ct-space-8);
+        }
+
+        #region-main-box.ct-login-sheet {
+            flex: 0 1 460px;
+            padding: var(--ct-space-6);
+            border-radius: var(--ct-radius-xl);
+            background-color: var(--ct-color-surface);
+            box-shadow: var(--ct-shadow-lg);
+        }
+    }
+
+    .ct-login-layout-plain #region-main-box.ct-login-sheet {
+        padding: var(--ct-space-7) var(--ct-space-6);
+        background-color: var(--ct-color-surface);
+    }
+}

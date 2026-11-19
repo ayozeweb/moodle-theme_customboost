@@ -144,7 +144,9 @@ class tokens {
             self::MIN_TEXT,
             '#ffffff'
         );
-        $adjusted[] = 'primary-dark';
+        if ($darkprimary !== $brand) {
+            $adjusted[] = 'primary-dark';
+        }
         $dark['primary'] = $darkprimary;
         $dark['primary-hover'] = self::mix('#ffffff', $darkprimary, 0.18);
         $dark['on-primary'] = self::best_on($darkprimary, $dark['bg']);
@@ -161,6 +163,9 @@ class tokens {
             self::MIN_TEXT,
             '#ffffff'
         );
+        if ($darkaccent !== $accent) {
+            $adjusted[] = 'accent-dark';
+        }
         $dark['accent'] = $darkaccent;
         $dark['on-accent'] = self::best_on($darkaccent, $dark['bg']);
         $dark['link'] = $darkprimary;
@@ -237,11 +242,17 @@ class tokens {
      * preset when Boost's colour modes are off).
      *
      * @param array $palettes Result of build().
+     * @param string $light Selector of the light palette (the live preview scopes it to its own panel).
+     * @param string $dark Selector of the dark palette.
      * @return string CSS.
      */
-    public static function to_css(array $palettes): string {
-        $css = ":root,\n[data-bs-theme=\"light\"] {\n" . self::declarations($palettes['light']) . "    color-scheme: light;\n}\n";
-        $css .= "[data-bs-theme=\"dark\"] {\n" . self::declarations($palettes['dark']) . "    color-scheme: dark;\n}\n";
+    public static function to_css(
+        array $palettes,
+        string $light = ":root,\n[data-bs-theme=\"light\"]",
+        string $dark = '[data-bs-theme="dark"]'
+    ): string {
+        $css = "{$light} {\n" . self::declarations($palettes['light']) . "    color-scheme: light;\n}\n";
+        $css .= "{$dark} {\n" . self::declarations($palettes['dark']) . "    color-scheme: dark;\n}\n";
         return $css;
     }
 

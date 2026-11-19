@@ -40,6 +40,9 @@ if ($isdefaultimage) {
 $title = trim((string) get_config('theme_customboost', 'logintitle'));
 $tagline = trim((string) get_config('theme_customboost', 'logintagline'));
 
+$layout = \theme_customboost\options::get('loginlayout');
+$footertext = trim((string) get_config('theme_customboost', 'loginfootertext'));
+
 $leftinstructions = !empty($CFG->auth_instructions)
     ? format_text($CFG->auth_instructions, FORMAT_MOODLE, ['context' => $systemcontext])
     : null;
@@ -57,6 +60,9 @@ $templatecontext = [
         ? format_string($tagline, true, ['context' => $systemcontext, 'escape' => false])
         : get_string('logintagline_default', 'theme_customboost'),
     'leftinstructions' => $leftinstructions,
+    'layout' => $layout,
+    'hasimage' => $layout !== 'plain',
+    'loginfootertext' => $footertext !== '' ? format_text($footertext, FORMAT_HTML, ['context' => $systemcontext]) : '',
 ];
 
 echo $OUTPUT->render_from_template('theme_customboost/login', $templatecontext);

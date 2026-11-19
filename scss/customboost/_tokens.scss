@@ -3,6 +3,14 @@
 // The contract is documented in docs/tokens.md. Plugins must read them with a fallback, e.g.
 // `border-radius: var(--ct-radius-lg, 1rem)`, so they keep working under other themes.
 
+// Defaults; the Corner radius and Density settings override them (classes/options.php).
+$ct-radius-sm: .5rem !default;
+$ct-radius-md: .75rem !default;
+$ct-radius-lg: 1rem !default;
+$ct-radius-xl: 1.5rem !default;
+$ct-radius-pill: 999px !default;
+$ct-density: 1 !default;
+
 :root {
     // Typography.
     --ct-font-family: #{$font-family-sans-serif};
@@ -24,14 +32,14 @@
     --ct-letter-spacing-tight: -0.015em;
 
     // Shape.
-    --ct-radius-sm: .5rem;
-    --ct-radius-md: .75rem;
-    --ct-radius-lg: 1rem;
-    --ct-radius-xl: 1.5rem;
-    --ct-radius-pill: 999px;
+    --ct-radius-sm: #{$ct-radius-sm};
+    --ct-radius-md: #{$ct-radius-md};
+    --ct-radius-lg: #{$ct-radius-lg};
+    --ct-radius-xl: #{$ct-radius-xl};
+    --ct-radius-pill: #{$ct-radius-pill};
 
     // Spacing (4px base) and density multiplier.
-    --ct-density: 1;
+    --ct-density: #{$ct-density};
     --ct-space-1: calc(.25rem * var(--ct-density));
     --ct-space-2: calc(.5rem * var(--ct-density));
     --ct-space-3: calc(.75rem * var(--ct-density));

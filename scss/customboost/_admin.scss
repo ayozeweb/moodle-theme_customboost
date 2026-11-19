@@ -1,0 +1,118 @@
+// Live preview of the appearance settings (Site administration > Appearance > Themes > Custom Boost).
+// The panels read the --ct- tokens that the preview module scopes to them.
+
+.ct-preview {
+    container-type: inline-size;
+}
+
+.ct-preview-status:empty {
+    display: none;
+}
+
+.ct-preview-status {
+    padding: var(--ct-space-2) var(--ct-space-3);
+    border-inline-start: 4px solid var(--ct-color-warning);
+    border-radius: var(--ct-radius-sm);
+    background-color: var(--ct-color-warning-subtle);
+    color: var(--ct-color-text);
+}
+
+.ct-preview-panels {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ct-space-4);
+    transition: opacity var(--ct-duration) var(--ct-ease);
+
+    .ct-preview-loading & {
+        opacity: .6;
+    }
+}
+
+@container (min-width: 640px) {
+    .ct-preview-panels {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.ct-preview-panel {
+    overflow: hidden;
+    border: 1px solid var(--ct-color-border);
+    border-radius: var(--ct-radius-lg);
+    background-color: var(--ct-color-bg);
+    color: var(--ct-color-text);
+    font-family: var(--ct-font-family);
+}
+
+.ct-preview-label {
+    padding: var(--ct-space-1) var(--ct-space-3);
+    background-color: var(--ct-color-surface-2);
+    color: var(--ct-color-text-muted);
+    font-size: var(--ct-font-size-xs);
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.ct-preview-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--ct-space-2);
+    padding: var(--ct-space-2) var(--ct-space-3);
+    border-bottom: 1px solid var(--ct-color-border);
+    background-color: var(--ct-color-header-bg);
+    font-weight: 700;
+}
+
+.ct-preview-pill {
+    margin-inline-start: auto;
+    padding: .25rem .75rem;
+    border-radius: var(--ct-radius-pill);
+    background-color: var(--ct-color-primary-subtle);
+    color: var(--ct-color-on-primary-subtle);
+    font-size: var(--ct-font-size-sm);
+    font-weight: 650;
+}
+
+.ct-preview-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ct-space-3);
+    padding: var(--ct-space-4);
+}
+
+.ct-preview-title {
+    margin: 0;
+}
+
+.ct-preview-text {
+    margin: 0;
+    color: var(--ct-color-text-muted);
+
+    a {
+        color: var(--ct-color-link);
+        text-decoration: underline;
+    }
+}
+
+.ct-preview-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ct-space-2);
+}
+
+.ct-preview-card {
+    max-width: 280px;
+
+    &:hover {
+        transform: none;
+    }
+
+    .ct-course-card-title {
+        font-weight: 650;
+    }
+}
+
+.ct-preview-card-media {
+    aspect-ratio: 16 / 7;
+    background: linear-gradient(135deg, var(--ct-color-primary), var(--ct-color-accent));
+}

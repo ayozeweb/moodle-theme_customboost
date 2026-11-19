@@ -179,4 +179,68 @@ final class dashboard_test extends \advanced_testcase {
         // Without a course image every card still gets a generated pattern.
         $this->assertStringStartsWith('data:image/svg+xml', $cards['No tracking']['image']);
     }
+
+    /**
+     * The four sources: recent, in progress, starred and all.
+     */
+    public function test_sources(): void {
+        global $CFG, $DB, $PAGE;
+        require_once($CFG->libdir . '/completionlib.php');
+        $this->resetAfterTest();
+        $CFG->enablecompletion = 1;
+        $gen = $this->getDataGenerator();
+        $user = $gen->create_user();
+        $past = $gen->create_course(['fullname' => 'Past', 'startdate' => time() - 2 * YEARSECS, 'enddate' => time() - YEARSECS]);
+        $current = $gen->create_course(['fullname' => 'Current', 'startdate' => time() - WEEKSECS,
+            'enddate' => time() + YEARSECS]);
+        $future = $gen->create_course(['fullname' => 'Future', 'startdate' => time() + YEARSECS]);
+        foreach ([$past, $current, $future] as $course) {
+            $gen->enrol_user($user->id, $course->id, 'student');
+        }
+        $DB->insert_record('user_lastaccess', ['userid' => $user->id, 'courseid' => $past->id, 'timeaccess' => time()]);
+        $this->setUser($user);
+        \core_favourites\service_factory::get_service_for_user_context(\context_user::instance($user->id))
+            ->create_favourite('core_course', 'courses', $future->id, \context_course::instance($future->id));
+
+        $names = function (string $source) use ($user, $PAGE): array {
+            $data = (new dashboard($user, 6, $source))->export_for_template($PAGE->get_renderer('core'));
+            return array_column($data['courses'], 'fullname');
+        };
+        $this->assertSame(['Past', 'Current', 'Future'], $names('recent'));
+        $this->assertSame(['Current'], $names('inprogress'));
+        $this->assertSame(['Future'], $names('starred'));
+        // All: last accessed first, then by name.
+        $this->assertSame(['Past', 'Current', 'Future'], $names('all'));
+    }
+
+    /**
+     * Card elements and the greeting texts.
+     */
+    public function test_elements_and_texts(): void {
+        global $PAGE;
+        $this->resetAfterTest();
+        $gen = $this->getDataGenerator();
+        $user = $gen->create_user(['firstname' => 'Ana']);
+        $course = $gen->create_course(['enddate' => make_timestamp(2030, 6, 30)]);
+        $gen->enrol_user($user->id, $course->id, 'student');
+        $this->setUser($user);
+        $renderer = $PAGE->get_renderer('core');
+
+        $card = (new dashboard($user, 6, 'all', []))->export_for_template($renderer)['courses'][0];
+        $this->assertSame('', $card['category']);
+        $this->assertSame('', $card['enddate']);
+        $this->assertFalse($card['continue']);
+
+        $card = (new dashboard($user, 6, 'all', ['category', 'enddate', 'continue']))->export_for_template($renderer)['courses'][0];
+        $this->assertNotSame('', $card['category']);
+        $this->assertStringContainsString('30', $card['enddate']);
+        $this->assertTrue($card['continue']);
+
+        set_config('dashboardgreeting', 'Welcome back, {firstname}! <b>bold</b>', 'theme_customboost');
+        set_config('dashboardsubtitle', '{firstname}, your courses', 'theme_customboost');
+        $data = (new dashboard($user))->export_for_template($renderer);
+        $this->assertSame('Welcome back, Ana! bold', $data['greeting']);
+        $this->assertSame('Ana, your courses', $data['subtitle']);
+        $this->assertSame(get_string('dashboardsection_recent', 'theme_customboost'), $data['sectiontitle']);
+    }
 }

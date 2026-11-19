@@ -238,3 +238,15 @@
 .pagelayout-mydashboard:has(.ct-dashboard-hero) #page-header .page-header-headings {
     @include visually-hidden;
 }
+
+// Optional parts of a card: end date and a "Continue" cue (the whole card is the link, so the cue is not a control).
+.ct-course-card-meta {
+    color: var(--ct-color-text-muted);
+    font-size: var(--ct-font-size-sm);
+}
+
+.ct-course-card-continue {
+    align-self: flex-start;
+    margin-top: var(--ct-space-1);
+    pointer-events: none;
+}

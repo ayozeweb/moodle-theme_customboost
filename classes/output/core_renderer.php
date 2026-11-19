@@ -16,6 +16,9 @@
 
 namespace theme_customboost\output;
 
+use theme_customboost\hook_listener;
+use theme_customboost\options;
+
 /**
  * Core renderer for theme_customboost.
  *
@@ -42,10 +45,92 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
         global $USER;
         $limit = (int) (get_config('theme_customboost', 'dashboardcoursecount') ?: 6);
-        $dashboard = new dashboard($USER, $limit);
+        $elements = options::get('dashboardcardelements');
+        $dashboard = new dashboard(
+            $USER,
+            $limit,
+            options::get('dashboardsource'),
+            $elements === '' ? [] : explode(',', $elements)
+        );
         return $header . $this->render_from_template(
             'theme_customboost/dashboard',
             $dashboard->export_for_template($this)
+        );
+    }
+
+    /**
+     * The full logo: the dark version when the page is known to render dark.
+     *
+     * The mode is known on the server for the dark preset and for a user who chose dark in Boost's colour modes. With
+     * the automatic preset it is only known in the browser, so the light logo is used (documented in the guide).
+     *
+     * @param int|null $maxwidth
+     * @param int $maxheight
+     * @return \core\url|false
+     */
+    public function get_logo_url($maxwidth = null, $maxheight = 200) {
+        if (hook_listener::current_mode() === hook_listener::PRESET_DARK && ($dark = $this->dark_logo_url('logodark'))) {
+            return $dark;
+        }
+        return parent::get_logo_url($maxwidth, $maxheight);
+    }
+
+    /**
+     * URL of the compact logo for dark mode, or false. The header prints both and CSS shows the right one, so it also
+     * works with the automatic preset.
+     *
+     * @return \core\url|false
+     */
+    public function dark_compact_logo_url() {
+        return $this->should_display_navbar_logo() ? $this->dark_logo_url('logocompactdark') : false;
+    }
+
+    /**
+     * Whether the header shows the site name next to the compact logo (without a logo it is always shown).
+     *
+     * @return bool
+     */
+    public function show_navbar_sitename(): bool {
+        return (bool) get_config('theme_customboost', 'showsitename');
+    }
+
+    /**
+     * The administrator's footer text, filtered for the system context.
+     *
+     * @return string
+     */
+    public function ct_footer_text(): string {
+        $text = trim((string) get_config('theme_customboost', 'footertext'));
+        if ($text === '') {
+            return '';
+        }
+        return format_text($text, FORMAT_HTML, ['context' => \context_system::instance()]);
+    }
+
+    /**
+     * URL of one of the dark logo settings, or false when it is not set.
+     *
+     * Returned as a URL object like core's get_logo_url(): callers such as the login form call out() on it.
+     *
+     * @param string $setting logodark or logocompactdark.
+     * @return \core\url|false
+     */
+    protected function dark_logo_url(string $setting) {
+        if ($this->page->theme->name !== 'customboost') {
+            // A child theme of this one has its own settings.
+            return false;
+        }
+        $filepath = (string) get_config('theme_customboost', $setting);
+        if ($filepath === '') {
+            return false;
+        }
+        return \core\url::make_pluginfile_url(
+            \context_system::instance()->id,
+            'theme_customboost',
+            $setting,
+            theme_get_revision(),
+            dirname($filepath) === '/' ? '/' : dirname($filepath) . '/',
+            basename($filepath)
         );
     }
 }

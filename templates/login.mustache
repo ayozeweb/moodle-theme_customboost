@@ -18,8 +18,9 @@
     @template theme_customboost/login
 
     Login page: an image panel with the site title and tagline, and the login form.
-    On mobile the image is a band on top and the form slides over it as a sheet;
-    from 992 px they sit side by side.
+    On mobile the image is a band on top and the form slides over it as a sheet.
+    From 992 px it depends on the layout setting: image on the left or on the right,
+    image covering the page with the form in a card, or no image at all.
 
     Example context (json):
     {
@@ -34,7 +35,10 @@
         "isdefaultimage": true,
         "logintitle": "Campus Demo",
         "logintagline": "Learn at your own pace, from any device.",
-        "leftinstructions": ""
+        "leftinstructions": "",
+        "layout": "left",
+        "hasimage": true,
+        "loginfootertext": "<p>Need help? Write to the help desk.</p>"
     }
 }}
 {{> theme_boost/head }}
@@ -47,7 +51,8 @@
     {{{ output.standard_top_of_body_html }}}
 
     <div id="page" class="ct-login">
-        <div id="page-content" class="ct-login-grid">
+        <div id="page-content" class="ct-login-grid ct-login-layout-{{layout}}">
+            {{#hasimage}}
             <aside class="ct-login-media{{#isdefaultimage}} ct-login-media-default{{/isdefaultimage}}">
                 <img class="ct-login-image" src="{{loginimage}}" alt="" width="1600" height="1100" fetchpriority="high" decoding="async">
                 <div class="ct-login-media-content">
@@ -62,11 +67,15 @@
                     {{/leftinstructions}}
                 </div>
             </aside>
+            {{/hasimage}}
             <div id="region-main" class="ct-login-main">
                 <div id="region-main-box" class="ct-login-sheet">
                     <div class="login-container">
                         {{{ output.main_content }}}
                     </div>
+                    {{#loginfootertext}}
+                        <div class="ct-login-footertext">{{{loginfootertext}}}</div>
+                    {{/loginfootertext}}
                 </div>
             </div>
         </div>

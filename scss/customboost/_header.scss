@@ -160,3 +160,18 @@
         flex-shrink: 0;
     }
 }
+
+// Light and dark versions of the compact logo: both are in the page, the colour mode picks one.
+.ct-logo-dark {
+    display: none;
+}
+
+[data-bs-theme="dark"] {
+    .ct-logo-light {
+        display: none;
+    }
+
+    .ct-logo-dark {
+        display: inline-block;
+    }
+}

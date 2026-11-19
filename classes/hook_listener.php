@@ -65,6 +65,18 @@ class hook_listener {
     }
 
     /**
+     * The colour mode of this request as far as the server knows it: light, dark or auto (resolved in the browser).
+     *
+     * @return string
+     */
+    public static function current_mode(): string {
+        if (colour_mode::is_enabled()) {
+            return colour_mode::get_current_mode();
+        }
+        return self::get_preset();
+    }
+
+    /**
      * Whether this theme, rather than Boost, decides the colour mode on this request.
      *
      * @return bool
@@ -97,10 +109,7 @@ class hook_listener {
         if (!self::is_active()) {
             return;
         }
-        $palettes = tokens::build(
-            get_config('theme_customboost', 'brandcolour') ?: null,
-            get_config('theme_customboost', 'accentcolour') ?: null
-        );
+        $palettes = options::palettes();
         // Mobile browsers tint their toolbar with this, so it matches the compact header in each mode.
         $hook->add_html(html_writer::empty_tag('meta', ['name' => 'theme-color',
             'content' => $palettes['light']['header-bg'], 'media' => '(prefers-color-scheme: light)']));

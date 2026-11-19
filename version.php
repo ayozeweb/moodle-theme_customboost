@@ -25,9 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'theme_customboost';
-$plugin->version   = 2026111800;
-$plugin->release   = '0.2.0';
-$plugin->maturity  = MATURITY_ALPHA;
+$plugin->version   = 2026111900;
+$plugin->release   = '0.5.0';
+$plugin->maturity  = MATURITY_BETA;
 $plugin->requires  = 2026100500;
 $plugin->supported = [503, 503];
 $plugin->dependencies = [

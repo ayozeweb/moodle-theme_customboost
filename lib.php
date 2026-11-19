@@ -22,6 +22,7 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use theme_customboost\options;
 use theme_customboost\tokens;
 
 /**
@@ -31,8 +32,7 @@ use theme_customboost\tokens;
  * @return array
  */
 function theme_customboost_palettes(?theme_config $theme = null): array {
-    $settings = $theme ? $theme->settings : get_config('theme_customboost');
-    return tokens::build($settings->brandcolour ?? null, $settings->accentcolour ?? null);
+    return options::palettes($theme ? $theme->settings : null);
 }
 
 /**
@@ -69,6 +69,8 @@ function theme_customboost_get_pre_scss($theme): string {
     $scss .= "\$dark-surface-raised: {$dark['surface']};\n";
     $scss .= "\$dark-surface-page: {$dark['bg']};\n";
     $scss .= "\$dark-surface-recessed: {$dark['surface-sunken']};\n";
+    // Typography, corner radius and density chosen in the settings.
+    $scss .= options::pre_scss($theme->settings);
     $scss .= file_get_contents(__DIR__ . '/scss/preset/variables.scss');
 
     if (!empty($theme->settings->scsspre)) {
@@ -85,6 +87,7 @@ function theme_customboost_get_pre_scss($theme): string {
  */
 function theme_customboost_get_extra_scss($theme): string {
     $content = tokens::to_css(theme_customboost_palettes($theme));
+    $content .= options::extra_css($theme->settings);
 
     if (!empty($theme->settings->scss)) {
         $content .= "\n" . $theme->settings->scss;
@@ -104,6 +107,48 @@ function theme_customboost_get_precompiled_css(): string {
 }
 
 /**
+ * After the login image is saved: scale it down to at most 2000px wide and reset the theme caches.
+ *
+ * The login page is the first page every user loads, often on a phone. A 2000px image covers a 1000px wide panel at
+ * twice the pixel density; anything bigger only costs bandwidth. GIF and SVG are not accepted by the setting; AVIF
+ * and WebP are left as they are when the server's GD cannot read them.
+ *
+ * @param string $name The full setting name.
+ * @return void
+ */
+function theme_customboost_process_login_image(string $name = ''): void {
+    $maxwidth = 2000;
+    $fs = get_file_storage();
+    $context = context_system::instance();
+    foreach ($fs->get_area_files($context->id, 'theme_customboost', 'loginimage', 0, 'id', false) as $file) {
+        $info = $file->get_imageinfo();
+        $resizable = $info && in_array($info['mimetype'], ['image/jpeg', 'image/png', 'image/webp'], true);
+        if (!$resizable || $info['width'] <= $maxwidth) {
+            continue;
+        }
+        try {
+            $record = [
+                'contextid' => $context->id,
+                'component' => 'theme_customboost',
+                'filearea' => 'loginimage',
+                'itemid' => 0,
+                'filepath' => $file->get_filepath(),
+                'filename' => 'resized-' . $file->get_filename(),
+            ];
+            $resized = $fs->convert_image($record, $file, $maxwidth, null, true, 85);
+            // Same name as before, so the stored setting value (the file path) stays valid.
+            $filename = $file->get_filename();
+            $file->delete();
+            $resized->rename($resized->get_filepath(), $filename);
+        } catch (Exception $e) {
+            // Keep the original image: a slow login page is better than a missing one.
+            debugging('Could not resize the login image: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        }
+    }
+    theme_reset_all_caches();
+}
+
+/**
  * Serve the theme setting files.
  *
  * @param stdClass $course
@@ -116,7 +161,7 @@ function theme_customboost_get_precompiled_css(): string {
  * @return bool
  */
 function theme_customboost_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
-    if ($context->contextlevel == CONTEXT_SYSTEM && $filearea === 'loginimage') {
+    if ($context->contextlevel == CONTEXT_SYSTEM && in_array($filearea, ['loginimage', 'logodark', 'logocompactdark'], true)) {
         $theme = theme_config::load('customboost');
         if (!array_key_exists('cacheability', $options)) {
             $options['cacheability'] = 'public';

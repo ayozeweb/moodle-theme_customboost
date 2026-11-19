@@ -19,7 +19,8 @@
     @template theme_boost/navbar
 
     Overridden by theme_customboost: compact 56px header with the brand visible on mobile,
-    44px touch targets and dividers hidden on small screens.
+    44px touch targets and dividers hidden on small screens. The compact logo can have a dark
+    version (both are printed, CSS shows one) and the site name can follow the logo.
 
     This template renders the top navbar.
 
@@ -67,7 +68,13 @@
 
         <a href="{{{ config.homeurl }}}" class="navbar-brand ct-brand d-flex align-items-center m-0 me-md-4 p-0 aabtn">
             {{# output.should_display_navbar_logo }}
-                <img src="{{output.get_compact_logo_url}}" class="logo" alt="{{sitename}}">
+                <img src="{{output.get_compact_logo_url}}" class="logo{{#output.dark_compact_logo_url}} ct-logo-light{{/output.dark_compact_logo_url}}" alt="{{^output.show_navbar_sitename}}{{sitename}}{{/output.show_navbar_sitename}}">
+                {{#output.dark_compact_logo_url}}
+                    <img src="{{.}}" class="logo ct-logo-dark" alt="{{^output.show_navbar_sitename}}{{sitename}}{{/output.show_navbar_sitename}}">
+                {{/output.dark_compact_logo_url}}
+                {{#output.show_navbar_sitename}}
+                    <span class="ct-brand-name">{{{ sitename }}}</span>
+                {{/output.show_navbar_sitename}}
             {{/ output.should_display_navbar_logo }}
             {{^ output.should_display_navbar_logo }}
                 <span class="ct-brand-mark" aria-hidden="true"></span>

@@ -1,8 +1,13 @@
 // Footer.
+// Boost's footer only holds the help popover (and, with this theme, the footer text): no box of its own.
 #page-footer {
-    background-color: var(--ct-color-surface);
+    background-color: transparent !important; // stylelint-disable-line declaration-no-important
     color: var(--ct-color-text);
-    border-top: 1px solid var(--ct-color-border);
+}
+
+#page-footer .footer-content-popover {
+    background-color: var(--ct-color-surface);
+    border: 1px solid var(--ct-color-border);
 }
 
 .btn-footer-popover {
@@ -20,4 +25,23 @@
     border-top: 1px solid var(--ct-color-border);
     // stylelint-disable-next-line csstree/validator
     padding-bottom: env(safe-area-inset-bottom);
+}
+
+// Administrator's footer text: a quiet band at the end of the page, outside Boost's footer popover.
+.ct-site-footer {
+    // Boost's footer is not full width, so no box: centred text on the page canvas.
+    padding: var(--ct-space-5) var(--ct-gutter) calc(var(--ct-space-5) + env(safe-area-inset-bottom));
+    background-color: var(--ct-color-bg);
+    color: var(--ct-color-text-muted);
+    font-size: var(--ct-font-size-sm);
+    text-align: center;
+
+    p:last-child {
+        margin-bottom: 0;
+    }
+
+    a {
+        color: var(--ct-color-link);
+        text-decoration: underline;
+    }
 }
