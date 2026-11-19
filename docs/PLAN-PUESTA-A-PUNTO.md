@@ -37,8 +37,8 @@ compatibilidad móvil, administración muy personalizable, seguridad, accesibili
 | Contraste AA de los presets | `tests/tokens_test.php` (10 colores de marca) y `cli/contrast.php` (98 parejas) |
 | Sin scroll horizontal a 360 px | Script de capturas en acceso, área personal, Mis cursos y curso |
 | Estilo de código | `phpcs` con moodle-cs 3.7.0: 0 errores, 0 avisos |
-| Tests | 31 tests PHPUnit (tokens, tarjetas, preset, escapado, archivos, compilación SCSS, privacidad, idiomas) y 24 escenarios Behat, 8 de ellos con axe (contraste incluido) en claro y oscuro |
-| Recorrido de páginas | `tests/audit`: 34 páginas × 360/768/1280 px × claro/oscuro, comparado con Boost. Informe: [docs/informes/2026-11-18.md](informes/2026-11-18.md) |
+| Tests | 58 tests PHPUnit (tokens, opciones, tarjetas, preset, escapado, archivos, compilación SCSS, vista previa, exportar/importar, migración, privacidad, idiomas) y 32 escenarios Behat, 8 de ellos con axe (contraste incluido) en claro y oscuro |
+| Recorrido de páginas | `tests/audit`: 35 páginas (desde F2, también las herramientas del tema) × 360/768/1280 px × claro/oscuro, comparado con Boost. Informe: [docs/informes/2026-11-18.md](informes/2026-11-18.md) |
 
 ### Hallazgos de la revisión previa del código
 
@@ -49,7 +49,7 @@ Detectados al preparar este plan y **cerrados en la fase F0** (versión 0.1.1), 
 | H-01 | Nombre del sitio y título de acceso impresos sin escapar | ✅ | `layout/login.php` exporta texto plano y la plantilla escapa con `{{ }}`. Escenario Behat con marcado en el título. |
 | H-02 | Doble escapado del saludo, el curso y la categoría («O'Brien», «I+D & Formación») | ✅ | Misma convención en `classes/output/dashboard.php`. Test `test_strings_are_escaped_once`. |
 | H-03 | El script en línea del preset automático necesita `unsafe-inline` con una CSP estricta | 🟡 aceptado | Mismo mecanismo que usa Boost para su modo automático. Documentado en la guía; se elimina si Boost lo hace. |
-| H-04 | Imagen de acceso sin límite de peso | ✅ | Límite de 1 MB en el ajuste. El redimensionado en servidor sigue previsto (ADM-L6). |
+| H-04 | Imagen de acceso sin límite de peso | ✅ | Límite de 1 MB en el ajuste y, desde F2, reducción a 2000 px al guardar (ADM-L6). |
 | H-05 | `tokens::build()` se ejecutaba completo en cada página | ✅ | Resultado en caché durante la petición. |
 | H-06 | Sin CSS precompilado propio | 🟡 herramienta lista | `cli/build_css.php` genera `style/moodle.css` con los marcadores de imagen y fuente intactos. Se ejecuta al preparar cada versión; el archivo no se guarda en Git. |
 | H-07 | `mustache` y `grunt` sin verificar | ✅ | El CI de GitHub ya ejecutaba ambos: `mustache` pasaba y `grunt` fallaba por 80 avisos de stylelint, ahora corregidos. También fallaba `phpcs` por el orden de una cadena de idioma. |
@@ -183,32 +183,37 @@ vista previa y sin poder romper la accesibilidad.
 5. **Reversible:** botón para restaurar valores de fábrica y exportación/importación de la configuración.
 6. **Cada ajuste nuevo** llega con cadenas en/es, valor por defecto, validación, test y una fila en la guía.
 
-### 4.2 Estructura de pestañas propuesta
+### 4.2 Estructura de pestañas
+
+Implementada en F2 con **seis pestañas** en lugar de las nueve propuestas inicialmente:
 
 | Pestaña | Contenido |
 |---|---|
-| Marca | Colores, preset, logotipos por modo, favicon |
-| Tipografía | Familia, tamaño base, escala |
-| Formas y densidad | Radios, sombras, densidad, ancho del contenido |
-| Cabecera y navegación | Altura, estilo, barra inferior móvil, enlaces |
-| Página de acceso | Imagen, disposición, textos, pie |
-| Área personal | Tarjetas, saludo, contenido destacado |
-| Cursos | Tarjetas del core, cabecera de curso |
-| Pie de página | Columnas, enlaces, redes, texto legal |
-| Avanzado | SCSS, exportar/importar, restaurar |
+| Apariencia | Vista previa, preset, paleta, colores, logotipos para modo oscuro, tipografía, tamaño, redondeo y densidad |
+| Cabecera | Nombre del sitio junto al logotipo (y, en el futuro, ADM-N2 a N4) |
+| Página de acceso | Disposición, imagen, título, lema, texto bajo el formulario |
+| Área personal | Cursos mostrados, número, elementos de la tarjeta, saludo y subtítulo |
+| Pie de página | Texto legal (y, en el futuro, ADM-P2 a P4) |
+| Avanzado | Enlace a las herramientas, SCSS |
+
+**Desviación respecto a la propuesta.** Marca, tipografía y formas comparten la pestaña *Apariencia* porque la vista
+previa en vivo solo puede seguir los campos de la pestaña en la que está; separarlas habría obligado a repetir la
+vista previa o a cambiar de pestaña para ver el efecto. Exportar, importar, restaurar y el informe de contraste son
+acciones, no ajustes, y van en una página propia (`tools.php`, *Custom Boost: herramientas*) enlazada desde
+*Avanzado*. La pestaña *Cursos* se creará cuando entre su primer ajuste (ADM-C*, P2).
 
 ### 4.3 Ajustes nuevos
 
-Prioridad: **P1** imprescindible para 1.0 · **P2** deseable · **P3** posterior.
+Prioridad: **P1** imprescindible para 1.0 · **P2** deseable · **P3** posterior. **✅** implementado (F2, 0.5.0).
 
 **Marca**
 
 | Id | Ajuste | Tipo | Por defecto | Token / efecto | Pr. |
 |---|---|---|---|---|---|
-| ADM-M1 | Presets de paleta listos para usar (Índigo, Océano, Bosque, Granate, Grafito) | Lista con muestra | Índigo | Rellena marca y acento | P1 |
+| ADM-M1 | Presets de paleta listos para usar (Índigo, Océano, Bosque, Granate, Grafito) | Lista con muestra | Índigo | Rellena marca y acento | P1✅ |
 | ADM-M2 | Tono de los neutros (frío, neutro, cálido) | Lista | Frío | `--ct-color-bg`, `surface*`, `border*` | P2 |
 | ADM-M3 | Colores de estado (éxito, aviso, error, información) | Color ×4 | Actuales | `--ct-color-success`… | P2 |
-| ADM-M4 | Logotipo para modo oscuro | Archivo | Vacío | Cabecera y acceso en oscuro | P1 |
+| ADM-M4 | Logotipo para modo oscuro | Archivo | Vacío | Cabecera y acceso en oscuro | P1✅ |
 | ADM-M5 | Color de fondo de la cabecera (superficie o marca) | Lista | Superficie | `--ct-color-header-bg` | P2 |
 | ADM-M6 | Colores distintos por categoría de cursos | Tabla categoría → color | Vacío | Tokens en `body.category-N` | P3 |
 
@@ -216,18 +221,18 @@ Prioridad: **P1** imprescindible para 1.0 · **P2** deseable · **P3** posterior
 
 | Id | Ajuste | Tipo | Por defecto | Token / efecto | Pr. |
 |---|---|---|---|---|---|
-| ADM-T1 | Familia tipográfica (Inter, Noto Sans del core, fuente del sistema, serif) | Lista | Inter | `--ct-font-family` | P1 |
+| ADM-T1 | Familia tipográfica (Inter, Noto Sans del core, fuente del sistema, serif) | Lista | Inter | `--ct-font-family` | P1✅ |
 | ADM-T2 | Fuente propia (WOFF2 subido por el administrador) | Archivo + nombre | Vacío | `@font-face` local | P2 |
 | ADM-T3 | Fuente distinta para títulos | Lista | Igual que el texto | `--ct-font-family-heading` | P2 |
-| ADM-T4 | Tamaño base (15, 16, 17, 18 px) | Lista | 16 | Tamaño raíz; mínimo 16 en campos | P1 |
+| ADM-T4 | Tamaño base (15, 16, 17, 18 px) | Lista | 15 (base de Moodle) | Tamaño raíz; mínimo 16 en campos | P1✅ |
 | ADM-T5 | Fuente para dislexia opcional por usuario | Preferencia de usuario | No | Clase en `<body>` | P3 |
 
 **Formas y densidad**
 
 | Id | Ajuste | Tipo | Por defecto | Token / efecto | Pr. |
 |---|---|---|---|---|---|
-| ADM-F1 | Redondeo (recto, suave, redondeado, muy redondeado) | Lista | Redondeado | `--ct-radius-*` y variables de Bootstrap | P1 |
-| ADM-F2 | Densidad (compacta, normal, amplia) | Lista | Normal | `--ct-density` | P1 |
+| ADM-F1 | Redondeo (recto, suave, redondeado, muy redondeado) | Lista | Redondeado | `--ct-radius-*` y variables de Bootstrap | P1✅ |
+| ADM-F2 | Densidad (compacta, normal, amplia) | Lista | Normal | `--ct-density` | P1✅ |
 | ADM-F3 | Sombras (ninguna, sutiles, marcadas) | Lista | Sutiles | `--ct-shadow-*` | P2 |
 | ADM-F4 | Ancho máximo del contenido | Lista | 1240 px | `--ct-content-max` | P2 |
 
@@ -235,7 +240,7 @@ Prioridad: **P1** imprescindible para 1.0 · **P2** deseable · **P3** posterior
 
 | Id | Ajuste | Tipo | Por defecto | Efecto | Pr. |
 |---|---|---|---|---|---|
-| ADM-N1 | Mostrar nombre del sitio junto al logotipo | Casilla | No | Marca | P1 |
+| ADM-N1 | Mostrar nombre del sitio junto al logotipo | Casilla | No | Marca | P1✅ |
 | ADM-N2 | Cabecera fija o que se oculta al bajar | Lista | Fija | Comportamiento al hacer scroll | P2 |
 | ADM-N3 | Barra de navegación inferior en móvil (Inicio, Área personal, Mis cursos, Mensajes) | Casilla + selección | No | Navegación con el pulgar | P2 |
 | ADM-N4 | Botón de acceso destacado para no identificados | Casilla | Sí | Cabecera | P2 |
@@ -244,22 +249,22 @@ Prioridad: **P1** imprescindible para 1.0 · **P2** deseable · **P3** posterior
 
 | Id | Ajuste | Tipo | Por defecto | Efecto | Pr. |
 |---|---|---|---|---|---|
-| ADM-L1 | Disposición (imagen a la izquierda, a la derecha, fondo completo con tarjeta, sin imagen) | Lista con miniaturas | Izquierda | Layout | P1 |
+| ADM-L1 | Disposición (imagen a la izquierda, a la derecha, fondo completo con tarjeta, sin imagen) | Lista con miniaturas | Izquierda | Layout | P1✅ |
 | ADM-L2 | Intensidad del degradado sobre la imagen | Lista | Media | Con mínimo que garantiza AA | P2 |
 | ADM-L3 | Punto focal de la imagen (arriba, centro, abajo) | Lista | Centro | `object-position` | P2 |
 | ADM-L4 | Varias imágenes en rotación | Archivos (hasta 5) | Una | Una por visita, sin animación | P3 |
-| ADM-L5 | Texto bajo el formulario (aviso legal, soporte) | Editor HTML | Vacío | Pie del formulario | P1 |
-| ADM-L6 | Límite de peso y redimensionado de la imagen (cierra H-04) | Validación | 1 MB | Rendimiento | P1 |
+| ADM-L5 | Texto bajo el formulario (aviso legal, soporte) | Editor HTML | Vacío | Pie del formulario | P1✅ |
+| ADM-L6 | Límite de peso y redimensionado de la imagen (cierra H-04) | Validación | 1 MB | Rendimiento | P1✅ |
 | ADM-L7 | Ocultar el lema o el distintivo del sitio | Casillas | Visibles | Panel de imagen | P2 |
 
 **Área personal**
 
 | Id | Ajuste | Tipo | Por defecto | Efecto | Pr. |
 |---|---|---|---|---|---|
-| ADM-D1 | Qué cursos mostrar (recientes, en curso, destacados por el usuario, todos) | Lista | Recientes | Selección | P1 |
+| ADM-D1 | Qué cursos mostrar (recientes, en curso, destacados por el usuario, todos) | Lista | Recientes | Selección | P1✅ |
 | ADM-D2 | Orden (último acceso, nombre, progreso) | Lista | Último acceso | Orden | P2 |
-| ADM-D3 | Texto del saludo y del subtítulo | Texto ×2 (multilang) | Cadenas actuales | Cabecera | P1 |
-| ADM-D4 | Elementos de la tarjeta (categoría, progreso, fecha de fin, botón «Continuar») | Casillas | Categoría y progreso | Tarjeta | P1 |
+| ADM-D3 | Texto del saludo y del subtítulo | Texto ×2 (multilang) | Cadenas actuales | Cabecera | P1✅ |
+| ADM-D4 | Elementos de la tarjeta (categoría, progreso, fecha de fin, botón «Continuar») | Casillas | Categoría y progreso | Tarjeta | P1✅ |
 | ADM-D5 | Presentación en móvil (fila deslizable o lista) | Lista | Fila | Layout | P2 |
 | ADM-D6 | Franja de avisos del sitio (texto, tipo, fechas, descartable) | Editor + fechas | Vacío | Encima del saludo | P2 |
 | ADM-D7 | Imagen o color de fondo del saludo | Archivo / color | Ninguno | Cabecera | P3 |
@@ -276,7 +281,7 @@ Prioridad: **P1** imprescindible para 1.0 · **P2** deseable · **P3** posterior
 
 | Id | Ajuste | Tipo | Por defecto | Efecto | Pr. |
 |---|---|---|---|---|---|
-| ADM-P1 | Texto legal / copyright | Editor HTML | Vacío | Pie | P1 |
+| ADM-P1 | Texto legal / copyright | Editor HTML | Vacío | Pie | P1✅ |
 | ADM-P2 | Columnas de enlaces (hasta 3, formato «texto|url») | Área de texto ×3 | Vacío | Pie | P2 |
 | ADM-P3 | Redes sociales (URL por red) | Texto | Vacío | Iconos con nombre accesible | P2 |
 | ADM-P4 | Ocultar «Desarrollado por Moodle» y el botón de ayuda flotante | Casillas | Visibles | Pie | P2 |
@@ -285,35 +290,35 @@ Prioridad: **P1** imprescindible para 1.0 · **P2** deseable · **P3** posterior
 
 | Id | Ajuste | Tipo | Efecto | Pr. |
 |---|---|---|---|---|
-| ADM-A1 | Exportar e importar configuración (JSON, sin archivos) | Botones | Copiar la configuración entre sitios | P1 |
-| ADM-A2 | Restaurar valores de fábrica | Botón con confirmación | Reinicio | P1 |
+| ADM-A1 | Exportar e importar configuración (JSON, sin archivos) | Botones | Copiar la configuración entre sitios | P1✅ |
+| ADM-A2 | Restaurar valores de fábrica | Botón con confirmación | Reinicio | P1✅ |
 | ADM-A3 | Tokens personalizados (clave → valor) con validación | Tabla | Sobrescribir cualquier `--ct-*` no cromático | P2 |
-| ADM-A4 | Informe de contraste dentro de los ajustes | Página | Lo mismo que `cli/contrast.php`, en la web | P1 |
+| ADM-A4 | Informe de contraste dentro de los ajustes | Página | Lo mismo que `cli/contrast.php`, en la web | P1✅ |
 | ADM-A5 | Capacidad `theme/customboost:configure` para delegar el diseño sin dar administración completa | Capacidad | Permisos | P3 |
 
 ### 4.4 Experiencia del panel de ajustes
 
 | Id | Mejora | Pr. |
 |---|---|---|
-| ADM-X1 | **Vista previa en vivo**: panel con acceso, tarjeta, botones y alertas que se actualiza al mover los selectores, en claro y oscuro, sin guardar | P1 |
-| ADM-X2 | Aviso inmediato junto al selector cuando un color se ajusta («Lo hemos oscurecido para que se lea»), con el antes y el después | P1 |
-| ADM-X3 | Descripciones con ejemplo y medidas recomendadas en cada ajuste; enlace a la guía | P1 |
+| ADM-X1 | **Vista previa en vivo**: panel con acceso, tarjeta, botones y alertas que se actualiza al mover los selectores, en claro y oscuro, sin guardar | P1 ✅ (servicio web `theme_customboost_preview`, mismo código que el CSS real) |
+| ADM-X2 | Aviso inmediato junto al selector cuando un color se ajusta («Lo hemos oscurecido para que se lea»), con el antes y el después | P1 ✅ (aviso bajo la vista previa al momento; «Colores en uso» tras guardar) |
+| ADM-X3 | Descripciones con ejemplo y medidas recomendadas en cada ajuste; enlace a la guía | P1 🟡 descripciones completas; el enlace a la guía espera a que esté publicada en la web |
 | ADM-X4 | Miniaturas en las listas de disposición y de presets | P2 |
 | ADM-X5 | Asistente inicial de tres pasos (logotipo, colores, acceso) al seleccionar el tema por primera vez | P3 |
 
 ### 4.5 Verificación de la administración
 
-| Id | Comprobación | Criterio |
-|---|---|---|
-| ADM-V1 | Cada ajuste: valor por defecto, valor extremo, valor inválido y vacío | Nunca error PHP ni CSS roto; mensaje claro en inválidos |
-| ADM-V2 | Cada ajuste cambia solo lo que dice | Regresión visual limitada a la zona afectada |
-| ADM-V3 | Los ajustes que afectan al CSS purgan la caché del tema; los demás no | Tiempo de guardado medido |
-| ADM-V4 | `forced_plugin_settings` en `config.php` | El ajuste aparece bloqueado y se respeta |
-| ADM-V5 | Actualización desde 0.1.0 | Los ajustes existentes se migran a las nuevas claves sin pérdida |
-| ADM-V6 | Exportar en un sitio e importar en otro | Aspecto idéntico (salvo archivos) |
-| ADM-V7 | Combinaciones: 5 paletas × 2 modos × 4 redondeos × 3 densidades | Contraste AA en todas (test parametrizado); sin desbordes a 360 px (muestreo) |
-| ADM-V8 | Panel de ajustes usable a 360 px y con teclado | Sin scroll horizontal; orden de foco lógico |
-| ADM-V9 | Todas las cadenas nuevas en `lang/en` y `lang/es` | Test que compara las claves de ambos archivos |
+| Id | Comprobación | Criterio | Estado |
+|---|---|---|---|
+| ADM-V1 | Cada ajuste: valor por defecto, valor extremo, valor inválido y vacío | Nunca error PHP ni CSS roto; mensaje claro en inválidos | ✅ `options_test` (todo valor desconocido vuelve al defecto), `external_preview_test`, `settings_io_test` (importación de valores hostiles) |
+| ADM-V2 | Cada ajuste cambia solo lo que dice | Regresión visual limitada a la zona afectada | ✅ Behat `settings.feature` (disposiciones, pie, nombre, área personal) y revisión de capturas |
+| ADM-V3 | Los ajustes que afectan al CSS purgan la caché del tema; los demás no | Tiempo de guardado medido | ✅ Solo los de *Apariencia*, la disposición de acceso y el SCSS llevan `theme_reset_all_caches`; textos y área personal se guardan sin recompilar |
+| ADM-V4 | `forced_plugin_settings` en `config.php` | El ajuste aparece bloqueado y se respeta | ✅ Bloqueado con «Definido en config.php» y aplicado al CSS; importar y restaurar lo omiten (`test_forced_settings_are_skipped`) |
+| ADM-V5 | Actualización desde 0.1.0 | Los ajustes existentes se migran a las nuevas claves sin pérdida | ✅ Colores propios → paleta «Personalizada» (`upgrade_test`); probado 0.2.0 → 0.5.0 en el sitio de demostración |
+| ADM-V6 | Exportar en un sitio e importar en otro | Aspecto idéntico (salvo archivos) | ✅ `test_round_trip` y Behat de importación |
+| ADM-V7 | Combinaciones: 5 paletas × 2 modos × 4 redondeos × 3 densidades | Contraste AA en todas (test parametrizado); sin desbordes a 360 px (muestreo) | ✅ `test_palettes_reach_aa`; muestreo extremo (18 px, serif, muy redondeado, amplia, Granate) en 11 páginas × 2 modos sin desbordes. Única incidencia: variante de C-02 del [informe de F1](informes/2026-11-18.md) (barra de edición masiva, otro botón tapado a 18 px), ya prevista para F3 |
+| ADM-V8 | Panel de ajustes usable a 360 px y con teclado | Sin scroll horizontal; orden de foco lógico | ✅ Auditoría de ajustes y herramientas a 360/768/1280 en ambos modos (corregido un desborde de 40 px de las listas largas); axe en Behat; vista previa `inert`, fuera del orden de foco |
+| ADM-V9 | Todas las cadenas nuevas en `lang/en` y `lang/es` | Test que compara las claves de ambos archivos | ✅ 163/163 |
 
 **Criterio de aceptación:** todos los ajustes P1 implementados, documentados en la guía y cubiertos por ADM-V1 a
 ADM-V9.
@@ -530,7 +535,7 @@ exista el formato; sin regresiones en COM-30.
 |---|---|---|---|
 | **F0 · Cierre de hallazgos** | 0.1.1 alfa | H-01 a H-08; tests AUT-05, 06, 07, 09; CI en GitHub en verde (incluidos `mustache` y `grunt`) | CI verde en PHP 8.3 y 8.4; 0 hallazgos abiertos de gravedad media |
 | **F1 · Verificación base** ✅ 2026-11-18 | 0.2.0 alfa | Recorrido 2.2 completo en claro y oscuro; Behat AUT-01 a 04; regresión visual AUT-08; MOV-01 y MOV-02 automatizados; axe en CI (ACC-02) | FUN-01 a 17 en ✅; 0 infracciones graves de axe |
-| **F2 · Administración P1** | 0.5.0 beta | Nueva estructura de pestañas; ajustes P1 de marca, tipografía, formas, acceso, área personal, pie y avanzado; vista previa en vivo (ADM-X1 a X3); guía actualizada | ADM-V1 a V9 en ✅; migración desde 0.1.0 probada |
+| **F2 · Administración P1** ✅ 2026-11-19 | 0.5.0 beta | Nueva estructura de pestañas; ajustes P1 de marca, tipografía, formas, acceso, área personal, pie y avanzado; vista previa en vivo (ADM-X1 a X3); guía actualizada | ADM-V1 a V9 en ✅; migración desde 0.1.0 probada |
 | **F3 · Móvil y accesibilidad** | 0.7.0 beta | MOV-03 a 16 en dispositivos reales; ACC-10 a 37; preset de alto contraste; declaración de accesibilidad | Criterios de los apartados 3 y 6 cumplidos |
 | **F4 · Seguridad y compatibilidad** | 0.9.0 RC | SEG-01 a 20 (incluido ZAP y revisión por pares); matriz de CI completa; navegadores; RTL; extensiones; rendimiento | Criterios de los apartados 5, 7 y 8 cumplidos; 0 defectos críticos o altos abiertos |
 | **F5 · Publicación** | 1.0.0 estable | Ajustes P2 que hayan entrado; `CHANGELOG`, `UPGRADING`, `SECURITY`; CSS precompilado; capturas y guía finales; envío al directorio de extensiones de Moodle | Dos semanas en un sitio piloto sin incidencias críticas |

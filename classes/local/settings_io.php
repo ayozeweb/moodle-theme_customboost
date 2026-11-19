@@ -148,7 +148,13 @@ class settings_io {
      * @param array $result Collects the outcome.
      */
     protected static function write(\admin_setting $setting, string $value, array &$result): void {
+        global $CFG;
         $name = $setting->name;
+        if (array_key_exists($name, $CFG->forced_plugin_settings['theme_customboost'] ?? [])) {
+            // A value forced in config.php wins over the database: writing would change nothing the site uses.
+            $result['rejected'][$name] = get_string('configoverride', 'admin');
+            return;
+        }
         $multi = $setting instanceof \admin_setting_configmulticheckbox;
         $normalise = function ($stored) use ($multi): string {
             $stored = (string) $stored;

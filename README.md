@@ -14,11 +14,13 @@ nombres `--ct-`, compartido con [`format_customtiles`](https://github.com/ayozew
 ## Características
 
 - **Página de acceso con imagen.** En móvil la imagen es una franja superior y el formulario sube como una hoja;
-  desde 992 px se colocan a pantalla partida. Imagen configurable (ilustración SVG propia por defecto), título y
-  lema. Un degradado sobre la imagen garantiza el contraste del texto con cualquier foto. Usa el formulario
+  desde 992 px, cuatro disposiciones: imagen a la izquierda, a la derecha, a toda la página o sin imagen. Imagen
+  configurable (ilustración SVG propia por defecto, las grandes se reducen al guardar), título, lema y texto bajo el
+  formulario. Un degradado sobre la imagen garantiza el contraste del texto con cualquier foto. Usa el formulario
   `core/loginform` del core, así que OAuth2, MFA, registro y recuperación de contraseña siguen funcionando.
-- **Área personal con tarjetas de cursos.** Saludo y «Sigue aprendiendo»: los cursos visitados más recientemente,
-  con imagen, categoría y progreso (texto + barra, nunca solo color). En móvil, una fila deslizable con
+- **Área personal con tarjetas de cursos.** Saludo y subtítulo configurables y tarjetas con los cursos recientes, en
+  curso, destacados o todos; con imagen y, a elegir, categoría, progreso (texto + barra, nunca solo color), fecha de
+  fin y botón «Continuar». En móvil, una fila deslizable con
   *scroll-snap*; desde 768 px, una rejilla. Las tarjetas del core (Mis cursos, bloque *Vista general de cursos*)
   adoptan el mismo estilo.
 - **Cabecera compacta.** Barra de 56 px con la marca visible también en móvil, objetivos táctiles de 44 px,
@@ -30,6 +32,10 @@ nombres `--ct-`, compartido con [`format_customtiles`](https://github.com/ayozew
 - **Contraste AA garantizado.** El color de marca y el de acento se ajustan (por luminosidad HSL, conservando el
   tono) hasta que todas las combinaciones de texto alcanzan 4,5:1 y los bordes de control y el foco 3:1. Lo
   comprueban PHPUnit (con colores hostiles: blanco, negro, amarillo, verde neón…) y `cli/contrast.php`.
+- **Muy personalizable sin CSS.** Cinco paletas o colores propios, cuatro tipografías, tamaño de texto de 15 a
+  18 px, cuatro redondeos, tres densidades, logotipos para modo oscuro, nombre del sitio junto al logotipo y franja
+  de pie de página. **Vista previa en vivo** en claro y oscuro antes de guardar, y una página de herramientas para
+  exportar, importar y restaurar los ajustes y revisar el contraste.
 - **Sin CDN.** Tipografía Inter (OFL) servida desde el tema; ninguna petición externa.
 - **Accesible.** Foco visible y uniforme, `prefers-reduced-motion`, textos de 16 px en campos (sin zoom en iOS),
   enlaces subrayados en prosa en modo oscuro, sin scroll horizontal a 360 px.
@@ -53,13 +59,20 @@ nombres `--ct-`, compartido con [`format_customtiles`](https://github.com/ayozew
 
 *Administración del sitio › Apariencia › Temas › Custom Boost*
 
-| Pestaña | Ajuste | Descripción |
-|---|---|---|
-| Apariencia | Preset de color | Claro, oscuro o automático (según el dispositivo). Se ignora si los modos de color de Boost están activados. |
-| | Color de marca / de acento | Se ajustan automáticamente a AA; el ajuste muestra los colores efectivos. |
-| Página de acceso | Imagen, título, lema | Imagen horizontal de al menos 1600 px. |
-| Área personal | Mostrar tarjetas de cursos, número de tarjetas | Cabecera de bienvenida y tarjetas (3–12). |
-| Avanzado | SCSS inicial / SCSS en bruto | Igual que en Boost. |
+| Pestaña | Ajustes |
+|---|---|
+| Apariencia | Vista previa en vivo; preset (claro, oscuro, automático); paleta (Índigo, Océano, Bosque, Granate, Grafito o Personalizada con color de marca y acento, ajustados a AA); logotipos para modo oscuro; tipografía; tamaño del texto; redondeo; densidad |
+| Cabecera | Nombre del sitio junto al logotipo |
+| Página de acceso | Disposición, imagen, título, lema, texto bajo el formulario |
+| Área personal | Mostrar tarjetas, cursos mostrados, número, elementos de la tarjeta, saludo y subtítulo |
+| Pie de página | Texto del pie |
+| Avanzado | Enlace a las herramientas; SCSS inicial y SCSS en bruto |
+
+Herramientas (*Apariencia › Temas › Custom Boost: herramientas*): informe de contraste, exportar e importar los
+ajustes en JSON y restaurar los valores por defecto. Todo se explica en la
+[guía de administración](docs/GUIA-ADMINISTRACION.md).
+
+![Ajustes con la vista previa](docs/screenshots/settings-light-1280.png)
 
 Informe de contraste de la configuración actual (código de salida 1 si algo falla):
 

@@ -1,9 +1,35 @@
 # STATUS · theme_customboost
 
 ## Current milestone
-**F1 · Base verification** (plan phase F1, version 0.2.0): done. Report: `docs/informes/2026-11-18.md`.
+**F2 · Administration P1** (plan phase F2, version 0.5.0 beta): done.
 
-## F1 · Done
+## F2 · Done
+- `classes/options.php`: one source of truth for every choice (palettes, fonts, sizes, radii, densities, login
+  layouts, dashboard sources, card elements). Every reader validates and falls back to the default.
+- Settings in six tabs (Appearance, Header, Login page, Personal area, Footer, Advanced) instead of the nine first
+  proposed: the live preview can only follow the fields of its own tab, so everything visual sits with it. The
+  deviation is recorded in the plan (4.2).
+- New P1 settings: palettes (ADM-M1), dark logos (M4), typeface (T1), text size 15-18 px (T4; 15 is Moodle's
+  base, not 16 as first planned), radius (F1), density (F2), site name with the logo (N1), login layouts (L1), text
+  under the login form (L5), login image resize to 2000 px (L6), dashboard source (D1), greeting and subtitle (D3),
+  card elements (D4), footer text (P1).
+- Live preview (ADM-X1/X2): AMD module + web service `theme_customboost_preview`, which runs the same token code as
+  the stylesheet, scoped to the preview panels. Requires `moodle/site:config`.
+- Tools page `tools.php` (ADM-A1/A2/A4): contrast report, JSON export, import (each value through the setting's own
+  `write_setting()` and read back; forced settings skipped), restore defaults with confirmation.
+- Upgrade: a site with its own colours gets the "Custom" palette and keeps them (`local\upgrade`).
+- Fixes found while verifying: dark logo URL returned as a string broke the login page; `hide_if` on a tab is ignored
+  (moved to the tabs page); long select options overflowed the settings page by 40 px at 360 px; container queries
+  replaced by a media query (Moodle's stylelint rejects them).
+- Verification ADM-V1 to V9 all ✅ (see the plan, 4.5): PHPUnit 58 tests / 615 assertions; Behat 32 scenarios
+  (new `settings.feature`: preview, saving, import/restore, four login layouts, footer and dashboard options);
+  audit of the settings and tools pages at 360/768/1280 in both modes; extreme combination sampled on 11 pages.
+- Behat: custom step for heavy pages, because core's axe step stops polling before axe finishes on the settings
+  page ("No data", intermittent).
+
+## Previous milestones
+
+### F1 · Done
 - `tests/audit`: Playwright + axe audit of 34 pages at 360/768/1280 px in both presets (overflow, touch targets,
   WCAG 2.2 AA, JS errors, visual regression against `tests/audit/baseline`). Every run is compared with Boost to
   tell theme findings from core ones. `tests/fixtures/demo_site.php` creates the demo data.
@@ -25,7 +51,6 @@
   automatic preset following the system in real time.
 - Packaging: `.gitattributes` keeps screenshots and visual baselines out of the ZIP (15 MB → 413 KB).
 
-## Previous milestones
 
 ### F0 · Done
 - GitHub Actions was failing on every push: `phpcs` (language string order) and `grunt` (80 stylelint problems in
@@ -108,11 +133,12 @@ Version 0.1.0 (ALPHA) was installable and complete for the requested scope; the 
 - None.
 
 ## Next steps
-- Phase F2 of the plan: administration P1 settings with live preview (recommended model: Fable 5.2, see the plan).
+- Phase F3 of the plan: mobile on real devices and accessibility (MOV-03 to 16, ACC-10 to 37), including C-02
+  (bulk edit bar at 360 px, also seen at 18 px text size with another button).
+- F2 leftovers, not blocking: link from each setting to the published guide (ADM-X3).
 - F1 leftovers, not blocking: OAuth 2 / MFA login screens, PNG/WebP/AVIF and portrait login images, block drag and
   drop, the colour mode cookie on the login page, overflow at 320/344/375/412 px.
 
 ## Later ideas
 - Hero image per course category on the personal area cards.
 - Course page header with cover image when format_customtiles is not in use.
-- Behat scenarios for the login layout and the dashboard cards.

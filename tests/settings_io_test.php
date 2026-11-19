@@ -136,4 +136,25 @@ final class settings_io_test extends \advanced_testcase {
         $this->assertSame(options::DEFAULTS['fontsize'], get_config('theme_customboost', 'fontsize'));
         $this->assertSame(options::DEFAULTS['dashboardcardelements'], get_config('theme_customboost', 'dashboardcardelements'));
     }
+
+    /**
+     * Settings forced in config.php are reported and left alone by import and restore.
+     */
+    public function test_forced_settings_are_skipped(): void {
+        global $CFG, $DB;
+        set_config('palette', 'ocean', 'theme_customboost');
+        $CFG->forced_plugin_settings = ['theme_customboost' => ['palette' => 'forest']];
+        \cache::make('core', 'config')->purge();
+
+        $result = settings_io::import(json_encode(['format' => settings_io::FORMAT, 'settings' => [
+            'palette' => 'garnet',
+            'radius' => 'soft',
+        ]]));
+        $this->assertSame(get_string('configoverride', 'admin'), $result['rejected']['palette']);
+        $this->assertSame(['radius'], $result['applied']);
+        $this->assertNotContains('palette', settings_io::restore_defaults());
+        $stored = $DB->get_field('config_plugins', 'value', ['plugin' => 'theme_customboost', 'name' => 'palette']);
+        $this->assertSame('ocean', $stored);
+        $this->assertSame('forest', get_config('theme_customboost', 'palette'));
+    }
 }

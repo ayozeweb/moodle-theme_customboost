@@ -48,4 +48,82 @@ class behat_theme_customboost extends behat_base {
             );
         }
     }
+
+    /**
+     * Waits for the live preview of the theme settings to use a brand colour in the light panel.
+     *
+     * @Then the theme preview should use :colour as the brand colour in theme_customboost
+     * @param string $colour Hex colour, e.g. #147c3b.
+     */
+    public function the_theme_preview_should_use_brand_colour(string $colour): void {
+        $colour = strtolower($colour);
+        $this->spin(function () use ($colour): bool {
+            $css = (string) $this->evaluate_script(
+                'return (document.querySelector(\'[data-region="ct-preview-style"]\') || {}).textContent || "";'
+            );
+            if (!preg_match('/data-ct-preview-mode="light"\] \{[^}]*--ct-color-primary: (#[0-9a-f]{6});/', $css, $m)) {
+                throw new ExpectationException('The preview has no colours yet', $this->getSession());
+            }
+            if ($m[1] !== $colour) {
+                throw new ExpectationException("The preview uses {$m[1]}, not {$colour}", $this->getSession());
+            }
+            return true;
+        });
+    }
+
+    /**
+     * Check stored plugin settings: rows of name, expected value and plugin.
+     *
+     * @Then the following theme_customboost settings should be stored:
+     * @param \Behat\Gherkin\Node\TableNode $table
+     */
+    public function the_following_settings_should_be_stored(\Behat\Gherkin\Node\TableNode $table): void {
+        foreach ($table->getRows() as [$name, $expected, $plugin]) {
+            global $DB;
+            // From the database: get_config() in the test runner keeps its own cache of what the site has since changed.
+            $actual = $DB->get_field('config_plugins', 'value', ['plugin' => $plugin, 'name' => $name]);
+            if ((string) $actual !== $expected) {
+                throw new \Behat\Mink\Exception\ExpectationException(
+                    "{$plugin}/{$name} is '{$actual}', expected '{$expected}'",
+                    $this->getSession()
+                );
+            }
+        }
+    }
+
+    /**
+     * Core's accessibility check, given the time a heavy page needs.
+     *
+     * Core polls for axe's results without pausing, so on a heavy page (the theme settings, with every tab and its
+     * editors in the DOM) it gives up with "No data" while axe is still running. Starting again would fail too ("Axe is
+     * already running"), so this waits for that same run to finish and reads its results.
+     *
+     * @Then the heavy page should meet accessibility standards in theme_customboost
+     */
+    public function the_heavy_page_should_meet_accessibility_standards(): void {
+        try {
+            \behat_context_helper::get('behat_accessibility')->run_axe_validation_for_tags();
+            return;
+        } catch (\Exception $e) {
+            if ($e->getMessage() !== 'No data') {
+                throw $e;
+            }
+        }
+        $read = 'return document.querySelector(\'script[data-purpose="axe"]\').dataset.results;';
+        $results = null;
+        for ($i = 0; $i < 60 && !$results; $i++) {
+            usleep(500000);
+            $results = json_decode($this->evaluate_script($read) ?? '');
+        }
+        if (!$results) {
+            throw new ExpectationException('Axe did not finish within 30 seconds', $this->getSession());
+        }
+        if ($results->exception !== null) {
+            throw new ExpectationException(json_encode($results->exception), $this->getSession());
+        }
+        if ($results->violations) {
+            $ids = array_map(fn($violation) => $violation->id . ' (' . count($violation->nodes) . ')', $results->violations);
+            throw new ExpectationException('Accessibility violations: ' . implode(', ', $ids), $this->getSession());
+        }
+    }
 }

@@ -37,9 +37,13 @@ Feature: The theme's own pages meet WCAG 2.1 AA in both colour presets
       | colourpreset | <preset> | theme_customboost |
     When I log in as "admin"
     And I visit "/admin/settings.php?section=themesettingcustomboost"
-    Then the page should meet accessibility standards
+    # The live preview answers asynchronously: let it finish before axe reads the page.
+    And I wait until the page is ready
+    Then the heavy page should meet accessibility standards in theme_customboost
     And I click on "Login page" "link" in the "[role=tablist]" "css_element"
-    And the page should meet accessibility standards
+    And "#id_s_theme_customboost_loginlayout" "css_element" should be visible
+    And I wait until the page is ready
+    And the heavy page should meet accessibility standards in theme_customboost
 
     Examples:
       | preset |

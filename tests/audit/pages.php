@@ -78,6 +78,7 @@ $pages = [
     ['admin-search', '/admin/search.php', 'admin'],
     ['admin-users', '/admin/user.php', 'admin'],
     ['admin-theme', '/admin/settings.php?section=themesettingcustomboost', 'admin'],
+    ['admin-theme-tools', '/theme/customboost/tools.php', 'admin'],
 ];
 
 // Self registration only exists when an authentication plugin offers it.
