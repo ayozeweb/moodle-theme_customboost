@@ -26,6 +26,9 @@
   audit of the settings and tools pages at 360/768/1280 in both modes; extreme combination sampled on 11 pages.
 - Behat: custom step for heavy pages, because core's axe step stops polling before axe finishes on the settings
   page ("No data", intermittent).
+- CI green on PHP 8.3 and 8.4 (run 45071001541) after two fixes the sandbox could not catch: the mustache HTML
+  validator rejected the preview's style element inside a div (now added to the head by the module), and ESLint's
+  promise/no-nesting (the refresh now uses async/await).
 
 ## Previous milestones
 
