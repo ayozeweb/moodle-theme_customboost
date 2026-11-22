@@ -2,3 +2,4 @@ node_modules/
 /style/
 tests/audit/results/
 tests/audit/pages.json
+tests/audit/_*.mjs
