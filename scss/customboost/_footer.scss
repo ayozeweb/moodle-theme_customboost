@@ -27,6 +27,14 @@
     padding-bottom: env(safe-area-inset-bottom);
 }
 
+// Core slides a disabled sticky footer out of view with a transform, but its buttons stayed in the Tab order: the
+// focus went to invisible controls (bulk editing bar of the course page, WCAG 2.4.7). Take it out of the focus order
+// once the slide-out has finished. Behat sites show it static, so they keep it.
+body:not(.hasstickyfooter):not(.behat-site) .stickyfooter {
+    visibility: hidden;
+    transition: transform .5s, visibility 0s linear .5s;
+}
+
 // Bulk editing bar of the course page. Core lays out "Select all" and seven 56 px buttons on one row, which is
 // wider than a phone and clips the last buttons. Below 576 px: "Select all" gets its own row and the actions become
 // 44 px icons. Their names stay in the buttons for screen readers, and in the title for a long press.
