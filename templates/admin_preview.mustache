@@ -18,7 +18,7 @@
     @template theme_customboost/admin_preview
 
     Live preview of the appearance settings: the same components in the light and the dark preset.
-    The theme_customboost/preview module fills the style element with CSS computed on the server.
+    The theme_customboost/preview module adds a style element to the head with CSS computed on the server.
     Nothing in it is interactive: links and buttons are inert and hidden from assistive technology
     except for the status line, which announces when the colours had to be adjusted.
 
@@ -32,7 +32,6 @@
     }
 }}
 <div class="ct-preview" data-region="ct-preview">
-    <style data-region="ct-preview-style"></style>
     <p class="ct-preview-status" data-region="ct-preview-status" role="status" aria-live="polite"></p>
     <div class="ct-preview-panels" inert>
         {{#modes}}

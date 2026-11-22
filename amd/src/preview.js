@@ -67,12 +67,15 @@ export const init = (selector) => {
     if (!root || !field('palette')) {
         return;
     }
-    const style = root.querySelector('[data-region="ct-preview-style"]');
+    // The CSS goes in the head: a style element inside the settings form would not be valid HTML.
+    const style = document.createElement('style');
+    style.dataset.region = 'ct-preview-style';
+    document.head.append(style);
     const status = root.querySelector('[data-region="ct-preview-status"]');
     let timer = null;
     let last = '';
 
-    const refresh = () => {
+    const refresh = async() => {
         const values = readValues();
         const key = JSON.stringify(values);
         if (key === last) {
@@ -80,21 +83,18 @@ export const init = (selector) => {
         }
         last = key;
         root.classList.add('ct-preview-loading');
-        // Ajax.call() returns jQuery promises, which have no finally(): wrap it in a native one.
-        Promise.resolve(Ajax.call([{methodname: 'theme_customboost_preview', args: values}])[0])
-            .then((result) => {
-                // Only apply the answer to the latest request.
-                if (key === last) {
-                    style.textContent = result.css;
-                    status.textContent = result.notice;
-                }
-                return result;
-            })
-            .catch(() => getString('preview_failed', 'theme_customboost').then((message) => {
-                status.textContent = message;
-                return message;
-            }))
-            .finally(() => root.classList.remove('ct-preview-loading'));
+        try {
+            const result = await Ajax.call([{methodname: 'theme_customboost_preview', args: values}])[0];
+            // Only apply the answer to the latest request.
+            if (key === last) {
+                style.textContent = result.css;
+                status.textContent = result.notice;
+            }
+        } catch (error) {
+            status.textContent = await getString('preview_failed', 'theme_customboost');
+        } finally {
+            root.classList.remove('ct-preview-loading');
+        }
     };
 
     const schedule = () => {
