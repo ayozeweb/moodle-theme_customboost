@@ -38,6 +38,14 @@
         }
     }
 
+    // Overdue time and late submissions: a literal #ca3120, 3.5:1 on the dark canvas. The danger token is AA-tested.
+    .path-mod-assign .overdue,
+    .path-mod-assign .overduesubmission,
+    .path-mod-assign [data-region="grade-panel"] td.submissionnotgraded,
+    .path-mod-assign [data-region="grade-panel"] div.submissionnotgraded {
+        color: var(--ct-color-danger);
+    }
+
     .path-mod-assign .gradingtable thead th,
     .path-mod-assign .gradingtable tr.unselectedrow td {
         background-color: var(--ct-color-surface);

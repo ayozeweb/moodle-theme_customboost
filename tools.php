@@ -117,27 +117,34 @@ $table->head = [
     get_string('contrastbackground', 'theme_customboost'),
     get_string('preset_light', 'theme_customboost'),
     get_string('preset_dark', 'theme_customboost'),
+    get_string('preset_highcontrast', 'theme_customboost'),
+    get_string('preset_highcontrastdark', 'theme_customboost'),
     get_string('contrastminimum', 'theme_customboost'),
 ];
 $table->attributes['class'] = 'generaltable table-sm';
-foreach (tokens::contrast_pairs() as [$fg, $bg, $min]) {
+// The same pairs in every palette: 4.5:1 (AA) in light and dark, 7:1 (AAA) in the high contrast ones.
+$pairs = tokens::contrast_pairs();
+$highpairs = tokens::contrast_pairs(true);
+foreach ($pairs as $i => [$fg, $bg, $min]) {
     $cells = [s($fg), s($bg)];
-    foreach (['light', 'dark'] as $mode) {
+    foreach (tokens::MODES as $mode) {
+        $high = str_ends_with($mode, '-high');
+        $minimum = $high ? $highpairs[$i][2] : $min;
         $ratio = tokens::contrast($palettes[$mode][$fg], $palettes[$mode][$bg]);
-        $ok = $ratio >= $min;
+        $ok = $ratio >= $minimum;
         $failures += $ok ? 0 : 1;
         $cells[] = sprintf('%.2f:1 ', $ratio) . html_writer::span(
-            get_string($ok ? 'contrastpass' : 'contrastfail', 'theme_customboost'),
+            get_string($ok ? ($high ? 'contrastpasshigh' : 'contrastpass') : 'contrastfail', 'theme_customboost'),
             'badge ' . ($ok ? 'bg-success text-white' : 'bg-danger text-white')
         );
     }
-    $cells[] = sprintf('%.1f:1', $min);
+    $cells[] = sprintf('%.1f:1 / %.1f:1', $min, $highpairs[$i][2]);
     $table->data[] = $cells;
 }
 echo $OUTPUT->notification(
     $failures
         ? get_string('contrastsummaryfail', 'theme_customboost', $failures)
-        : get_string('contrastsummarypass', 'theme_customboost', 2 * count(tokens::contrast_pairs())),
+        : get_string('contrastsummarypass', 'theme_customboost', count(tokens::MODES) * count($pairs)),
     $failures ? \core\output\notification::NOTIFY_ERROR : \core\output\notification::NOTIFY_SUCCESS,
     false
 );

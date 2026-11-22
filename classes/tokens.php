@@ -46,6 +46,12 @@ class tokens {
     /** @var float Minimum contrast for non-text UI (borders of controls, focus ring). */
     public const MIN_UI = 3.0;
 
+    /** @var float Minimum contrast for text in the high contrast palettes (WCAG 2.1 AAA, 1.4.6), with the same margin. */
+    public const MIN_TEXT_HIGH = 7.1;
+
+    /** @var float Minimum contrast for non-text UI in the high contrast palettes. */
+    public const MIN_UI_HIGH = 4.5;
+
     /** @var array Fixed neutral and status colours for the light preset. */
     protected const LIGHT = [
         'bg' => '#f5f6fa',
@@ -80,12 +86,50 @@ class tokens {
         'header-bg' => '#12162a',
     ];
 
+    /** @var array Neutral and status colours of the high contrast light palette: black on white. */
+    protected const LIGHT_HIGH = [
+        'bg' => '#ffffff',
+        'surface' => '#ffffff',
+        'surface-2' => '#f0f1f5',
+        'surface-sunken' => '#e6e8ef',
+        'text' => '#000000',
+        'text-muted' => '#2e3345',
+        'border' => '#5c6175',
+        'border-strong' => '#1d2030',
+        'success' => '#0b5a2c',
+        'warning' => '#6b3f00',
+        'danger' => '#9e1c1c',
+        'info' => '#07506f',
+        'header-bg' => '#ffffff',
+    ];
+
+    /** @var array Neutral and status colours of the high contrast dark palette: white on black. */
+    protected const DARK_HIGH = [
+        'bg' => '#000000',
+        'surface' => '#0b0c12',
+        'surface-2' => '#161924',
+        'surface-sunken' => '#000000',
+        'text' => '#ffffff',
+        'text-muted' => '#d0d4e2',
+        'border' => '#8d93a8',
+        'border-strong' => '#e2e5ef',
+        'success' => '#7ee2a6',
+        'warning' => '#ffd36e',
+        'danger' => '#ffaaa5',
+        'info' => '#8fd6f6',
+        'header-bg' => '#000000',
+    ];
+
+    /** @var string[] The palettes build() returns. */
+    public const MODES = ['light', 'dark', 'light-high', 'dark-high'];
+
     /**
-     * Build the light and dark palettes.
+     * Build the light and dark palettes, and their high contrast versions.
      *
      * @param string|null $brand Brand colour as hex, null for the default.
      * @param string|null $accent Accent colour as hex, null for the default.
-     * @return array ['light' => [name => hex], 'dark' => [name => hex], 'adjusted' => [notes]]
+     * @return array ['light' => [name => hex], 'dark' => [...], 'light-high' => [...], 'dark-high' => [...],
+     *     'adjusted' => [notes about the light and dark palettes]]
      */
     public static function build(?string $brand = null, ?string $accent = null): array {
         $brand = self::normalise_hex($brand) ?? self::DEFAULT_BRAND;
@@ -96,123 +140,104 @@ class tokens {
         if (isset($cache[$key])) {
             return $cache[$key];
         }
-        $adjusted = [];
-
-        $light = self::LIGHT;
-        $dark = self::DARK;
-
-        // Light mode: the brand colour must be readable as text/link on every light surface where it may appear
-        // (the darkest being surface-2), and a fill which carries white text.
-        $lightprimary = self::ensure_contrast(
-            $brand,
-            [$light['surface-2'], $light['bg'], $light['surface']],
-            self::MIN_TEXT,
-            '#000000'
-        );
-        if ($lightprimary !== $brand) {
-            $adjusted[] = 'primary-light';
-        }
-        $light['primary'] = $lightprimary;
-        $light['primary-hover'] = self::mix('#000000', $lightprimary, 0.15);
-        $light['on-primary'] = self::best_on($lightprimary);
-        $light['primary-subtle'] = self::mix($lightprimary, $light['surface'], 0.10);
-        $light['on-primary-subtle'] = self::ensure_contrast(
-            $lightprimary,
-            [$light['primary-subtle']],
-            self::MIN_TEXT,
-            '#000000'
+        [$light, $lightadjusted] = self::palette(self::LIGHT, 'light', $brand, $accent, self::MIN_TEXT, self::MIN_UI);
+        [$dark, $darkadjusted] = self::palette(self::DARK, 'dark', $brand, $accent, self::MIN_TEXT, self::MIN_UI);
+        [$lighthigh] = self::palette(self::LIGHT_HIGH, 'light', $brand, $accent, self::MIN_TEXT_HIGH, self::MIN_UI_HIGH);
+        [$darkhigh] = self::palette(self::DARK_HIGH, 'dark', $brand, $accent, self::MIN_TEXT_HIGH, self::MIN_UI_HIGH);
+        // Notes: primary-light, accent-light, primary-dark, accent-dark. The high contrast palettes always adjust.
+        $adjusted = array_merge(
+            array_map(fn($name) => $name . '-light', $lightadjusted),
+            array_map(fn($name) => $name . '-dark', $darkadjusted)
         );
 
-        $lightaccent = self::ensure_contrast(
-            $accent,
-            [$light['surface-2'], $light['bg'], $light['surface']],
-            self::MIN_TEXT,
-            '#000000'
-        );
-        if ($lightaccent !== $accent) {
-            $adjusted[] = 'accent-light';
-        }
-        $light['accent'] = $lightaccent;
-        $light['on-accent'] = self::best_on($lightaccent);
-        $light['link'] = $lightprimary;
-        $light['focus'] = self::ensure_contrast($lightprimary, [$light['bg'], $light['surface']], self::MIN_UI, '#000000');
-
-        // Dark mode: lighten the brand until it reads on the lightest dark surface; fills then carry dark text.
-        $darkprimary = self::ensure_contrast(
-            $brand,
-            [$dark['surface-2'], $dark['surface'], $dark['bg']],
-            self::MIN_TEXT,
-            '#ffffff'
-        );
-        if ($darkprimary !== $brand) {
-            $adjusted[] = 'primary-dark';
-        }
-        $dark['primary'] = $darkprimary;
-        $dark['primary-hover'] = self::mix('#ffffff', $darkprimary, 0.18);
-        $dark['on-primary'] = self::best_on($darkprimary, $dark['bg']);
-        $dark['primary-subtle'] = self::mix($darkprimary, $dark['surface'], 0.16);
-        $dark['on-primary-subtle'] = self::ensure_contrast(
-            $darkprimary,
-            [$dark['primary-subtle']],
-            self::MIN_TEXT,
-            '#ffffff'
-        );
-        $darkaccent = self::ensure_contrast(
-            $accent,
-            [$dark['surface-2'], $dark['surface'], $dark['bg']],
-            self::MIN_TEXT,
-            '#ffffff'
-        );
-        if ($darkaccent !== $accent) {
-            $adjusted[] = 'accent-dark';
-        }
-        $dark['accent'] = $darkaccent;
-        $dark['on-accent'] = self::best_on($darkaccent, $dark['bg']);
-        $dark['link'] = $darkprimary;
-        $dark['focus'] = self::ensure_contrast($darkprimary, [$dark['bg'], $dark['surface']], self::MIN_UI, '#ffffff');
-
-        foreach (['light' => &$light, 'dark' => &$dark] as $mode => &$palette) {
-            $base = $mode === 'light' ? '#ffffff' : $palette['bg'];
-            $towards = $mode === 'light' ? '#000000' : '#ffffff';
-            $surfaces = [$palette['bg'], $palette['surface'], $palette['surface-2']];
-            foreach (['success', 'warning', 'danger', 'info'] as $status) {
-                // Safety net: the fixed status colours already pass, but keep them honest if they are ever edited.
-                $palette[$status] = self::ensure_contrast($palette[$status], $surfaces, self::MIN_TEXT, $towards);
-                $palette['on-' . $status] = self::best_on($palette[$status], $base);
-                $palette[$status . '-subtle'] = self::mix($palette[$status], $palette['surface'], $mode === 'light' ? 0.10 : 0.16);
-            }
-        }
-        unset($palette);
-
-        $cache[$key] = ['light' => $light, 'dark' => $dark, 'adjusted' => $adjusted];
+        $cache[$key] = [
+            'light' => $light,
+            'dark' => $dark,
+            'light-high' => $lighthigh,
+            'dark-high' => $darkhigh,
+            'adjusted' => $adjusted,
+        ];
         return $cache[$key];
     }
 
     /**
-     * The text/background pairs that must reach AA, with their thresholds.
+     * One palette: the fixed neutrals plus brand, accent and status colours adjusted to the contrast minimums.
      *
+     * @param array $base Fixed neutral and status colours.
+     * @param string $mode light or dark: which way colours are pushed when they lack contrast.
+     * @param string $brand Brand colour.
+     * @param string $accent Accent colour.
+     * @param float $text Minimum contrast for text.
+     * @param float $ui Minimum contrast for the focus ring.
+     * @return array [palette, names of the chosen colours that had to change (primary, accent)]
+     */
+    protected static function palette(array $base, string $mode, string $brand, string $accent, float $text, float $ui): array {
+        $light = $mode === 'light';
+        // Light palettes darken colours that lack contrast; dark ones lighten them, so fills then carry dark text.
+        $towards = $light ? '#000000' : '#ffffff';
+        $surfaces = [$base['surface-2'], $base['bg'], $base['surface']];
+        $palette = $base;
+        $adjusted = [];
+
+        // The brand must read as text/link on every surface where it may appear, and as a fill under its own text.
+        $primary = self::ensure_contrast($brand, $surfaces, $text, $towards);
+        if ($primary !== $brand) {
+            $adjusted[] = 'primary';
+        }
+        $palette['primary'] = $primary;
+        $palette['primary-hover'] = $light ? self::mix('#000000', $primary, 0.15) : self::mix('#ffffff', $primary, 0.18);
+        $palette['on-primary'] = $light ? self::best_on($primary) : self::best_on($primary, $base['bg']);
+        $palette['primary-subtle'] = self::mix($primary, $base['surface'], $light ? 0.10 : 0.16);
+        $palette['on-primary-subtle'] = self::ensure_contrast($primary, [$palette['primary-subtle']], $text, $towards);
+
+        $accentcolour = self::ensure_contrast($accent, $surfaces, $text, $towards);
+        if ($accentcolour !== $accent) {
+            $adjusted[] = 'accent';
+        }
+        $palette['accent'] = $accentcolour;
+        $palette['on-accent'] = $light ? self::best_on($accentcolour) : self::best_on($accentcolour, $base['bg']);
+        $palette['link'] = $primary;
+        $palette['focus'] = self::ensure_contrast($primary, [$base['bg'], $base['surface']], $ui, $towards);
+
+        $fill = $light ? '#ffffff' : $base['bg'];
+        foreach (['success', 'warning', 'danger', 'info'] as $status) {
+            // Safety net: the fixed status colours already pass, but keep them honest if they are ever edited.
+            $palette[$status] = self::ensure_contrast($base[$status], $surfaces, $text, $towards);
+            $palette['on-' . $status] = self::best_on($palette[$status], $fill);
+            $palette[$status . '-subtle'] = self::mix($palette[$status], $base['surface'], $light ? 0.10 : 0.16);
+        }
+        return [$palette, $adjusted];
+    }
+
+
+    /**
+     * The text/background pairs that must reach AA (or AAA for the high contrast palettes), with their thresholds.
+     *
+     * @param bool $high Thresholds of the high contrast palettes: 7:1 for text, 4.5:1 for borders and focus.
      * @return array List of [foreground, background, minimum].
      */
-    public static function contrast_pairs(): array {
+    public static function contrast_pairs(bool $high = false): array {
+        $t = $high ? 7.0 : 4.5;
+        $u = $high ? 4.5 : 3.0;
         $pairs = [];
         foreach (['bg', 'surface', 'surface-2'] as $surface) {
             foreach (['text', 'text-muted', 'primary', 'link', 'accent', 'success', 'warning', 'danger', 'info'] as $fg) {
-                $pairs[] = [$fg, $surface, 4.5];
+                $pairs[] = [$fg, $surface, $t];
             }
-            $pairs[] = ['border-strong', $surface, 3.0];
-            $pairs[] = ['focus', $surface, 3.0];
+            $pairs[] = ['border-strong', $surface, $u];
+            $pairs[] = ['focus', $surface, $u];
         }
-        $pairs[] = ['text', 'surface-sunken', 4.5];
-        $pairs[] = ['text', 'header-bg', 4.5];
-        $pairs[] = ['text-muted', 'header-bg', 4.5];
-        $pairs[] = ['on-primary', 'primary', 4.5];
-        $pairs[] = ['on-primary', 'primary-hover', 4.5];
-        $pairs[] = ['on-primary-subtle', 'primary-subtle', 4.5];
-        $pairs[] = ['text', 'primary-subtle', 4.5];
-        $pairs[] = ['on-accent', 'accent', 4.5];
+        $pairs[] = ['text', 'surface-sunken', $t];
+        $pairs[] = ['text', 'header-bg', $t];
+        $pairs[] = ['text-muted', 'header-bg', $t];
+        $pairs[] = ['on-primary', 'primary', $t];
+        $pairs[] = ['on-primary', 'primary-hover', $t];
+        $pairs[] = ['on-primary-subtle', 'primary-subtle', $t];
+        $pairs[] = ['text', 'primary-subtle', $t];
+        $pairs[] = ['on-accent', 'accent', $t];
         foreach (['success', 'warning', 'danger', 'info'] as $status) {
-            $pairs[] = ['on-' . $status, $status, 4.5];
-            $pairs[] = ['text', $status . '-subtle', 4.5];
+            $pairs[] = ['on-' . $status, $status, $t];
+            $pairs[] = ['text', $status . '-subtle', $t];
         }
         return $pairs;
     }
@@ -221,11 +246,12 @@ class tokens {
      * Check every pair of a palette.
      *
      * @param array $palette A palette from build().
+     * @param bool $high Use the high contrast thresholds.
      * @return array List of failures as strings; empty when the palette passes.
      */
-    public static function audit(array $palette): array {
+    public static function audit(array $palette, bool $high = false): array {
         $failures = [];
-        foreach (self::contrast_pairs() as [$fg, $bg, $min]) {
+        foreach (self::contrast_pairs($high) as [$fg, $bg, $min]) {
             $ratio = self::contrast($palette[$fg], $palette[$bg]);
             if ($ratio < $min) {
                 $failures[] = sprintf('%s (%s) on %s (%s): %.2f < %.1f', $fg, $palette[$fg], $bg, $palette[$bg], $ratio, $min);
@@ -241,18 +267,35 @@ class tokens {
      * what Boost 5.3 writes on the html tag when a dark colour mode is in use (and what this theme writes for the dark
      * preset when Boost's colour modes are off).
      *
+     * The high contrast palettes apply with the high contrast presets (data-ct-contrast="more" on the html tag) and,
+     * whatever the preset, when the device asks for more contrast (prefers-contrast: more).
+     *
      * @param array $palettes Result of build().
      * @param string $light Selector of the light palette (the live preview scopes it to its own panel).
      * @param string $dark Selector of the dark palette.
+     * @param bool $high Also emit the high contrast palettes (not wanted in the live preview).
      * @return string CSS.
      */
     public static function to_css(
         array $palettes,
         string $light = ":root,\n[data-bs-theme=\"light\"]",
-        string $dark = '[data-bs-theme="dark"]'
+        string $dark = '[data-bs-theme="dark"]',
+        bool $high = true
     ): string {
         $css = "{$light} {\n" . self::declarations($palettes['light']) . "    color-scheme: light;\n}\n";
         $css .= "{$dark} {\n" . self::declarations($palettes['dark']) . "    color-scheme: dark;\n}\n";
+        if (!$high || !isset($palettes['light-high'])) {
+            return $css;
+        }
+        // Same specificity as the rules above and later in the file, so the high contrast values win.
+        $lighthigh = self::declarations($palettes['light-high']) . "    color-scheme: light;\n";
+        $darkhigh = self::declarations($palettes['dark-high']) . "    color-scheme: dark;\n";
+        $css .= "[data-ct-contrast=\"more\"] {\n{$lighthigh}}\n";
+        $css .= "[data-ct-contrast=\"more\"][data-bs-theme=\"dark\"] {\n{$darkhigh}}\n";
+        $css .= "@media (prefers-contrast: more) {\n";
+        $css .= ":root,\n[data-bs-theme=\"light\"] {\n{$lighthigh}}\n";
+        $css .= "[data-bs-theme=\"dark\"] {\n{$darkhigh}}\n";
+        $css .= "}\n";
         return $css;
     }
 

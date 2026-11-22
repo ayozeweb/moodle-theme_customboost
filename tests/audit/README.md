@@ -64,10 +64,30 @@ Sin `AUDIT_PASSWORD_ADMIN` se omiten las páginas de administración.
 
 Ejecuta la misma auditoría con Boost (`--mode=boost-light`, cambiando antes el tema del sitio a Boost) y compara los
 dos `report.json`. Lo que aparece igual con Boost es del core. Así se clasificó la ronda del
-[informe de F1](../../docs/informes/2026-11-17.md).
+[informe de F1](../../docs/informes/2026-11-18.md).
 
 ## Referencias visuales
 
 Las capturas de `baseline/` dependen de la tipografía y el renderizado del sistema, así que son fiables en la misma
 máquina en la que se generaron. Regénéralas (`--update-baseline`) al cambiar a propósito el aspecto del tema y revisa
 las diferencias antes de hacerlo.
+
+## Condiciones extremas (`stress.mjs`)
+
+Complementa la auditoría con lo que un usuario con baja visión o un móvil girado cambian en la página. Usa el mismo
+`pages.json` y los mismos usuarios.
+
+```bash
+AUDIT_PASSWORD_ADMIN='contraseña-del-admin' node stress.mjs --base=http://localhost:8080 --mode=light
+```
+
+| Condición | Qué simula | Criterio |
+|---|---|---|
+| `text200` | Móvil de 360 px con el texto del sistema al 200 % (todos los `rem` se duplican) | Sin desborde ni texto cortado (WCAG 1.4.4) |
+| `spacing360`, `spacing1280` | Espaciado de texto de WCAG 1.4.12 (interlineado 1,5, letras 0,12 em, palabras 0,16 em, párrafos 2 em) | Sin pérdida de contenido |
+| `zoom200` | Pantalla de 1280 × 800 al 200 % de zoom (640 × 400). El 400 % equivale a la pasada de 320 px de `audit.mjs` | Sin desborde (WCAG 1.4.10) |
+| `landscape852`, `landscape740` | iPhone y Android compacto en horizontal | Sin desborde; la cabecera fija no ocupa más de una quinta parte de la pantalla |
+
+Informa, por página: desborde horizontal, elementos con texto recortado por `overflow: hidden` (los truncados con
+puntos suspensivos se marcan como `ellipsis`) y el porcentaje de la altura que ocupa la cabecera. Opciones:
+`--only=...` y `--conditions=text200,spacing360`. Resultados en `results/stress-<modo>/`.

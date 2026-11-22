@@ -1,9 +1,35 @@
 # STATUS · theme_customboost
 
 ## Current milestone
-**F2 · Administration P1** (plan phase F2, version 0.5.0 beta): done.
+**F3 · Mobile and accessibility** (plan phase F3, version 0.7.0 beta): everything that can be automated or emulated
+is done; screen reader and physical device tests need a person (protocol in `docs/ACCESIBILIDAD.md`).
+Report: `docs/informes/2026-11-22.md`.
 
-## F2 · Done
+## F3 · Done
+- Fixes found by the new checks:
+  - Bulk edit bar of the course page clipped at 360 px (C-02): icons of 44 px below 576 px, names kept for screen
+    readers.
+  - Edit mode switch invisible on phones: the theme hid its whole label, which in Moodle 5.3 holds the control.
+  - Full header at 320 px (Boost colour mode menu, edit mode, notifications, messages, user): the brand mark was
+    covered; now the name gives way and every target keeps 44 px.
+  - Browser toolbar colour followed the device, not the preset (white toolbar over a dark site).
+  - Greeting and course cards moved into the main landmark, so "Skip to main content" lands on them.
+  - Drawers: Escape closes them, Tab stays inside while open, focus returns to the opening button after a tap on
+    the backdrop (Boost focused another drawer's button), focused card scrolled into view (`amd/src/a11y.js`).
+  - Words split letter by letter in tables inside labels (core `.text-break`); participants page 16 px too wide at
+    320 px; My courses sort button and quiz attempt table overflowing with text at 200 %.
+  - Login image: brand chip at 1.9:1 over light photos, now on a dark fill (≥ 10:1); stronger top of the scrim.
+  - Dark preset: overdue dates in mod_assign at 3.5:1 (literal colour in core).
+- High contrast: presets "High contrast, light" and "dark" (7:1 text, AAA), also applied automatically with
+  `prefers-contrast: more`; `forced-colors` support; contrast report with 196 pairs (four palettes).
+- Tooling: `tests/audit/stress.mjs` (text 200 %, WCAG text spacing, zoom, landscape); audit at 320-430 px; new
+  Behat `keyboard.feature` and a mobile header scenario; PHPUnit 61 tests.
+- Accessibility statement `docs/ACCESIBILIDAD.md`.
+- Slow 4G + CPU x4: the theme adds 73 KB and 0.16 s FCP over Boost; the 3 s target is a core/server matter (F4).
+
+## Previous milestones
+
+### F2 · Done
 - `classes/options.php`: one source of truth for every choice (palettes, fonts, sizes, radii, densities, login
   layouts, dashboard sources, card elements). Every reader validates and falls back to the default.
 - Settings in six tabs (Appearance, Header, Login page, Personal area, Footer, Advanced) instead of the nine first
@@ -29,8 +55,6 @@
 - CI green on PHP 8.3 and 8.4 (run 45071001541) after two fixes the sandbox could not catch: the mustache HTML
   validator rejected the preview's style element inside a div (now added to the head by the module), and ESLint's
   promise/no-nesting (the refresh now uses async/await).
-
-## Previous milestones
 
 ### F1 · Done
 - `tests/audit`: Playwright + axe audit of 34 pages at 360/768/1280 px in both presets (overflow, touch targets,
@@ -136,8 +160,8 @@ Version 0.1.0 (ALPHA) was installable and complete for the requested scope; the 
 - None.
 
 ## Next steps
-- Phase F3 of the plan: mobile on real devices and accessibility (MOV-03 to 16, ACC-10 to 37), including C-02
-  (bulk edit bar at 360 px, also seen at 18 px text size with another button).
+- Manual tests that need people and devices: ACC-30 to 37 and MOV-04/05/06/16 (protocol in docs/ACCESIBILIDAD.md).
+- Phase F4 of the plan: security, compatibility and performance (MOV-14 moves there).
 - F2 leftovers, not blocking: link from each setting to the published guide (ADM-X3).
 - F1 leftovers, not blocking: OAuth 2 / MFA login screens, PNG/WebP/AVIF and portrait login images, block drag and
   drop, the colour mode cookie on the login page, overflow at 320/344/375/412 px.

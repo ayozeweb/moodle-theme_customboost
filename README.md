@@ -37,6 +37,8 @@ nombres `--ct-`, compartido con [`format_customtiles`](https://github.com/ayozew
   de pie de página. **Vista previa en vivo** en claro y oscuro antes de guardar, y una página de herramientas para
   exportar, importar y restaurar los ajustes y revisar el contraste.
 - **Sin CDN.** Tipografía Inter (OFL) servida desde el tema; ninguna petición externa.
+- **Alto contraste.** Presets de alto contraste claro y oscuro (texto a 7:1, AAA), aplicados también cuando el
+  dispositivo pide más contraste, y soporte del modo de colores forzados de Windows.
 - **Accesible.** Foco visible y uniforme, `prefers-reduced-motion`, textos de 16 px en campos (sin zoom en iOS),
   enlaces subrayados en prosa en modo oscuro, sin scroll horizontal a 360 px.
 - Cadenas en **inglés y español**. Privacy API (no guarda datos personales).
@@ -61,7 +63,7 @@ nombres `--ct-`, compartido con [`format_customtiles`](https://github.com/ayozew
 
 | Pestaña | Ajustes |
 |---|---|
-| Apariencia | Vista previa en vivo; preset (claro, oscuro, automático); paleta (Índigo, Océano, Bosque, Granate, Grafito o Personalizada con color de marca y acento, ajustados a AA); logotipos para modo oscuro; tipografía; tamaño del texto; redondeo; densidad |
+| Apariencia | Vista previa en vivo; preset (claro, oscuro, automático, alto contraste claro u oscuro); paleta (Índigo, Océano, Bosque, Granate, Grafito o Personalizada con color de marca y acento, ajustados a AA); logotipos para modo oscuro; tipografía; tamaño del texto; redondeo; densidad |
 | Cabecera | Nombre del sitio junto al logotipo |
 | Página de acceso | Disposición, imagen, título, lema, texto bajo el formulario |
 | Área personal | Mostrar tarjetas, cursos mostrados, número, elementos de la tarjeta, saludo y subtítulo |
@@ -86,6 +88,8 @@ php public/theme/customboost/cli/contrast.php
 |---|---|---|
 | [Guía de administración](docs/GUIA-ADMINISTRACION.md) | Administradores de Moodle | Instalación, todos los ajustes paso a paso, recetas, solución de problemas y preguntas frecuentes |
 | [Plan de puesta a punto](docs/PLAN-PUESTA-A-PUNTO.md) | Equipo del proyecto | Verificación, móvil, administración personalizable, seguridad, accesibilidad, compatibilidad y hoja de ruta hasta la 1.0 |
+| [Declaración de accesibilidad](docs/ACCESIBILIDAD.md) | Administradores y responsables de accesibilidad | Qué cumple el tema, cómo se ha comprobado, limitaciones conocidas y pruebas pendientes |
+| [Informe de verificación F3](docs/informes/2026-11-22.md) | Equipo del proyecto | Móvil y accesibilidad: anchos de 320 a 1280 px, condiciones extremas, teclado, alto contraste |
 | [Informe de verificación F1](docs/informes/2026-11-18.md) | Equipo del proyecto | Resultado del recorrido de 34 páginas en claro y oscuro, defectos corregidos y pendientes |
 | [Auditoría de páginas](tests/audit/README.md) | Desarrolladores | Cómo repetir el recorrido (desbordes, objetivos táctiles, axe, regresión visual) |
 | [Design tokens](docs/tokens.md) | Desarrolladores | Contrato `--ct-*` e informe de contraste |

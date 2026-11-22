@@ -115,6 +115,19 @@ a {
     min-width: 0;
 }
 
+// A data table placed straight in a card (quiz attempts summary, among others) cannot shrink below its longest words;
+// with large text it got wider than the card and the page. It scrolls inside the card instead.
+#region-main .card:has(> table) {
+    overflow-x: auto;
+}
+
+// Core's .text-break (labels, page content) uses word-break: break-word, which acts like "anywhere": a table in a
+// label shrank to the screen and split every word ("Wee-k"). Its cells keep whole words, so the table stays readable
+// and scrolls inside the .no-overflow box that core puts around it.
+.text-break :is(th, td) {
+    word-break: normal !important; // stylelint-disable-line declaration-no-important
+}
+
 // Activity dates and inline selects that do not wrap pushed some pages 1-5px past the viewport at 360px. Scoped to
 // #page because the activity header sits outside #region-main.
 #page {

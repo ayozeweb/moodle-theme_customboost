@@ -57,6 +57,22 @@ final class tokens_test extends \basic_testcase {
         $palettes = tokens::build($brand, $accent);
         $this->assertSame([], tokens::audit($palettes['light']), 'Light preset');
         $this->assertSame([], tokens::audit($palettes['dark']), 'Dark preset');
+        $this->assertSame([], tokens::audit($palettes['light-high'], true), 'High contrast light (AAA)');
+        $this->assertSame([], tokens::audit($palettes['dark-high'], true), 'High contrast dark (AAA)');
+    }
+
+    /**
+     * The high contrast palettes are emitted for the presets and for prefers-contrast, but not when the preview asks
+     * for the plain palettes.
+     */
+    public function test_high_contrast_css(): void {
+        $palettes = tokens::build();
+        $css = tokens::to_css($palettes);
+        $this->assertStringContainsString('[data-ct-contrast="more"] {', $css);
+        $this->assertStringContainsString('[data-ct-contrast="more"][data-bs-theme="dark"] {', $css);
+        $this->assertStringContainsString('@media (prefers-contrast: more)', $css);
+        $this->assertStringContainsString('--ct-color-text: #000000;', $css);
+        $this->assertStringNotContainsString('data-ct-contrast', tokens::to_css($palettes, '.a', '.b', false));
     }
 
     /**

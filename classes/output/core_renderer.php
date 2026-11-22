@@ -27,13 +27,46 @@ use theme_customboost\options;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class core_renderer extends \theme_boost\output\core_renderer {
+    /** @var bool Whether main_content() already printed the skip link target before the personal area greeting. */
+    protected $ctskiptargetprinted = false;
+
     /**
-     * Page header, followed on the personal area by the greeting and the course cards.
+     * The main region. On the personal area it starts with the greeting and the course cards: they are the main
+     * content of that page, so they belong in the main landmark and the "Skip to main content" link lands on them.
      *
      * @return string
      */
-    public function full_header() {
-        $header = parent::full_header();
+    public function main_content() {
+        $hero = $this->dashboard_hero();
+        if ($hero === '') {
+            return parent::main_content();
+        }
+        // Core prints the skip link target right before the page content, which would put it after the cards. Print
+        // it here, before them, and skip_link_target() leaves core's one out.
+        $this->ctskiptargetprinted = true;
+        return '<div role="main">' . parent::skip_link_target('maincontent') . $hero . $this->unique_main_content_token .
+            '</div>';
+    }
+
+    /**
+     * Skip link target; the main content one is left out when main_content() printed it.
+     *
+     * @param string $id
+     * @return string
+     */
+    public function skip_link_target($id = null) {
+        if ($id === 'maincontent' && $this->ctskiptargetprinted) {
+            return '';
+        }
+        return parent::skip_link_target($id);
+    }
+
+    /**
+     * The personal area greeting and course cards, or an empty string on any other page.
+     *
+     * @return string
+     */
+    protected function dashboard_hero(): string {
         // Only the dashboard gets the cards. Both checks are needed: messaging reuses the mydashboard layout and
         // My courses reuses the my-index page type.
         if (
@@ -41,7 +74,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 || !isloggedin() || isguestuser()
                 || !get_config('theme_customboost', 'dashboardcourses')
         ) {
-            return $header;
+            return '';
         }
         global $USER;
         $limit = (int) (get_config('theme_customboost', 'dashboardcoursecount') ?: 6);
@@ -52,10 +85,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
             options::get('dashboardsource'),
             $elements === '' ? [] : explode(',', $elements)
         );
-        return $header . $this->render_from_template(
-            'theme_customboost/dashboard',
-            $dashboard->export_for_template($this)
-        );
+        return $this->render_from_template('theme_customboost/dashboard', $dashboard->export_for_template($this));
     }
 
     /**

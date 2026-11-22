@@ -82,11 +82,19 @@
     }
 }
 
-// Filter bar of My courses: wraps neatly on phones.
+// Filter bar of My courses: wraps neatly on phones. With large text a menu label ("Sort by course name") wraps
+// inside its button instead of pushing it past the screen.
 .block_myoverview [data-region="filter"] {
     gap: var(--ct-space-2);
 
     .btn {
         min-height: var(--ct-touch-target);
+        max-width: 100%;
+        white-space: normal;
+        text-align: start;
+    }
+
+    .dropdown-toggle > span {
+        white-space: normal;
     }
 }

@@ -126,4 +126,18 @@ class behat_theme_customboost extends behat_base {
             throw new ExpectationException('Accessibility violations: ' . implode(', ', $ids), $this->getSession());
         }
     }
+
+    /**
+     * The focused element is inside the element matched by a CSS selector.
+     *
+     * @Then the focus should be inside :selector in theme_customboost
+     * @param string $selector CSS selector.
+     */
+    public function the_focus_should_be_inside(string $selector): void {
+        $script = 'return (function() { var c = document.querySelector(' . json_encode($selector) . ');' .
+            ' return !!c && c.contains(document.activeElement); })();';
+        if (!$this->evaluate_script($script)) {
+            throw new ExpectationException("The focus is not inside {$selector}", $this->getSession());
+        }
+    }
 }

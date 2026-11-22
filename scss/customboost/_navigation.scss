@@ -86,6 +86,14 @@
 
     .navitem {
         margin-bottom: var(--ct-space-3);
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    // Action buttons ("Enrol users") wrap their label on the narrowest phones instead of leaving the screen.
+    .navitem .btn {
+        max-width: 100%;
+        white-space: normal;
     }
 }
 

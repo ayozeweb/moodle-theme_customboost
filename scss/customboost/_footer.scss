@@ -27,6 +27,46 @@
     padding-bottom: env(safe-area-inset-bottom);
 }
 
+// Bulk editing bar of the course page. Core lays out "Select all" and seven 56 px buttons on one row, which is
+// wider than a phone and clips the last buttons. Below 576 px: "Select all" gets its own row and the actions become
+// 44 px icons. Their names stay in the buttons for screen readers, and in the title for a long press.
+@include media-breakpoint-down(sm) {
+    #sticky-footer .bulkactions {
+        flex-wrap: wrap;
+        row-gap: var(--ct-space-1);
+
+        .form-check {
+            flex: 1 0 100%;
+        }
+
+        [data-for="bulktools"] {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        [data-for="bulkactions"] {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        [data-for="bulkaction"] {
+            align-items: center;
+            justify-content: center;
+            min-width: var(--ct-touch-target);
+            min-height: var(--ct-touch-target);
+            padding-inline: var(--ct-space-1);
+        }
+
+        .bulkaction-icon {
+            padding-inline-start: 0 !important; // stylelint-disable-line declaration-no-important
+        }
+
+        .bulkaction-name {
+            @include visually-hidden;
+        }
+    }
+}
+
 // Administrator's footer text: a quiet band at the end of the page, outside Boost's footer popover.
 .ct-site-footer {
     // Boost's footer is not full width, so no box: centred text on the page canvas.

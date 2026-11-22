@@ -30,6 +30,7 @@ define('CLI_SCRIPT', true);
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 
+use theme_customboost\options;
 use theme_customboost\tokens;
 
 [$options, $unrecognised] = cli_get_params(['brand' => null, 'accent' => null, 'help' => false], ['h' => 'help']);
@@ -38,16 +39,21 @@ if ($options['help']) {
     exit(0);
 }
 
-$brand = $options['brand'] ?? (get_config('theme_customboost', 'brandcolour') ?: null);
-$accent = $options['accent'] ?? (get_config('theme_customboost', 'accentcolour') ?: null);
-$palettes = tokens::build($brand, $accent);
+// The colours in use (palette or colour pickers), unless colours to try are given.
+if ($options['brand'] === null && $options['accent'] === null) {
+    $palettes = options::palettes();
+} else {
+    [$brand, $accent] = options::colours();
+    $palettes = tokens::build($options['brand'] ?? $brand, $options['accent'] ?? $accent);
+}
 
 $failures = 0;
-foreach (['light', 'dark'] as $mode) {
+foreach (tokens::MODES as $mode) {
+    $high = str_ends_with($mode, '-high');
     cli_heading($mode);
     cli_writeln('| Foreground | Background | Ratio | Min | Result |');
     cli_writeln('|---|---|---|---|---|');
-    foreach (tokens::contrast_pairs() as [$fg, $bg, $min]) {
+    foreach (tokens::contrast_pairs($high) as [$fg, $bg, $min]) {
         $ratio = tokens::contrast($palettes[$mode][$fg], $palettes[$mode][$bg]);
         $ok = $ratio >= $min;
         $failures += $ok ? 0 : 1;
@@ -59,7 +65,7 @@ foreach (['light', 'dark'] as $mode) {
             $palettes[$mode][$bg],
             $ratio,
             $min,
-            $ok ? 'AA' : 'FAIL'
+            $ok ? ($high ? 'AAA' : 'AA') : 'FAIL'
         ));
     }
 }

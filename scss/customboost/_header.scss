@@ -50,8 +50,10 @@
         align-items: center;
     }
 
-    // The edit mode switch keeps its label for screen readers but drops it visually on phones.
-    .editmode-switch-form label {
+    // The edit mode switch keeps its label for screen readers but drops its text visually on phones. Only the text:
+    // in Moodle 5.3 the label element also holds the switch itself, and hiding it hid the control.
+    .editmode-switch-form .mds-switch-label,
+    .editmode-switch-form label:not(.mds-switch-control) {
         @include media-breakpoint-down(md) {
             @include visually-hidden;
         }
@@ -73,7 +75,8 @@
 .ct-brand {
     gap: var(--ct-space-2);
     min-height: var(--ct-touch-target);
-    min-width: 0;
+    // When the bar is full only the name gives way (it truncates); the mark, or the start of the logo, stays.
+    min-width: 32px;
     color: var(--ct-color-text);
     font-weight: 700;
     font-size: var(--ct-font-size-lg);
@@ -91,7 +94,12 @@
     }
 }
 
+.ct-brand:has(.logo) {
+    min-width: var(--ct-touch-target);
+}
+
 .ct-brand-name {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -152,8 +160,31 @@
 
 // Phones: every pixel of the 56px bar counts; the avatar alone opens the user menu.
 @include media-breakpoint-down(md) {
-    .ct-navbar .usermenu .dropdown-toggle::after {
+    .ct-navbar .usermenu .dropdown-toggle::after,
+    .ct-navbar #colourmode-menu-toggle::after {
         display: none;
+    }
+
+    // A full bar (colour mode menu, edit mode, notifications, messages, user) must fit 320 px with 44 px targets.
+    .ct-navbar #colourmode-menu-toggle,
+    .ct-navbar .usermenu .dropdown-toggle {
+        min-width: var(--ct-touch-target);
+        padding-inline: 0;
+        justify-content: center;
+    }
+
+    .ct-navbar .editmode-switch-form {
+        margin-inline-start: 0 !important; // stylelint-disable-line declaration-no-important
+    }
+
+    .ct-navbar .editmode-switch-form .mds-switch {
+        min-width: var(--ct-touch-target);
+        justify-content: center;
+    }
+
+    .ct-brand-mark,
+    .ct-brand .logo {
+        flex-shrink: 0;
     }
 
     .ct-navbar #usernavigation {
@@ -173,5 +204,12 @@
 
     .ct-logo-dark {
         display: inline-block;
+    }
+}
+
+// The narrowest phones (320 px): a full bar only fits without the gap after the menu button.
+@media (max-width: 359.98px) {
+    .ct-navbar-toggler {
+        margin-inline-end: 0;
     }
 }

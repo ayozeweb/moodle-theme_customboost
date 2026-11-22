@@ -1,0 +1,10 @@
+import {chromium} from 'playwright';
+const b = await chromium.launch();
+const p = await (await b.newContext({viewport:{width:360,height:800}})).newPage();
+const rows = [];
+p.on('response', async r => { try { const body = await r.body(); rows.push([body.length, r.headers()['content-encoding']||'-', r.request().resourceType(), r.url().replace('http://localhost:8080','').slice(0,110)]); } catch(e){} });
+await p.goto('http://localhost:8080/login/index.php', {waitUntil:'networkidle'});
+rows.sort((a,b)=>b[0]-a[0]);
+for (const r of rows.slice(0,12)) console.log(Math.round(r[0]/1024)+'KB', r[1], r[2], r[3]);
+console.log('total', Math.round(rows.reduce((a,r)=>a+r[0],0)/1024)+'KB', rows.length);
+await b.close();

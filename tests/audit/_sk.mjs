@@ -1,0 +1,10 @@
+import {chromium} from 'playwright';
+const b = await chromium.launch();
+const p = await (await b.newContext({viewport:{width:360,height:300}})).newPage();
+await p.goto('http://localhost:8080/login/index.php'); await p.fill('#username','ana'); await p.fill('#password','Demo1234!');
+await Promise.all([p.waitForNavigation(), p.click('#loginbtn')]);
+await p.goto('http://localhost:8080/my/', {waitUntil:'networkidle'});
+await p.keyboard.press('Tab');
+console.log(await p.evaluate(() => { const e=document.activeElement; const r=e.getBoundingClientRect(); const s=getComputedStyle(e); const top=document.elementFromPoint(r.left+r.width/2, r.top+r.height/2); return {rect:[r.left,r.top,r.width,r.height].map(Math.round), z:s.zIndex, pos:s.position, topEl: top===e||e.contains(top) ? 'self' : top.tagName+'.'+top.className}; }));
+await p.screenshot({path:'/tmp/claude-0/-home-user-moodle-theme-customboost/f3b5be22-ab6d-5763-99b2-7cd7eb11c8f2/scratchpad/skip.png'});
+await b.close();

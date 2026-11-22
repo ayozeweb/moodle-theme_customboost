@@ -1,0 +1,87 @@
+// High contrast: the high contrast presets (data-ct-contrast="more" on the html tag) and devices set to ask for more
+// contrast (prefers-contrast: more). The colours come from the high contrast palettes (classes/tokens.php, 7:1 text);
+// these rules add what colour alone does not.
+@mixin ct-more-contrast {
+    // A thicker focus ring, and no shadows: borders carry the shape of cards and menus instead.
+    --ct-focus-width: 4px;
+    --ct-shadow-sm: none;
+    --ct-shadow-md: none;
+    --ct-shadow-lg: none;
+
+    // Every link is underlined, not only those in running text. Controls styled as links keep their own look.
+    a:not(.btn):not(.nav-link):not(.dropdown-item):not(.list-group-item):not(.navbar-brand):not(.ct-course-card-link) {
+        text-decoration: underline;
+    }
+
+    // The course cards' link covers the whole card: underline the title so the card still reads as a link.
+    .ct-course-card-link {
+        text-decoration: underline;
+    }
+
+    .ct-course-card,
+    .card {
+        border-color: var(--ct-color-border-strong);
+    }
+
+    ::placeholder {
+        color: var(--ct-color-text-muted);
+        opacity: 1;
+    }
+}
+
+[data-ct-contrast="more"] {
+    @include ct-more-contrast;
+}
+
+@media (prefers-contrast: more) {
+    :root {
+        @include ct-more-contrast;
+    }
+}
+
+// Windows high contrast and other forced colour modes: the system replaces every colour and drops backgrounds and
+// shadows. Keep visible what the theme shows with a fill alone. Focus already uses outline, which survives.
+@media (forced-colors: active) {
+    .progress {
+        border: 1px solid currentcolor;
+    }
+
+    .progress-bar {
+        forced-color-adjust: none;
+        background-color: Highlight;
+    }
+
+    .ct-chip,
+    .badge,
+    .ct-course-card,
+    .ct-dashboard-empty {
+        border: 1px solid currentcolor;
+    }
+
+    // The current page in the navigation is marked with a fill and a dot: underline it as well.
+    .nav-link.active,
+    .nav-link[aria-current="page"],
+    .mds-nav-pill--selected,
+    .mds-nav-pill[aria-current="page"] {
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+    }
+
+    // The edit mode switch is drawn with fills only and vanished: outline its track and paint the thumb.
+    .mds-switch-track {
+        border: 1px solid ButtonText;
+    }
+
+    .mds-switch-thumb {
+        forced-color-adjust: none;
+        background-color: ButtonText;
+    }
+
+    .mds-switch-input:checked + .mds-switch-control .mds-switch-thumb {
+        background-color: Highlight;
+    }
+
+    .btn {
+        border: 1px solid ButtonText;
+    }
+}

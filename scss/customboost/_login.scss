@@ -34,13 +34,14 @@
     background-color: #1e1b4b;
     color: #fff;
 
-    // Scrim: guarantees AA for the white text whatever image the administrator uploads.
+    // Scrim: the white title and tagline keep AA over any image the administrator uploads, including near-white
+    // photos (measured on screenshots, ACC-04). The brand chip carries its own dark fill for its small text.
     &::after {
         content: "";
         position: absolute;
         inset: 0;
         z-index: -1;
-        background: linear-gradient(180deg, rgba(8, 10, 28, .1) 0%, rgba(8, 10, 28, .5) 50%, rgba(8, 10, 28, .86) 100%);
+        background: linear-gradient(180deg, rgba(8, 10, 28, .25) 0%, rgba(8, 10, 28, .55) 50%, rgba(8, 10, 28, .86) 100%);
     }
 }
 
@@ -70,7 +71,8 @@
     gap: var(--ct-space-2);
     padding: .3rem .875rem .3rem .3rem;
     border-radius: var(--ct-radius-pill);
-    background-color: rgba(255, 255, 255, .14);
+    // Dark enough on its own for 14 px white text over a white photo (5.8:1).
+    background-color: rgba(8, 10, 28, .6);
     border: 1px solid rgba(255, 255, 255, .28);
     backdrop-filter: blur(10px);
     font-weight: 650;

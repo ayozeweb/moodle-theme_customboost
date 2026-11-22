@@ -56,4 +56,59 @@ final class hook_listener_test extends \advanced_testcase {
         hook_listener::before_html_attributes($hook);
         $this->assertArrayNotHasKey('data-ct-preset', $hook->get_attributes());
     }
+
+    /**
+     * The browser toolbar colour follows the mode the page renders in; only the automatic preset follows the device.
+     */
+    public function test_theme_color(): void {
+        global $PAGE;
+        $this->resetAfterTest();
+        $PAGE->force_theme('customboost');
+        $palettes = options::palettes();
+        $head = function (): string {
+            global $PAGE;
+            $hook = new \core\hook\output\before_standard_head_html_generation($PAGE->get_renderer('core'));
+            hook_listener::before_standard_head_html_generation($hook);
+            return $hook->get_output();
+        };
+
+        set_config('colourpreset', 'dark', 'theme_customboost');
+        $html = $head();
+        $this->assertSame(1, substr_count($html, 'name="theme-color"'));
+        $this->assertStringContainsString('content="' . $palettes['dark']['header-bg'] . '"', $html);
+        $this->assertStringNotContainsString('prefers-color-scheme', $html);
+
+        set_config('colourpreset', 'auto', 'theme_customboost');
+        $html = $head();
+        $this->assertSame(2, substr_count($html, 'name="theme-color"'));
+        $this->assertStringContainsString('(prefers-color-scheme: dark)', $html);
+    }
+
+    /**
+     * The high contrast presets write the mode and data-ct-contrast; other presets do not.
+     */
+    public function test_high_contrast_presets(): void {
+        global $PAGE;
+        $this->resetAfterTest();
+        $PAGE->force_theme('customboost');
+        $attributes = function (): array {
+            global $PAGE;
+            $hook = new \core\hook\output\before_html_attributes($PAGE->get_renderer('core'));
+            hook_listener::before_html_attributes($hook);
+            return $hook->get_attributes();
+        };
+
+        set_config('colourpreset', 'highcontrast', 'theme_customboost');
+        $this->assertSame('light', $attributes()['data-bs-theme']);
+        $this->assertSame('more', $attributes()['data-ct-contrast'] ?? null);
+        $this->assertSame('light', hook_listener::current_mode());
+
+        set_config('colourpreset', 'highcontrastdark', 'theme_customboost');
+        $this->assertSame('dark', $attributes()['data-bs-theme']);
+        $this->assertSame('more', $attributes()['data-ct-contrast'] ?? null);
+        $this->assertSame('dark', hook_listener::current_mode());
+
+        set_config('colourpreset', 'dark', 'theme_customboost');
+        $this->assertArrayNotHasKey('data-ct-contrast', $attributes());
+    }
 }

@@ -3,7 +3,7 @@
 Guía completa para instalar, configurar y mantener el tema **Custom Boost** (`theme_customboost`) en tu Moodle.
 No hace falta saber programar: cada apartado indica dónde hacer clic y qué resultado esperar.
 
-> Versión documentada: **0.5.0 (beta)** para **Moodle 5.3**. Las opciones marcadas como *previstas* todavía no
+> Versión documentada: **0.7.0 (beta)** para **Moodle 5.3**. Las opciones marcadas como *previstas* todavía no
 > existen; están descritas en el [plan de puesta a punto](PLAN-PUESTA-A-PUNTO.md).
 
 ## Índice
@@ -39,7 +39,8 @@ No hace falta saber programar: cada apartado indica dónde hacer clic y qué res
 | Página de acceso | Cuatro disposiciones (imagen a la izquierda, a la derecha, a toda la página o sin imagen) y un texto opcional bajo el formulario. En móvil, imagen arriba y formulario debajo. |
 | Área personal | Saludo y tarjetas de cursos (recientes, en curso, destacados o todos) con categoría, progreso, fecha de fin y botón «Continuar» a elegir. |
 | Cabecera | Barra compacta de 56 px con la marca visible también en móvil; logotipo específico para modo oscuro. |
-| Colores | Cinco paletas listas para usar o colores propios; presets claro, oscuro y automático con contraste AA garantizado. |
+| Colores | Cinco paletas listas para usar o colores propios; presets claro, oscuro y automático con contraste AA garantizado, y dos de alto contraste (AAA). |
+| Accesibilidad | Alto contraste también cuando el dispositivo lo pide, compatibilidad con el modo de alto contraste de Windows, uso completo con teclado en móvil. Ver la [declaración de accesibilidad](ACCESIBILIDAD.md). |
 | Tipografía y forma | Cuatro tipografías sin conexiones externas, cuatro tamaños de texto, cuatro redondeos y tres densidades. |
 | Pie de página | Franja opcional con aviso legal, contacto o enlaces. |
 | Administración | Vista previa en vivo de claro y oscuro antes de guardar; herramientas para exportar, importar y restaurar ajustes y para revisar el contraste. |
@@ -154,6 +155,8 @@ pérdida de conexión), se indica y puedes guardar igualmente.
 | Claro | Fondo claro para todos los usuarios (valor por defecto) |
 | Oscuro | Fondo oscuro para todos los usuarios |
 | Automático | Sigue la preferencia claro/oscuro del dispositivo de cada persona |
+| Alto contraste claro | Negro sobre blanco, texto a 7:1 como mínimo (WCAG AAA), enlaces subrayados y bordes marcados |
+| Alto contraste oscuro | Blanco sobre negro, con los mismos refuerzos |
 
 Este ajuste se ignora si activas los modos de color de Boost (ver [apartado 7](#7-modo-claro-oscuro-y-automático)).
 
@@ -217,6 +220,21 @@ sitio publica una política de cookies, añádela a la lista.
 
 > Es una función que Moodle 5.3 marca como experimental. Con ella activada, el *Preset de color* de Custom Boost no
 > tiene efecto.
+
+### Alto contraste
+
+Hay dos formas de dar alto contraste a quien lo necesita, y se pueden combinar:
+
+- **Para todo el sitio:** *Preset de color › Alto contraste claro* u *Alto contraste oscuro*. Útil en sitios para
+  personas con baja visión.
+- **Para cada persona, sin configurar nada:** si su dispositivo pide más contraste (*Aumentar contraste* en iOS y
+  macOS, *Texto de alto contraste* en Android, *Contraste* en Windows), el tema aplica los colores de alto contraste
+  del modo que esté viendo, sea cual sea el preset. Funciona también con los modos de color de Boost.
+
+Los colores de alto contraste se calculan a partir de la paleta elegida: el color de marca se oscurece (o aclara)
+hasta 7:1. Si el dispositivo usa el modo de **colores forzados** (alto contraste de Windows), el sistema decide los
+colores y el tema solo se asegura de que sigan visibles el foco, las barras de progreso, las etiquetas, el
+interruptor del modo de edición y la página actual del menú.
 
 ## 8. Logotipos y nombre del sitio
 
@@ -350,7 +368,13 @@ Lo demás se controla desde Moodle:
 | Elementos del menú de usuario | *Apariencia › Ajustes avanzados de temas › Elementos del menú de usuario* |
 
 En pantallas de menos de 768 px el menú principal pasa a un panel lateral que se abre con el botón de la izquierda
-de la cabecera.
+de la cabecera. Con teclado: **Esc** lo cierra, **Tab** recorre solo sus enlaces mientras está abierto y, al
+cerrarlo de cualquier forma (botón, Esc o tocando fuera), el foco vuelve al botón que lo abrió. Lo mismo vale para el
+panel de bloques.
+
+**Cabecera llena.** Con el selector de modo de Boost, el modo de edición, notificaciones, mensajes y el menú de
+usuario, todo cabe a 320 px con objetivos de 44 px; para conseguirlo, en el móvil el nombre del sitio se acorta (con
+puntos suspensivos) antes que el logotipo, y con el texto del sistema al 200 % solo queda el logotipo.
 
 ## 13. Pie de página
 
@@ -370,8 +394,9 @@ Requiere ser administrador del sitio.
 
 ### Contraste de los colores en uso
 
-Comprueba las 98 combinaciones de texto y fondo de los presets claro y oscuro con los colores guardados y muestra
-el ratio de cada una. Con los ajustes de color siempre cumplen AA; si algo falla, la causa está en el SCSS propio.
+Comprueba las 196 combinaciones de texto y fondo de los cuatro juegos de colores (claro, oscuro y los dos de alto
+contraste) con los colores guardados y muestra el ratio de cada una: AA (4,5:1 en texto) en claro y oscuro, AAA
+(7:1) en alto contraste. Con los ajustes de color siempre cumplen; si algo falla, la causa está en el SCSS propio.
 
 También existe por línea de comandos, útil para probar colores antes de guardarlos:
 
@@ -522,6 +547,16 @@ ajustes se conservan. Antes, exporta los ajustes desde las herramientas del tema
   conviene pasarlos a la pestaña *Apariencia* y vaciar el código.
 - La cadena `coursesinprogress` se sustituye por `dashboardsection_*` ([apartado 17](#17-idiomas-y-textos-multiidioma)).
 
+**Novedades al pasar de 0.5.0 a 0.7.0**
+
+- Dos presets nuevos de alto contraste, y alto contraste automático cuando el dispositivo lo pide
+  ([apartado 7](#7-modo-claro-oscuro-y-automático)). No cambia nada en sitios que no lo usen.
+- El saludo y las tarjetas del área personal están ahora dentro de la región principal (`#region-main`, *main*)
+  en vez de en la cabecera de la página: el enlace «Saltar al contenido principal» lleva a ellos. Si tu SCSS propio
+  los buscaba dentro de `#page-header`, cambia el selector a `.ct-dashboard-hero`.
+- La etiqueta con el nombre del sitio sobre la imagen de acceso tiene ahora fondo oscuro, y el degradado es algo más
+  intenso arriba: el texto se lee también sobre fotos muy claras.
+
 **Desactivar.** *Apariencia › Temas*, selecciona otro tema (por ejemplo Boost). Los ajustes de Custom Boost se
 conservan por si vuelves.
 
@@ -583,8 +618,8 @@ ilegible en otra página en oscuro, abre una incidencia con la URL y una captura
 
 **¿Hay problemas de accesibilidad conocidos?** Los que quedan vienen de Moodle y ocurren igual con Boost: el
 calificador y la lista de entregas de una tarea son tablas anchas que obligan a desplazarse en horizontal en el
-móvil, el botón de borrado masivo en modo edición queda pequeño a 360 px y la página de mensajes tiene un elemento
-enfocable oculto. Están detallados en el [informe de verificación](informes/2026-11-18.md).
+móvil, y la página de mensajes tiene un elemento enfocable oculto. La lista completa, con lo que se ha comprobado y
+cómo, está en la [declaración de accesibilidad](ACCESIBILIDAD.md).
 
 **¿El editor de texto usa el aspecto del tema?** Sí en tipografía y formas. Los colores de marca no se aplican
 dentro del área de edición.
@@ -597,8 +632,9 @@ dentro del área de edición.
 **¿Es compatible con otros formatos de curso y extensiones?** Sí, con cualquiera que funcione con Boost. Está
 preparado para compartir estilos con `format_customtiles` mediante los tokens `--ct-*`.
 
-**¿Puedo usarlo en producción?** La versión 0.5.0 es beta: las funciones están completas, pero falta la revisión
-de seguridad, accesibilidad y compatibilidad de las fases siguientes. Pruébala antes en un entorno de pruebas; el
+**¿Puedo usarlo en producción?** La versión 0.7.0 es beta: las funciones están completas y la accesibilidad
+verificada con herramientas automáticas y emulación, pero falta la prueba con lectores de pantalla y dispositivos
+reales y la revisión de seguridad y compatibilidad de la fase siguiente. Pruébala antes en un entorno de pruebas; el
 [plan de puesta a punto](PLAN-PUESTA-A-PUNTO.md) detalla lo que falta para la versión estable.
 
 **¿Funciona con idiomas de derecha a izquierda?** Moodle genera la hoja de estilos RTL automáticamente; aún no
@@ -610,7 +646,7 @@ está verificado pantalla a pantalla (previsto en el plan).
 
 | Ajuste (clave) | Pestaña | Tipo | Por defecto | Valores / notas |
 |---|---|---|---|---|
-| Preset de color (`colourpreset`) | Apariencia | Lista | `light` | `light`, `dark`, `auto`. Se ignora con los modos de color de Boost activos. |
+| Preset de color (`colourpreset`) | Apariencia | Lista | `light` | `light`, `dark`, `auto`, `highcontrast`, `highcontrastdark`. Se ignora con los modos de color de Boost activos. |
 | Paleta (`palette`) | Apariencia | Lista | `indigo` | `indigo`, `ocean`, `forest`, `garnet`, `graphite`, `custom`. |
 | Color de marca (`brandcolour`) | Apariencia | Color | `#4338ca` | Solo con `palette = custom`. Ajustado a AA. |
 | Color de acento (`accentcolour`) | Apariencia | Color | `#c2410c` | Solo con `palette = custom`. Ajustado a AA. |

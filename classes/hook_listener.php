@@ -39,6 +39,18 @@ class hook_listener {
     public const PRESET_DARK = 'dark';
     /** @var string Follow the operating system. */
     public const PRESET_AUTO = 'auto';
+    /** @var string High contrast, light: black on white, 7:1 text (WCAG AAA). */
+    public const PRESET_HIGH_LIGHT = 'highcontrast';
+    /** @var string High contrast, dark: white on black, 7:1 text (WCAG AAA). */
+    public const PRESET_HIGH_DARK = 'highcontrastdark';
+    /** @var string[] Every preset. */
+    public const PRESETS = [
+        self::PRESET_LIGHT,
+        self::PRESET_DARK,
+        self::PRESET_AUTO,
+        self::PRESET_HIGH_LIGHT,
+        self::PRESET_HIGH_DARK,
+    ];
 
     /**
      * Whether the page is rendered with this theme.
@@ -61,7 +73,31 @@ class hook_listener {
      */
     public static function get_preset(): string {
         $preset = get_config('theme_customboost', 'colourpreset');
-        return in_array($preset, [self::PRESET_LIGHT, self::PRESET_DARK, self::PRESET_AUTO], true) ? $preset : self::PRESET_LIGHT;
+        return in_array($preset, self::PRESETS, true) ? $preset : self::PRESET_LIGHT;
+    }
+
+    /**
+     * Colour mode of a preset: light, dark or auto.
+     *
+     * @param string $preset
+     * @return string
+     */
+    public static function preset_mode(string $preset): string {
+        return match ($preset) {
+            self::PRESET_DARK, self::PRESET_HIGH_DARK => self::PRESET_DARK,
+            self::PRESET_AUTO => self::PRESET_AUTO,
+            default => self::PRESET_LIGHT,
+        };
+    }
+
+    /**
+     * Whether this request uses a high contrast preset. (The device's "more contrast" setting is applied by CSS.)
+     *
+     * @return bool
+     */
+    public static function high_contrast(): bool {
+        return self::theme_controls_mode()
+            && in_array(self::get_preset(), [self::PRESET_HIGH_LIGHT, self::PRESET_HIGH_DARK], true);
     }
 
     /**
@@ -73,7 +109,7 @@ class hook_listener {
         if (colour_mode::is_enabled()) {
             return colour_mode::get_current_mode();
         }
-        return self::get_preset();
+        return self::preset_mode(self::get_preset());
     }
 
     /**
@@ -96,12 +132,15 @@ class hook_listener {
         }
         $preset = self::get_preset();
         // Auto renders light until the inline script in the head resolves it, so it degrades gracefully without JS.
-        $hook->add_attribute('data-bs-theme', $preset === self::PRESET_DARK ? 'dark' : 'light');
+        $hook->add_attribute('data-bs-theme', self::preset_mode($preset) === self::PRESET_DARK ? 'dark' : 'light');
         $hook->add_attribute('data-ct-preset', $preset);
+        if (self::high_contrast()) {
+            $hook->add_attribute('data-ct-contrast', 'more');
+        }
     }
 
     /**
-     * Add the theme-color meta tags and, for the auto preset, the resolver script.
+     * Add the theme-color meta tags, the keyboard refinements and, for the auto preset, the resolver script.
      *
      * @param before_standard_head_html_generation $hook
      */
@@ -109,12 +148,23 @@ class hook_listener {
         if (!self::is_active()) {
             return;
         }
+        // Keyboard and focus refinements for drawers and the swipeable course row (amd/src/a11y.js).
+        $hook->renderer->get_page()->requires->js_call_amd('theme_customboost/a11y', 'init');
+
         $palettes = options::palettes();
-        // Mobile browsers tint their toolbar with this, so it matches the compact header in each mode.
-        $hook->add_html(html_writer::empty_tag('meta', ['name' => 'theme-color',
-            'content' => $palettes['light']['header-bg'], 'media' => '(prefers-color-scheme: light)']));
-        $hook->add_html(html_writer::empty_tag('meta', ['name' => 'theme-color',
-            'content' => $palettes['dark']['header-bg'], 'media' => '(prefers-color-scheme: dark)']));
+        // Mobile browsers tint their toolbar with this, so it matches the compact header. When the server knows the
+        // mode, one colour: a dark site on a phone set to light must not get a white toolbar. Only the automatic mode
+        // follows the device.
+        $mode = self::current_mode();
+        if ($mode === self::PRESET_LIGHT || $mode === self::PRESET_DARK) {
+            $palette = $palettes[$mode . (self::high_contrast() ? '-high' : '')];
+            $hook->add_html(html_writer::empty_tag('meta', ['name' => 'theme-color', 'content' => $palette['header-bg']]));
+        } else {
+            foreach ([self::PRESET_LIGHT, self::PRESET_DARK] as $scheme) {
+                $hook->add_html(html_writer::empty_tag('meta', ['name' => 'theme-color',
+                    'content' => $palettes[$scheme]['header-bg'], 'media' => "(prefers-color-scheme: {$scheme})"]));
+            }
+        }
 
         if (!self::theme_controls_mode() || self::get_preset() !== self::PRESET_AUTO || defined('BEHAT_SITE_RUNNING')) {
             return;

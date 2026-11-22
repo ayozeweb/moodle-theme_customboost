@@ -97,7 +97,7 @@ class preview extends external_api {
 
         $light = sprintf(self::SCOPE, 'light');
         $dark = sprintf(self::SCOPE, 'dark');
-        $css = tokens::to_css($palettes, $light, $dark);
+        $css = tokens::to_css($palettes, $light, $dark, false);
 
         $shared = "    font-family: " . options::FONTS[options::get('fontfamily', $settings)] . ";\n";
         $shared .= "    --ct-font-family: " . options::FONTS[options::get('fontfamily', $settings)] . ";\n";

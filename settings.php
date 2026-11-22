@@ -71,6 +71,8 @@ if ($ADMIN->fulltree) {
             hook_listener::PRESET_LIGHT => $str('preset_light'),
             hook_listener::PRESET_DARK => $str('preset_dark'),
             hook_listener::PRESET_AUTO => $str('preset_auto'),
+            hook_listener::PRESET_HIGH_LIGHT => $str('preset_highcontrast'),
+            hook_listener::PRESET_HIGH_DARK => $str('preset_highcontrastdark'),
         ]
     ));
 

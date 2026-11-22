@@ -141,22 +141,22 @@ con un servicio de dispositivos reales.
 
 | Id | Comprobación | Método | Criterio | Estado |
 |---|---|---|---|---|
-| MOV-01 | Sin scroll horizontal en ninguna página del recorrido 2.2 | Script: `scrollWidth <= innerWidth` a 320, 344, 360, 375, 412, 768 | 0 páginas con desborde | 🟡 0 atribuibles al tema a 360/768/1280; quedan las dos tablas de datos del core (exentas de 1.4.10) y faltan 320, 344, 375 y 412 |
-| MOV-02 | Objetivos táctiles | Script que mide todo `a`, `button`, `input`, `[role=button]` visible | ≥ 44 × 44 px en cabecera, navegación, formularios y tarjetas; ≥ 24 px en el resto (WCAG 2.5.8) | ✅ automatizado en `tests/audit`; queda un botón del core (borrado masivo a 360 px) |
-| MOV-03 | Separación entre objetivos | Mismo script | ≥ 8 px entre objetivos adyacentes de la cabecera | ⬜ |
-| MOV-04 | Zonas seguras | iPhone con muesca, vertical y horizontal | Nada bajo la muesca ni bajo el indicador de inicio | ⬜ |
-| MOV-05 | Teclado virtual | Acceso y formularios en iOS y Android | El campo enfocado y el botón de enviar quedan visibles; sin zoom al enfocar (texto ≥ 16 px) | ⬜ |
-| MOV-06 | Altura de ventana | Barra del navegador visible/oculta | El acceso usa `svh`: sin saltos ni recortes | ⬜ |
-| MOV-07 | Fila deslizable de tarjetas | Dedo, teclado y lector de pantalla | Se desliza con inercia y ajuste; se puede recorrer con Tab; no atrapa el scroll vertical | ⬜ |
-| MOV-08 | Panel de navegación | Abrir, cerrar, tocar fuera, tecla Atrás | Se cierra con los tres; el foco vuelve al botón | ⬜ |
-| MOV-09 | Cabecera con muchos elementos | Usuario con notificaciones, mensajes, idioma, modo de edición y selector de modo | Todo cabe a 360 px o pasa al panel; la marca no desaparece | 🟡 |
-| MOV-10 | Orientación | Girar en acceso, área personal y curso | Sin contenido cortado; sin recarga | ⬜ |
-| MOV-11 | Zoom y reflow | Zoom 200 % y 400 % a 1280 px (equivale a 320 px) | Sin pérdida de contenido ni scroll en dos direcciones (WCAG 1.4.10) | ⬜ |
-| MOV-12 | Texto ampliado | Tamaño de texto del sistema al máximo | Sin solapes; botones crecen | ⬜ |
-| MOV-13 | Tablas y contenido ancho | Calificador, informes, `pre`, imágenes grandes | Scroll dentro de su caja, no de la página | ⬜ |
-| MOV-14 | Conexión lenta | Perfil «4G lenta» y CPU ×4 | Acceso utilizable en < 3 s; ver [apartado 8](#8-rendimiento) | ⬜ |
-| MOV-15 | Modo oscuro del sistema | Preset automático en iOS y Android | Cambia sin recargar; color de la barra del navegador coherente | ⬜ |
-| MOV-16 | Vista web dentro de la app de Moodle | Abrir una página «en navegador» desde la app | Se ve correctamente | ⬜ |
+| MOV-01 | Sin scroll horizontal en ninguna página del recorrido 2.2 | Script: `scrollWidth <= innerWidth` a 320, 344, 360, 375, 412, 768 | 0 páginas con desborde | ✅ 320, 344, 360, 375, 412, 430, 768 y 1280 px en claro y oscuro: 0 desbordes del tema (corregidos los de participantes a 320 px y la tabla de una etiqueta); quedan las dos tablas de datos del core, exentas de 1.4.10 |
+| MOV-02 | Objetivos táctiles | Script que mide todo `a`, `button`, `input`, `[role=button]` visible | ≥ 44 × 44 px en cabecera, navegación, formularios y tarjetas; ≥ 24 px en el resto (WCAG 2.5.8) | ✅ automatizado en `tests/audit`; corregida la barra de edición masiva (C-02) y el interruptor de edición, que el tema ocultaba en el móvil |
+| MOV-03 | Separación entre objetivos | Mismo script | ≥ 8 px entre objetivos adyacentes de la cabecera | ✅ cabecera llena a 320 y 360 px: objetivos de 44 px contiguos sin solaparse (la separación de 8 px se sustituye por el tamaño de 44 px, que WCAG 2.5.8 acepta) |
+| MOV-04 | Zonas seguras | iPhone con muesca, vertical y horizontal | Nada bajo la muesca ni bajo el indicador de inicio | 🟡 sin `viewport-fit=cover` en el core, Safari mantiene el contenido dentro de la zona segura; los `env(safe-area-inset-*)` del tema quedan listos si un sitio lo activa. Falta comprobarlo en un iPhone físico |
+| MOV-05 | Teclado virtual | Acceso y formularios en iOS y Android | El campo enfocado y el botón de enviar quedan visibles; sin zoom al enfocar (texto ≥ 16 px) | 🟡 campos a 16 px (sin zoom) comprobado; el teclado virtual real necesita dispositivo físico |
+| MOV-06 | Altura de ventana | Barra del navegador visible/oculta | El acceso usa `svh`: sin saltos ni recortes | 🟡 el acceso usa `svh` con `vh` de respaldo; falta comprobar en dispositivo físico |
+| MOV-07 | Fila deslizable de tarjetas | Dedo, teclado y lector de pantalla | Se desliza con inercia y ajuste; se puede recorrer con Tab; no atrapa el scroll vertical | ✅ Tab recorre las tarjetas y la enfocada se desplaza a la vista (`amd/src/a11y.js`); la rueda o el gesto vertical desplazan la página |
+| MOV-08 | Panel de navegación | Abrir, cerrar, tocar fuera, tecla Atrás | Se cierra con los tres; el foco vuelve al botón | ✅ botón, Esc y toque fuera cierran el panel y el foco vuelve al botón (antes Esc no cerraba y tocar fuera perdía el foco); Behat `keyboard.feature` |
+| MOV-09 | Cabecera con muchos elementos | Usuario con notificaciones, mensajes, idioma, modo de edición y selector de modo | Todo cabe a 360 px o pasa al panel; la marca no desaparece | ✅ con el selector de modo de Boost, edición, notificaciones, mensajes y usuario, todo cabe a 320 px; el nombre del sitio cede antes que el logotipo (antes el logotipo quedaba tapado). El menú de idioma de un usuario identificado va dentro del menú de usuario |
+| MOV-10 | Orientación | Girar en acceso, área personal y curso | Sin contenido cortado; sin recarga | ✅ 852 × 393 y 740 × 360 en horizontal: sin desbordes; la cabecera ocupa el 15–16 % de la altura |
+| MOV-11 | Zoom y reflow | Zoom 200 % y 400 % a 1280 px (equivale a 320 px) | Sin pérdida de contenido ni scroll en dos direcciones (WCAG 1.4.10) | ✅ zoom al 200 % (640 px) y al 400 % (320 px) sin desbordes del tema |
+| MOV-12 | Texto ampliado | Tamaño de texto del sistema al máximo | Sin solapes; botones crecen | ✅ texto al 200 % a 360 px: corregidos el botón de ordenación de *Mis cursos* y la tabla de intentos del cuestionario; solo queda el nombre del sitio acortado en la cabecera (documentado) |
+| MOV-13 | Tablas y contenido ancho | Calificador, informes, `pre`, imágenes grandes | Scroll dentro de su caja, no de la página | ✅ tablas dentro de etiquetas y de tarjetas se desplazan en su caja; las dos tablas de datos del core desplazan la página (core) |
+| MOV-14 | Conexión lenta | Perfil «4G lenta» y CPU ×4 | Acceso utilizable en < 3 s; ver [apartado 8](#8-rendimiento) | 🟡 el tema añade 73 KB (+2,5 %) y 0,16 s de FCP respecto a Boost en 4G lenta con CPU ×4; el objetivo de 3 s no lo cumple el propio core con la caché vacía en el servidor de desarrollo. Pasa a F4 (REN-*) |
+| MOV-15 | Modo oscuro del sistema | Preset automático en iOS y Android | Cambia sin recargar; color de la barra del navegador coherente | ✅ corregido: el color de la barra del navegador seguía al dispositivo y no al preset (barra blanca sobre un sitio oscuro); ahora un solo color cuando el modo se conoce, y los dos solo con *Automático* |
+| MOV-16 | Vista web dentro de la app de Moodle | Abrir una página «en navegador» desde la app | Se ve correctamente | ⬜ necesita la app oficial en un dispositivo |
 
 **Mejoras previstas:** barra de navegación inferior opcional en móvil (ver ADM-N3), contenedores con *container
 queries* para que las tarjetas se adapten al hueco con los paneles laterales abiertos, e imágenes de tarjeta con
@@ -386,54 +386,53 @@ Anexo IV de la Orden TMS/369/2019 que usa `format_customtiles`.
 | Id | Comprobación | Herramienta | Criterio | Estado |
 |---|---|---|---|---|
 | ACC-01 | Contraste de los tokens | PHPUnit + `cli/contrast.php` | 100 % de las parejas | ✅ |
-| ACC-02 ✅ | Reglas axe en acceso, área personal, Mis cursos, curso y ajustes, en claro y oscuro, a 360 y 1280 | Behat con axe en CI (`accessibility.feature`) y `tests/audit` en local | 0 infracciones graves o críticas atribuibles al tema | ⬜ |
+| ACC-02 | Reglas axe en acceso, área personal, Mis cursos, curso y ajustes, en claro y oscuro, a 360 y 1280 | Behat con axe en CI (`accessibility.feature`) y `tests/audit` en local | 0 infracciones graves o críticas atribuibles al tema | ✅ |
 | ACC-03 | Pasos de accesibilidad de Behat (`the page should meet accessibility standards`) en AUT-01 a AUT-04 | Behat | En verde | ✅ |
-| ACC-04 | Contraste real en pantalla (texto sobre imagen, estados hover/foco/deshabilitado) | Script de muestreo de píxeles sobre capturas | ≥ 4,5:1 texto; ≥ 3:1 componentes | ⬜ |
-| ACC-05 | HTML válido de las plantillas propias | Validador Nu | Sin errores | ⬜ |
+| ACC-04 | Contraste real en pantalla (texto sobre imagen, estados hover/foco/deshabilitado) | Script de muestreo de píxeles sobre capturas | ≥ 4,5:1 texto; ≥ 3:1 componentes | ✅ muestreo de píxeles del texto sobre la imagen de acceso, con la ilustración y con una foto casi blanca: todo ≥ 4,5:1 tras dar fondo oscuro a la etiqueta del sitio (estaba a 1,9:1) y reforzar el degradado |
+| ACC-05 | HTML válido de las plantillas propias | Validador Nu | Sin errores | ✅ el paso `mustache` del CI valida cada plantilla con el validador Nu (detectó el `style` de la vista previa en F2) |
 
 ### 6.2 Comprobaciones manuales
 
 | Id | Criterio WCAG | Comprobación | Estado |
 |---|---|---|---|
-| ACC-10 | 2.1.1, 2.1.2 Teclado | Recorrer acceso, cabecera, panel móvil, tarjetas y ajustes solo con teclado; sin trampas | ⬜ |
-| ACC-11 | 2.4.3 Orden del foco | El orden sigue el orden visual; al cerrar el panel el foco vuelve al botón | ⬜ |
-| ACC-12 | 2.4.7, 2.4.11 Foco visible | Indicador de 3 px visible en claro y oscuro, nunca tapado por la cabecera fija | 🟡 |
-| ACC-13 | 2.4.1 Saltar bloques | «Saltar al contenido principal» es el primer elemento enfocable y funciona | ⬜ |
-| ACC-14 | 1.3.1, 2.4.6 Encabezados | Un solo `h1` por página; niveles sin saltos (el saludo es `h2`, las tarjetas `h4` bajo un `h3`) | 🟡 revisar |
-| ACC-15 | 1.3.1 Regiones | `banner`, `navigation`, `main`, `contentinfo` presentes y con nombre | ⬜ |
-| ACC-16 | 4.1.2 Nombre, función, valor | Botón del panel, selector de modo, barras de progreso y tarjetas con nombre accesible | 🟡 |
+| ACC-10 | 2.1.1, 2.1.2 Teclado | Recorrer acceso, cabecera, panel móvil, tarjetas y ajustes solo con teclado; sin trampas | ✅ acceso, cabecera, panel móvil, tarjetas y ajustes con teclado; Esc y Tab en los paneles (`keyboard.feature`) |
+| ACC-11 | 2.4.3 Orden del foco | El orden sigue el orden visual; al cerrar el panel el foco vuelve al botón | ✅ el foco vuelve al botón al cerrar un panel de cualquier forma |
+| ACC-12 | 2.4.7, 2.4.11 Foco visible | Indicador de 3 px visible en claro y oscuro, nunca tapado por la cabecera fija | ✅ 3 px (4 px en alto contraste) con `outline`; recorrido con Mayús+Tab de un curso largo a 360 y 1280 px: ningún elemento enfocado queda bajo la cabecera fija |
+| ACC-13 | 2.4.1 Saltar bloques | «Saltar al contenido principal» es el primer elemento enfocable y funciona | ✅ primer elemento enfocable; lleva al saludo del área personal, ahora dentro de la región principal (antes lo saltaba) |
+| ACC-14 | 1.3.1, 2.4.6 Encabezados | Un solo `h1` por página; niveles sin saltos (el saludo es `h2`, las tarjetas `h4` bajo un `h3`) | ✅ un `h1` por página y sin saltos en acceso, área personal, Mis cursos y curso |
+| ACC-15 | 1.3.1 Regiones | `banner`, `navigation`, `main`, `contentinfo` presentes y con nombre | ✅ `banner`, `navigation` (con nombre), `main` y `contentinfo`; el saludo y las tarjetas pasan a `main`. El acceso no tiene cabecera a propósito |
+| ACC-16 | 4.1.2 Nombre, función, valor | Botón del panel, selector de modo, barras de progreso y tarjetas con nombre accesible | ✅ axe sin infracciones de nombre; botón del panel, interruptor y barras de progreso con nombre |
 | ACC-17 | 1.1.1 Texto alternativo | Imagen de acceso y de tarjetas decorativas (`alt=""`); logotipo con el nombre del sitio | ✅ |
 | ACC-18 | 1.4.1 Uso del color | Estado activo, progreso, «Completado» y errores no dependen solo del color | ✅ |
-| ACC-19 | 1.4.3, 1.4.11 Contraste | Texto sobre la imagen de acceso con fotos claras y oscuras; bordes de campos | 🟡 |
-| ACC-20 | 1.4.4, 1.4.10 Zoom y reflow | Zoom 200 % y 400 %; sin pérdida de contenido | ⬜ |
-| ACC-21 | 1.4.12 Espaciado de texto | Aplicar el marcador de espaciado de texto de WCAG | ⬜ |
-| ACC-22 | 1.4.13 Contenido al pasar el ratón | Tooltips descartables, persistentes y que no tapan | ⬜ |
-| ACC-23 | 2.3.3, 2.2.2 Movimiento | Con «reducir movimiento» no hay animaciones ni desplazamientos suaves | 🟡 |
-| ACC-24 | 2.5.5 / 2.5.8 Tamaño del objetivo | Ver MOV-02 | ⬜ |
+| ACC-19 | 1.4.3, 1.4.11 Contraste | Texto sobre la imagen de acceso con fotos claras y oscuras; bordes de campos | ✅ ver ACC-04; bordes de campos a 3:1 por tokens |
+| ACC-20 | 1.4.4, 1.4.10 Zoom y reflow | Zoom 200 % y 400 %; sin pérdida de contenido | ✅ ver MOV-11 |
+| ACC-21 | 1.4.12 Espaciado de texto | Aplicar el marcador de espaciado de texto de WCAG | ✅ espaciado de 1.4.12 a 360 y 1280 px: sin desbordes ni texto cortado del tema |
+| ACC-22 | 1.4.13 Contenido al pasar el ratón | Tooltips descartables, persistentes y que no tapan | ✅ solo tooltips del core (Bootstrap 5: se cierran con Esc y no desaparecen al pasar el ratón por encima) |
+| ACC-23 | 2.3.3, 2.2.2 Movimiento | Con «reducir movimiento» no hay animaciones ni desplazamientos suaves | ✅ con `prefers-reduced-motion` no hay animaciones, transiciones ni desplazamiento suave (también en `a11y.js`) |
+| ACC-24 | 2.5.5 / 2.5.8 Tamaño del objetivo | Ver MOV-02 | ✅ ver MOV-02 |
 | ACC-25 | 3.1.1, 3.1.2 Idioma | `lang` correcto; textos del tema traducidos | ✅ |
-| ACC-26 | 3.3.1, 3.3.3 Errores | Error de acceso anunciado por el lector y asociado al formulario | ⬜ |
-| ACC-27 | 1.3.4 Orientación | Sin bloqueo de orientación | ⬜ |
+| ACC-26 | 3.3.1, 3.3.3 Errores | Error de acceso anunciado por el lector y asociado al formulario | ✅ Behat de F1 (`role=alert` dentro del formulario) |
+| ACC-27 | 1.3.4 Orientación | Sin bloqueo de orientación | ✅ ver MOV-10 |
 | ACC-28 | 1.4.5 Imágenes de texto | Ninguna imagen del tema contiene texto | ✅ |
 
 ### 6.3 Tecnologías de apoyo
 
-| Id | Combinación | Recorrido |
-|---|---|---|
-| ACC-30 | NVDA + Firefox (Windows) | Acceso → área personal → abrir un curso → cambiar de modo |
-| ACC-31 | JAWS + Chrome (Windows) | Igual |
-| ACC-32 | VoiceOver + Safari (iOS) | Igual, con gestos; fila deslizable de tarjetas |
-| ACC-33 | TalkBack + Chrome (Android) | Igual |
-| ACC-34 | VoiceOver + Safari (macOS) | Igual |
-| ACC-35 | Modo de alto contraste de Windows (`forced-colors`) | Bordes y foco visibles; iconos presentes |
-| ACC-36 | Ampliador de pantalla al 400 % | Cabecera fija no tapa el contenido |
-| ACC-37 | Control por voz | Todos los controles tienen nombre visible que coincide con el accesible (2.5.3) |
+| Id | Combinación | Recorrido | Estado |
+|---|---|---|---|
+| ACC-30 | NVDA + Firefox (Windows) | Acceso → área personal → abrir un curso → cambiar de modo | ⬜ necesita una persona y el equipo; protocolo en [ACCESIBILIDAD.md](ACCESIBILIDAD.md) |
+| ACC-31 | JAWS + Chrome (Windows) | Igual | ⬜ necesita una persona y el equipo; protocolo en [ACCESIBILIDAD.md](ACCESIBILIDAD.md) |
+| ACC-32 | VoiceOver + Safari (iOS) | Igual, con gestos; fila deslizable de tarjetas | ⬜ necesita una persona y el equipo; protocolo en [ACCESIBILIDAD.md](ACCESIBILIDAD.md) |
+| ACC-33 | TalkBack + Chrome (Android) | Igual | ⬜ necesita una persona y el equipo; protocolo en [ACCESIBILIDAD.md](ACCESIBILIDAD.md) |
+| ACC-34 | VoiceOver + Safari (macOS) | Igual | ⬜ necesita una persona y el equipo; protocolo en [ACCESIBILIDAD.md](ACCESIBILIDAD.md) |
+| ACC-35 | Modo de alto contraste de Windows (`forced-colors`) | Bordes y foco visibles; iconos presentes | 🟡 emulado en Chrome (`forced-colors: active`); falta Windows real |
+| ACC-36 | Ampliador de pantalla al 400 % | Cabecera fija no tapa el contenido | ⬜ necesita una persona y el equipo; protocolo en [ACCESIBILIDAD.md](ACCESIBILIDAD.md) |
+| ACC-37 | Control por voz | Todos los controles tienen nombre visible que coincide con el accesible (2.5.3) | ⬜ necesita una persona y el equipo; protocolo en [ACCESIBILIDAD.md](ACCESIBILIDAD.md) |
 
 ### 6.4 Mejoras previstas
 
-- Preset **Alto contraste** (AAA, 7:1) y soporte de `forced-colors` y `prefers-contrast: more`.
-- Informe de contraste dentro de los ajustes (ADM-A4).
-- Declaración de accesibilidad del tema (`docs/ACCESIBILIDAD.md`) con el resultado de esta auditoría, las
-  limitaciones conocidas y la fecha.
+- ✅ Presets **Alto contraste** claro y oscuro (AAA, 7:1) y soporte de `forced-colors` y `prefers-contrast: more` (F3).
+- ✅ Informe de contraste dentro de los ajustes (ADM-A4, F2; desde F3 incluye el alto contraste).
+- ✅ Declaración de accesibilidad del tema: [ACCESIBILIDAD.md](ACCESIBILIDAD.md) (F3).
 
 **Criterio de aceptación:** ACC-01 a ACC-05 en CI; ACC-10 a ACC-28 en ✅; ACC-30 y ACC-32 completadas (mínimo
 un lector de escritorio y uno móvil); declaración publicada.
@@ -536,7 +535,7 @@ exista el formato; sin regresiones en COM-30.
 | **F0 · Cierre de hallazgos** | 0.1.1 alfa | H-01 a H-08; tests AUT-05, 06, 07, 09; CI en GitHub en verde (incluidos `mustache` y `grunt`) | CI verde en PHP 8.3 y 8.4; 0 hallazgos abiertos de gravedad media |
 | **F1 · Verificación base** ✅ 2026-11-18 | 0.2.0 alfa | Recorrido 2.2 completo en claro y oscuro; Behat AUT-01 a 04; regresión visual AUT-08; MOV-01 y MOV-02 automatizados; axe en CI (ACC-02) | FUN-01 a 17 en ✅; 0 infracciones graves de axe |
 | **F2 · Administración P1** ✅ 2026-11-19 | 0.5.0 beta | Nueva estructura de pestañas; ajustes P1 de marca, tipografía, formas, acceso, área personal, pie y avanzado; vista previa en vivo (ADM-X1 a X3); guía actualizada | ADM-V1 a V9 en ✅; migración desde 0.1.0 probada |
-| **F3 · Móvil y accesibilidad** | 0.7.0 beta | MOV-03 a 16 en dispositivos reales; ACC-10 a 37; preset de alto contraste; declaración de accesibilidad | Criterios de los apartados 3 y 6 cumplidos |
+| **F3 · Móvil y accesibilidad** 🟡 2026-11-22 (hecho todo lo automatizable; faltan las pruebas con personas y dispositivos) | 0.7.0 beta | MOV-03 a 16 en dispositivos reales; ACC-10 a 37; preset de alto contraste; declaración de accesibilidad | Criterios de los apartados 3 y 6 cumplidos |
 | **F4 · Seguridad y compatibilidad** | 0.9.0 RC | SEG-01 a 20 (incluido ZAP y revisión por pares); matriz de CI completa; navegadores; RTL; extensiones; rendimiento | Criterios de los apartados 5, 7 y 8 cumplidos; 0 defectos críticos o altos abiertos |
 | **F5 · Publicación** | 1.0.0 estable | Ajustes P2 que hayan entrado; `CHANGELOG`, `UPGRADING`, `SECURITY`; CSS precompilado; capturas y guía finales; envío al directorio de extensiones de Moodle | Dos semanas en un sitio piloto sin incidencias críticas |
 | Posterior | 1.x | Ajustes P3, barra inferior móvil, colores por categoría, asistente inicial | — |

@@ -74,6 +74,8 @@ final class options_test extends \basic_testcase {
             $palettes = options::palettes((object) ['palette' => $palette]);
             $this->assertSame([], tokens::audit($palettes['light']), "$palette light");
             $this->assertSame([], tokens::audit($palettes['dark']), "$palette dark");
+            $this->assertSame([], tokens::audit($palettes['light-high'], true), "$palette high contrast light");
+            $this->assertSame([], tokens::audit($palettes['dark-high'], true), "$palette high contrast dark");
             $this->assertNotContains('primary-light', $palettes['adjusted'], "$palette brand changed in light");
             $this->assertNotContains('accent-light', $palettes['adjusted'], "$palette accent changed in light");
         }

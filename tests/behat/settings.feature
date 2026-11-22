@@ -43,7 +43,7 @@ Feature: Theme settings, live preview and tools
   Scenario: Import, invalid import and restore from the tools page
     Given I log in as "admin"
     And I visit "/theme/customboost/tools.php"
-    And I should see "reach WCAG 2.1 AA"
+    And I should see "reach their minimum"
     When I set the field "Or paste its content" to "{\"format\":\"theme_customboost-settings\",\"settings\":{\"palette\":\"garnet\",\"radius\":\"triangle\",\"nope\":\"1\"}}"
     And I press "Import settings"
     Then I should see "Import finished: 1 changed"

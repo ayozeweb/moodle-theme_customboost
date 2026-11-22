@@ -24,3 +24,10 @@ Feature: Compact header on phones
     Then the page should not scroll horizontally in theme_customboost
     And I visit "/my/courses.php"
     And the page should not scroll horizontally in theme_customboost
+
+  Scenario: The edit mode switch stays usable on phones, with its name for screen readers
+    Given I change viewport size to "360x800"
+    When I log in as "admin"
+    Then ".editmode-switch-form .mds-switch-track" "css_element" should be visible
+    And ".ct-brand" "css_element" should be visible
+    And the page should not scroll horizontally in theme_customboost
