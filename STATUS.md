@@ -20,6 +20,7 @@ Report: `docs/informes/2026-11-22.md`.
     320 px; My courses sort button and quiz attempt table overflowing with text at 200 %.
   - Login image: brand chip at 1.9:1 over light photos, now on a dark fill (≥ 10:1); stronger top of the scrim.
   - Dark preset: overdue dates in mod_assign at 3.5:1 (literal colour in core).
+  - Hidden sticky footer (bulk editing bar) stayed in the Tab order off-screen; now visibility: hidden.
 - High contrast: presets "High contrast, light" and "dark" (7:1 text, AAA), also applied automatically with
   `prefers-contrast: more`; `forced-colors` support; contrast report with 196 pairs (four palettes).
 - Tooling: `tests/audit/stress.mjs` (text 200 %, WCAG text spacing, zoom, landscape); audit at 320-430 px; new
