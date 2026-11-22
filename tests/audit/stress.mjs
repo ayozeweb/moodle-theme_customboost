@@ -98,9 +98,9 @@ function measure() {
         if (!r.width || !r.height) {
             continue;
         }
-        // Hidden with the visually-hidden mixin on an ancestor: a 1 px box.
+        // Hidden with the visually-hidden mixin, on the element or an ancestor: a 1 px box.
         let tiny = false;
-        for (let a = el.parentElement; a && a !== document.body && !tiny; a = a.parentElement) {
+        for (let a = el; a && a !== document.body && !tiny; a = a.parentElement) {
             const ar = a.getBoundingClientRect();
             tiny = ar.width <= 1 || ar.height <= 1;
         }
